@@ -1,0 +1,289 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import {
+  Check,
+  ExternalLink,
+  Lock,
+  Plane,
+  Sparkles,
+  X,
+} from 'lucide-react';
+import { tripPackDays } from '@/data/tripPack';
+import { MINI_PACK_COUNT } from '@/data/miniPacks';
+import {
+  PREMIUM_PHRASE_COUNT,
+  PREMIUM_SCENE_HIGHLIGHTS,
+  PREMIUM_SITUATION_COUNT,
+} from '@/data/premiumSituations';
+import {
+  JAPAN_PRO_GUMROAD_URL,
+  JAPAN_PRO_PRICE_JPY_NOTE,
+  JAPAN_PRO_PRICE_USD,
+  TRIP_PACK_GUMROAD_URL,
+  TRIP_PACK_PRICE_JPY_NOTE,
+  TRIP_PACK_PRICE_USD,
+  type UnlockTier,
+} from '@/data/monetization';
+import { trackEvent } from '@/lib/analytics';
+import { verifyUnlockCode } from '@/lib/unlockClient';
+
+export type UnlockContext = 'hub' | 'day' | 'complete' | 'premium' | 'upsell';
+
+type UnlockModalProps = {
+  tier: UnlockTier;
+  context: UnlockContext;
+  daysUntilTrip?: number | null;
+  onClose: () => void;
+  onUnlock: (tier: UnlockTier) => void;
+};
+
+const TRIP_CONTEXT_COPY: Record<Exclude<UnlockContext, 'premium' | 'upsell'>, { title: string; titleJa: string; lead: string; leadJa: string }> = {
+  hub: {
+    title: 'Unlock the Full 7-Day Course',
+    titleJa: '7日間コースを解放',
+    lead: 'Day 1 is free. Get all 6 remaining guided lessons before your trip.',
+    leadJa: 'Day 1 は無料。残り6日分のレッスンをすべて使えます。',
+  },
+  day: {
+    title: 'This Lesson Is Locked',
+    titleJa: 'このレッスンはロック中',
+    lead: 'Days 2–7 unlock with the full course. Complete Day 1 free first.',
+    leadJa: 'Day 2〜7 はフルコース購入で解放。まず Day 1 を無料で。',
+  },
+  complete: {
+    title: 'Day 1 Complete!',
+    titleJa: 'Day 1 クリア！',
+    lead: 'You crushed Day 1. Unlock the rest to be fully trip-ready.',
+    leadJa: 'お疲れさまでした。残りのレッスンを解放して旅行準備を完了しましょう。',
+  },
+};
+
+const PRO_CONTEXT_COPY: Record<'premium' | 'upsell', { title: string; titleJa: string; lead: string; leadJa: string }> = {
+  premium: {
+    title: 'Unlock Japan Pro',
+    titleJa: 'Japan Pro を解放',
+    lead: `Full trip course, ${PREMIUM_SITUATION_COUNT} real Japan scenes (${PREMIUM_SCENE_HIGHLIGHTS.slice(0, 4).join(', ')} & more), plus ${MINI_PACK_COUNT} guided mini courses.`,
+    leadJa: `7日コース + 実シーン${PREMIUM_SITUATION_COUNT}種 + ガイド付きミニコース${MINI_PACK_COUNT}本`,
+  },
+  upsell: {
+    title: 'Upgrade to Japan Pro',
+    titleJa: 'Japan Pro にアップグレード',
+    lead: `Trip course unlocked! Add ${PREMIUM_SITUATION_COUNT} scene packs + ${MINI_PACK_COUNT} guided mini courses with roleplay.`,
+    leadJa: `旅行コース解放済み。実シーン${PREMIUM_SITUATION_COUNT}種 + ロールプレイ付きミニコース${MINI_PACK_COUNT}本を追加。`,
+  },
+};
+
+const TRIP_FEATURES = [
+  { en: '6 more guided lessons (~15 min each)', ja: '6日分のガイド付きレッスン' },
+  { en: '90 more phrases · 30 roleplays · 48 quiz Qs', ja: '90フレーズ · ロールプレイ30 · クイズ48問' },
+  { en: 'Offline cheat sheet', ja: 'オフライン・チートシート' },
+];
+
+const PRO_FEATURES = [
+  { en: 'Everything in 7-Day Trip Course', ja: '7日間コースすべて含む' },
+  { en: `${PREMIUM_SITUATION_COUNT} real scenes · ${PREMIUM_PHRASE_COUNT} phrases`, ja: `実シーン${PREMIUM_SITUATION_COUNT}種 · ${PREMIUM_PHRASE_COUNT}語` },
+  { en: `${MINI_PACK_COUNT} guided mini courses with roleplay & quiz`, ja: `ロールプレイ付きミニコース${MINI_PACK_COUNT}本` },
+];
+
+const day2Preview = tripPackDays.find((d) => d.dayNumber === 2);
+
+export default function UnlockModal({
+  tier,
+  context,
+  daysUntilTrip,
+  onClose,
+  onUnlock,
+}: UnlockModalProps) {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const isPro = tier === 'pro';
+  const price = isPro ? JAPAN_PRO_PRICE_USD : TRIP_PACK_PRICE_USD;
+  const priceNote = isPro ? JAPAN_PRO_PRICE_JPY_NOTE : TRIP_PACK_PRICE_JPY_NOTE;
+  const gumroadUrl = isPro ? JAPAN_PRO_GUMROAD_URL : TRIP_PACK_GUMROAD_URL;
+  const features = isPro ? PRO_FEATURES : TRIP_FEATURES;
+
+  const copy =
+    isPro && (context === 'premium' || context === 'upsell')
+      ? PRO_CONTEXT_COPY[context]
+      : TRIP_CONTEXT_COPY[context as keyof typeof TRIP_CONTEXT_COPY] ?? TRIP_CONTEXT_COPY.hub;
+
+  useEffect(() => {
+    trackEvent('unlock_modal_shown', { tier, context });
+  }, [tier, context]);
+
+  const handleGumroadClick = () => {
+    trackEvent('gumroad_click', { tier, context });
+  };
+
+  const handleUnlock = async () => {
+    setLoading(true);
+    setError('');
+    const result = await verifyUnlockCode(code);
+    setLoading(false);
+
+    if (!result.ok) {
+      setError(result.error);
+      trackEvent('unlock_failed', { tier, context });
+      return;
+    }
+
+    if ('tier' in result) {
+      trackEvent('unlock_success', { tier: result.tier, context });
+      onUnlock(result.tier);
+      return;
+    }
+
+    setError('Enter a Trip or Pro unlock code.');
+  };
+
+  const showTripUrgency = !isPro && daysUntilTrip !== null && daysUntilTrip !== undefined && daysUntilTrip >= 0;
+  const showDay2Preview = !isPro && (context === 'complete' || context === 'hub') && day2Preview;
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] bg-slate-950/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-3xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden max-h-[calc(100dvh-2rem)] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className={`flex-shrink-0 px-5 py-5 text-white relative ${
+            isPro
+              ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600'
+              : 'bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            className="no-press absolute top-3 right-3 p-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3">
+            {isPro ? <Sparkles className="w-6 h-6 text-white" /> : <Lock className="w-6 h-6 text-white" />}
+          </div>
+          <h3 className="text-lg font-black leading-tight pr-6">{copy.title}</h3>
+          <p className="text-[11px] font-semibold text-white/80 mt-0.5">{copy.titleJa}</p>
+          <div className="mt-3 flex items-baseline gap-2 flex-wrap">
+            <span className="text-2xl font-black">{price}</span>
+            <span className="text-[11px] font-bold text-white/80">one-time · {priceNote}</span>
+          </div>
+          <p className="text-[10px] font-semibold text-white/70 mt-1.5">No subscription · Pay once, keep forever</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {showTripUrgency && (
+            <div className="flex items-center gap-3 rounded-2xl bg-indigo-50 border border-indigo-100 px-3.5 py-3">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                <Plane className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-xs font-black text-indigo-900">
+                  {daysUntilTrip === 0
+                    ? 'Your trip starts today!'
+                    : `${daysUntilTrip} day${daysUntilTrip === 1 ? '' : 's'} until Japan`}
+                </p>
+                <p className="text-[10px] font-semibold text-indigo-600/80 mt-0.5">
+                  {daysUntilTrip === 0
+                    ? '今日から日本！残りレッスンを今すぐ'
+                    : `来日まであと${daysUntilTrip}日 · 残り6日分を解放`}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs font-bold text-slate-700 leading-snug">{copy.lead}</p>
+          <p className="text-[10px] font-semibold text-slate-400 leading-snug -mt-2">{copy.leadJa}</p>
+
+          {showDay2Preview && day2Preview && (
+            <div className="relative rounded-2xl border border-slate-200 overflow-hidden">
+              <div className="absolute inset-0 backdrop-blur-[2px] bg-white/40 z-10 flex items-center justify-center">
+                <span className="text-[10px] font-black text-indigo-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm">
+                  Preview · Day 2 locked
+                </span>
+              </div>
+              <div className={`bg-gradient-to-br ${day2Preview.accent} p-3.5 text-white opacity-90`}>
+                <p className="text-[9px] font-black uppercase tracking-wider text-white/70">Up next · Day 2</p>
+                <p className="text-sm font-black mt-0.5">{day2Preview.titleEn}</p>
+                <p className="text-[10px] font-semibold text-white/80">{day2Preview.goalEn}</p>
+              </div>
+            </div>
+          )}
+
+          <ul className="space-y-2">
+            {features.map((item) => (
+              <li key={item.en} className="flex items-start gap-2">
+                <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[11px] font-bold text-slate-700 leading-snug">{item.en}</p>
+                  <p className="text-[9px] font-semibold text-slate-400 mt-0.5">{item.ja}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {gumroadUrl ? (
+            <a
+              href={gumroadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleGumroadClick}
+              className="btn-press pressable flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black text-sm shadow-lg shadow-indigo-200"
+            >
+              Buy on Gumroad
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          ) : (
+            <div className="rounded-xl bg-amber-50 border border-amber-100 px-3 py-2.5 text-[10px] font-semibold text-amber-800 text-center">
+              Store link coming soon — use your unlock code below
+            </div>
+          )}
+
+          <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5 text-center space-y-0.5">
+            <p className="text-[10px] font-bold text-slate-600 leading-snug">
+              Already purchased? Enter the same code on any device.
+            </p>
+            <p className="text-[9px] font-semibold text-slate-400 leading-snug">
+              別の端末でも、購入時のコードを再入力すれば復元できます
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-1 border-t border-slate-100">
+            <p className="text-[10px] font-bold text-slate-500">
+              Enter your unlock code
+              <span className="block text-slate-400 font-semibold">購入後に届くコードを入力</span>
+            </p>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError('');
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && !loading && handleUnlock()}
+              placeholder="Unlock code"
+              disabled={loading}
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+            />
+            {error && <p className="text-xs text-red-500 font-bold text-center">{error}</p>}
+            <button
+              type="button"
+              onClick={handleUnlock}
+              disabled={loading || !code.trim()}
+              className="btn-press w-full py-3 rounded-2xl bg-slate-900 text-white font-extrabold text-sm disabled:opacity-50"
+            >
+              {loading ? 'Checking…' : 'Unlock'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

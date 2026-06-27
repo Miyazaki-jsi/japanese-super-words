@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-plus-jakarta);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -55,6 +56,154 @@ body {
   animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+@keyframes stepExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+}
+
+@keyframes stepEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes stepBridgeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes stepBridgePulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.animate-step-exit {
+  animation: stepExit 0.32s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.animate-step-enter {
+  animation: stepEnter 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-step-bridge {
+  animation: stepBridgeIn 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-step-bridge-ring {
+  animation: stepBridgePulse 2s ease-out forwards;
+}
+
+@keyframes contentSwap {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-content-swap {
+  animation: contentSwap 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes introFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+.animate-intro-float {
+  animation: introFloat 2.6s ease-in-out infinite;
+}
+
+/* Soft "ふわっ" press — all buttons & pressable surfaces */
+button:not(:disabled):not(.no-press),
+[role="button"]:not([aria-disabled="true"]):not(.no-press),
+.pressable:not(.no-press):not(:disabled) {
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.45, 0.64, 1),
+    box-shadow 0.3s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  button:not(:disabled):not(.no-press):hover,
+  [role="button"]:not([aria-disabled="true"]):not(.no-press):hover,
+  .pressable:not(.no-press):not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+button:not(:disabled):not(.no-press):active,
+[role="button"]:not([aria-disabled="true"]):not(.no-press):active,
+.pressable:not(.no-press):not(:disabled):active {
+  transform: scale(0.93) translateY(2px);
+  transition-duration: 0.1s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@media (hover: hover) {
+  button:not(:disabled):not(.no-press):active:hover,
+  [role="button"]:not([aria-disabled="true"]):not(.no-press):active:hover,
+  .pressable:not(.no-press):not(:disabled):active:hover {
+    transform: scale(0.93) translateY(2px);
+  }
+}
+
+/* Small icon taps — gentle pop instead of squish */
+.icon-pop:not(:disabled):active {
+  transform: scale(1.18);
+  transition-duration: 0.15s;
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-press {
+  /* alias — global button styles apply automatically */
+}
+
 @keyframes starPop {
   0% {
     transform: scale(1);
@@ -88,4 +237,338 @@ body {
 .animate-card-slide {
   animation: cardSlide 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
   perspective: 1000px;
+}
+
+/* SUPER TEST ruby (furigana) */
+.super-test-ruby,
+.ruby-text {
+  ruby-align: center;
+}
+
+.super-test-ruby rt,
+.ruby-text rt {
+  font-size: 0.38em;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+}
+
+.roleplay-ruby rt {
+  font-size: 0.42em;
+  color: #64748b;
+}
+
+/* Situation word list — compact furigana above kanji */
+.word-list-ruby {
+  display: block;
+  ruby-align: center;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.word-list-ruby rt {
+  font-size: 0.44em;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Pack card sparkle frame */
+@keyframes packBorderShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes packShineSweep {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(220%) skewX(-18deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(220%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes packGlowPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgba(99, 102, 241, 0.35),
+      0 0 20px rgba(139, 92, 246, 0.18),
+      0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 16px rgba(99, 102, 241, 0.5),
+      0 0 30px rgba(167, 139, 250, 0.3),
+      0 4px 20px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.pack-card-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 72%;
+  max-width: 17rem;
+  scroll-snap-align: start;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(
+    120deg,
+    rgba(99, 102, 241, 0.55),
+    rgba(139, 92, 246, 0.95),
+    rgba(245, 158, 11, 0.8),
+    rgba(236, 72, 153, 0.75),
+    rgba(14, 165, 233, 0.7),
+    rgba(99, 102, 241, 0.55)
+  );
+  background-size: 280% 280%;
+  animation:
+    packBorderShimmer 2.8s ease-in-out infinite,
+    packGlowPulse 2.4s ease-in-out infinite;
+}
+
+.pack-card-wrap--featured {
+  padding: 2.5px;
+  background: linear-gradient(
+    120deg,
+    rgba(79, 70, 229, 0.65),
+    rgba(124, 58, 237, 1),
+    rgba(192, 132, 252, 0.9),
+    rgba(99, 102, 241, 0.95),
+    rgba(79, 70, 229, 0.65)
+  );
+  background-size: 280% 280%;
+}
+
+.pack-card-wrap--plan {
+  width: 100%;
+  max-width: none;
+  scroll-snap-align: unset;
+}
+
+.pack-card-wrap--hatsumode {
+  background: linear-gradient(
+    120deg,
+    rgba(225, 29, 72, 0.55),
+    rgba(244, 63, 94, 0.95),
+    rgba(251, 146, 60, 0.85),
+    rgba(225, 29, 72, 0.55)
+  );
+  background-size: 280% 280%;
+}
+
+.pack-card-wrap--arrival_24h {
+  background: linear-gradient(
+    120deg,
+    rgba(14, 165, 233, 0.55),
+    rgba(59, 130, 246, 0.95),
+    rgba(96, 165, 250, 0.85),
+    rgba(14, 165, 233, 0.55)
+  );
+  background-size: 280% 280%;
+}
+
+.pack-card-wrap--night_japan {
+  background: linear-gradient(
+    120deg,
+    rgba(79, 70, 229, 0.55),
+    rgba(124, 58, 237, 0.95),
+    rgba(167, 139, 250, 0.85),
+    rgba(79, 70, 229, 0.55)
+  );
+  background-size: 280% 280%;
+}
+
+.pack-card-wrap--foodie {
+  background: linear-gradient(
+    120deg,
+    rgba(249, 115, 22, 0.55),
+    rgba(245, 158, 11, 0.95),
+    rgba(250, 204, 21, 0.85),
+    rgba(249, 115, 22, 0.55)
+  );
+  background-size: 280% 280%;
+}
+
+.pack-card-wrap--premium {
+  background: linear-gradient(
+    120deg,
+    rgba(217, 119, 6, 0.55),
+    rgba(245, 158, 11, 0.95),
+    rgba(250, 204, 21, 0.85),
+    rgba(217, 119, 6, 0.55)
+  );
+  background-size: 280% 280%;
+}
+
+.pack-card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: calc(1rem - 2px);
+}
+
+.pack-card-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.pack-card-shine::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+  animation: packShineSweep 2.6s ease-in-out infinite;
+}
+
+@keyframes situationPremiumBreathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.situation-premium-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255, 255, 255, 0.28), transparent 58%),
+    radial-gradient(ellipse 70% 45% at 85% 110%, rgba(251, 191, 36, 0.07), transparent 52%);
+  animation: situationPremiumBreathe 5.5s ease-in-out infinite;
+}
+
+.lesson-start-btn-wrap {
+  padding: 2px;
+  border-radius: 1rem;
+  background: linear-gradient(
+    120deg,
+    rgba(129, 140, 248, 0.85),
+    rgba(255, 255, 255, 1),
+    rgba(165, 180, 252, 0.95),
+    rgba(255, 255, 255, 1),
+    rgba(129, 140, 248, 0.85)
+  );
+  background-size: 280% 280%;
+  animation: packBorderShimmer 2.6s ease-in-out infinite;
+}
+
+.lesson-start-btn {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: calc(1rem - 2px);
+}
+
+.lesson-start-btn-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.lesson-start-btn-shine::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.08),
+    rgba(139, 92, 246, 0.28),
+    rgba(99, 102, 241, 0.08),
+    transparent
+  );
+  animation: packShineSweep 2.4s ease-in-out infinite;
+}
+
+@keyframes superTestIntroProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-super-test-intro-progress {
+  animation: superTestIntroProgress 3.5s linear forwards;
+}
+
+@keyframes superTestIntroExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+.animate-super-test-intro-exit {
+  animation: superTestIntroExit 0.45s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes superTestEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-super-test-enter {
+  animation: superTestEnter 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

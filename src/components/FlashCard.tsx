@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { WordCard } from '@/data/words';
-import { CheckCircle, HelpCircle, RefreshCw, Star } from 'lucide-react';
+import { getSituationLabel } from '@/data/situationLabels';
+import { speakJapanese } from '@/lib/speakJapanese';
+import { CheckCircle, HelpCircle, RefreshCw, Star, Volume2 } from 'lucide-react';
 
 interface FlashCardProps {
   card: WordCard;
@@ -11,25 +13,6 @@ interface FlashCardProps {
   onToggleLearned: (id: string, learned: boolean) => void;
   onToggleFavorite: (id: string, favorite: boolean) => void;
 }
-
-const getSituationLabel = (id: string) => {
-  switch (id) {
-    case 'ramen_shop':
-      return 'ラーメン屋';
-    case 'convenience_store':
-      return 'コンビニ';
-    case 'greetings':
-      return '挨拶';
-    case 'hospital':
-      return '病院';
-    case 'train_station':
-      return '駅';
-    case 'izakaya':
-      return '居酒屋';
-    default:
-      return id;
-  }
-};
 
 export default function FlashCard({
   card,
@@ -40,23 +23,29 @@ export default function FlashCard({
 }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [animateStar, setAnimateStar] = useState(false);
+  const situationLabel = getSituationLabel(card.situation);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
   };
 
   const handleButtonClick = (e: React.MouseEvent, learned: boolean) => {
-    e.stopPropagation(); // Prevent card from flipping when clicking buttons
+    e.stopPropagation();
     onToggleLearned(card.id, learned);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card from flipping when starring
+    e.stopPropagation();
     setAnimateStar(true);
     onToggleFavorite(card.id, !isFavorite);
     setTimeout(() => {
       setAnimateStar(false);
     }, 350);
+  };
+
+  const handleListen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    speakJapanese(card.reading || card.japanese);
   };
 
   return (
@@ -71,28 +60,39 @@ export default function FlashCard({
       >
         {/* Front Side (Japanese) */}
         <div className="absolute inset-0 w-full h-full p-6 bg-white rounded-2xl shadow-md border border-slate-100 backface-hidden flex flex-col justify-between hover:shadow-lg transition-shadow duration-300">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full tracking-wider">
-                {getSituationLabel(card.situation)}
+          <div className="flex justify-between items-start gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full tracking-wider truncate max-w-[7rem]">
+                {situationLabel.en}
               </span>
               <button
                 onClick={handleFavoriteClick}
-                className="p-1 rounded-full hover:bg-slate-50 transition-colors"
+                className="no-press p-1 rounded-full hover:bg-slate-50 transition-colors flex-shrink-0"
                 title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
               >
                 <Star
-                  className={`w-5 h-5 transition-transform ${
-                    animateStar ? 'animate-star-pop' : 'active:scale-125'
+                  className={`w-5 h-5 icon-pop ${
+                    animateStar ? 'animate-star-pop' : ''
                   } ${
                     isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300 hover:text-amber-400'
                   }`}
                 />
               </button>
             </div>
-            <div className="flex items-center gap-1 text-slate-400 group-hover:text-indigo-500 transition-colors">
-              <span className="text-[10px] font-medium">Tap to flip</span>
-              <RefreshCw className="w-3 h-3 animate-pulse" />
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <button
+                type="button"
+                onClick={handleListen}
+                className="no-press flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-[10px] font-bold transition-colors"
+                aria-label="Listen"
+              >
+                <Volume2 className="w-3.5 h-3.5" />
+                Listen
+              </button>
+              <div className="hidden sm:flex items-center gap-1 text-slate-400 group-hover:text-indigo-500 transition-colors">
+                <span className="text-[10px] font-medium">Flip</span>
+                <RefreshCw className="w-3 h-3 animate-pulse" />
+              </div>
             </div>
           </div>
 
@@ -111,7 +111,7 @@ export default function FlashCard({
           <div className="flex justify-between gap-3 pt-4 border-t border-slate-50">
             <button
               onClick={(e) => handleButtonClick(e, false)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.97] ${
+              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
                 !isLearned
                   ? 'bg-amber-50 text-amber-600 border border-amber-200'
                   : 'bg-slate-50 text-slate-400 hover:bg-amber-50 hover:text-amber-600 border border-transparent'
@@ -124,7 +124,7 @@ export default function FlashCard({
             </button>
             <button
               onClick={(e) => handleButtonClick(e, true)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.97] ${
+              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
                 isLearned
                   ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
                   : 'bg-slate-50 text-slate-600 hover:bg-emerald-500 hover:text-white border border-slate-100'
@@ -140,28 +140,33 @@ export default function FlashCard({
 
         {/* Back Side (English) */}
         <div className="absolute inset-0 w-full h-full p-6 bg-slate-900 rounded-2xl shadow-md backface-hidden rotate-y-180 flex flex-col justify-between text-white hover:shadow-lg transition-shadow duration-300">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start gap-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold px-2.5 py-1 bg-slate-800 text-slate-300 rounded-full tracking-wider">
                 Translation
               </span>
               <button
                 onClick={handleFavoriteClick}
-                className="p-1 rounded-full hover:bg-slate-800 transition-colors"
+                className="no-press p-1 rounded-full hover:bg-slate-800 transition-colors"
               >
                 <Star
-                  className={`w-5 h-5 transition-transform ${
-                    animateStar ? 'animate-star-pop' : 'active:scale-125'
+                  className={`w-5 h-5 icon-pop ${
+                    animateStar ? 'animate-star-pop' : ''
                   } ${
                     isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-500 hover:text-amber-400'
                   }`}
                 />
               </button>
             </div>
-            <div className="flex items-center gap-1 text-slate-500 group-hover:text-indigo-400 transition-colors">
-              <span className="text-[10px] font-medium">Tap to flip</span>
-              <RefreshCw className="w-3 h-3" />
-            </div>
+            <button
+              type="button"
+              onClick={handleListen}
+              className="no-press flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-800 text-indigo-300 hover:bg-slate-700 text-[10px] font-bold"
+              aria-label="Listen"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+              Listen
+            </button>
           </div>
 
           <div className="flex-1 flex flex-col justify-center items-center text-center px-4">
@@ -174,7 +179,7 @@ export default function FlashCard({
           <div className="flex justify-between gap-3 pt-4 border-t border-slate-800">
             <button
               onClick={(e) => handleButtonClick(e, false)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.97] ${
+              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
                 !isLearned
                   ? 'bg-amber-500 text-white shadow-sm shadow-amber-200'
                   : 'bg-slate-800 text-slate-400 hover:bg-amber-500 hover:text-white'
@@ -187,7 +192,7 @@ export default function FlashCard({
             </button>
             <button
               onClick={(e) => handleButtonClick(e, true)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.97] ${
+              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
                 isLearned
                   ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-850'
                   : 'bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white'

@@ -1,0 +1,173 @@
+import type { SituationId } from './words';
+
+export type GrammarQuestion = {
+  id: string;
+  situation?: SituationId;
+  sentenceBefore: string;
+  sentenceAfter: string;
+  correct: string;
+  distractors: [string, string];
+};
+
+export const phraseCheckGrammarQuestions: GrammarQuestion[] = [
+  {
+    id: 'g1',
+    situation: 'train_station',
+    sentenceBefore: '駅は',
+    sentenceAfter: 'ですか。',
+    correct: 'どこ',
+    distractors: ['だれ', 'いつ'],
+  },
+  {
+    id: 'g2',
+    situation: 'convenience_store',
+    sentenceBefore: 'これを',
+    sentenceAfter: 'ください。',
+    correct: '一つ',
+    distractors: ['どこ', 'だれ'],
+  },
+  {
+    id: 'g3',
+    situation: 'hotel',
+    sentenceBefore: 'チェックインを',
+    sentenceAfter: 'ください。',
+    correct: 'お願いします',
+    distractors: ['ありがとう', 'すみません'],
+  },
+  {
+    id: 'g4',
+    situation: 'ramen_shop',
+    sentenceBefore: 'ラーメン',
+    sentenceAfter: 'ください。',
+    correct: 'を一つ',
+    distractors: ['が二つ', 'はどこ'],
+  },
+  {
+    id: 'g5',
+    situation: 'izakaya',
+    sentenceBefore: 'ビール',
+    sentenceAfter: 'ください。',
+    correct: 'を二つ',
+    distractors: ['が一つ', 'はいくら'],
+  },
+  {
+    id: 'g6',
+    situation: 'taxi',
+    sentenceBefore: 'この住所',
+    sentenceAfter: 'お願いします。',
+    correct: 'まで',
+    distractors: ['から', 'より'],
+  },
+  {
+    id: 'g7',
+    situation: 'coffee_shop',
+    sentenceBefore: 'ホットコーヒー',
+    sentenceAfter: 'ください。',
+    correct: 'を一つ',
+    distractors: ['が二つ', 'はどこ'],
+  },
+  {
+    id: 'g8',
+    situation: 'airport_immigration',
+    sentenceBefore: '観光',
+    sentenceAfter: '来ました。',
+    correct: 'で',
+    distractors: ['を', 'に'],
+  },
+  {
+    id: 'g9',
+    situation: 'pharmacy',
+    sentenceBefore: '頭が',
+    sentenceAfter: 'ます。',
+    correct: '痛い',
+    distractors: ['痛く', '痛み'],
+  },
+  {
+    id: 'g10',
+    situation: 'koban',
+    sentenceBefore: '財布を',
+    sentenceAfter: 'ました。',
+    correct: 'なくし',
+    distractors: ['ない', 'なくて'],
+  },
+  {
+    id: 'g11',
+    situation: 'sushi_shop',
+    sentenceBefore: 'おすすめ',
+    sentenceAfter: '何ですか。',
+    correct: 'は',
+    distractors: ['を', 'が'],
+  },
+  {
+    id: 'g12',
+    situation: 'don_quijote',
+    sentenceBefore: '免税',
+    sentenceAfter: 'できますか。',
+    correct: 'は',
+    distractors: ['を', 'に'],
+  },
+  {
+    id: 'g13',
+    situation: 'greetings',
+    sentenceBefore: 'よろしく',
+    sentenceAfter: 'お願いします。',
+    correct: 'お',
+    distractors: ['を', 'に'],
+  },
+  {
+    id: 'g14',
+    situation: 'train_station',
+    sentenceBefore: '新宿',
+    sentenceAfter: '行きたいです。',
+    correct: 'に',
+    distractors: ['を', 'で'],
+  },
+  {
+    id: 'g15',
+    situation: 'convenience_store',
+    sentenceBefore: 'レシートは',
+    sentenceAfter: '要りません。',
+    correct: '不',
+    distractors: ['無', '非'],
+  },
+  {
+    id: 'g16',
+    situation: 'hotel',
+    sentenceBefore: '朝食は',
+    sentenceAfter: 'からですか。',
+    correct: '何時',
+    distractors: ['どこ', 'だれ'],
+  },
+  {
+    id: 'g17',
+    situation: 'izakaya',
+    sentenceBefore: 'お会計',
+    sentenceAfter: 'お願いします。',
+    correct: 'を',
+    distractors: ['が', 'は'],
+  },
+  {
+    id: 'g18',
+    situation: 'rainy_day',
+    sentenceBefore: '傘を',
+    sentenceAfter: 'もらえますか。',
+    correct: '借りて',
+    distractors: ['借り', '借りた'],
+  },
+  {
+    id: 'g19',
+    situation: 'ticket_machine',
+    sentenceBefore: '大人',
+    sentenceAfter: '一枚お願いします。',
+    correct: 'の',
+    distractors: ['を', 'が'],
+  },
+  {
+    id: 'g20',
+    situation: 'lost_emergency',
+    sentenceBefore: '助けて',
+    sentenceAfter: '！',
+    correct: 'ください',
+    distractors: ['ます', 'います'],
+  },
+];
