@@ -21,6 +21,7 @@ export default function MiniPackUnlockModal({ pack, onClose, onUnlock }: MiniPac
   const [loading, setLoading] = useState(false);
   const [codeFocused, setCodeFocused] = useState(false);
   const codeInputRef = useRef<HTMLInputElement>(null);
+  const ignoreBackdropCloseRef = useRef(false);
   const { height: viewportHeight, offsetTop } = useVisualViewport();
 
   const gumroadUrl = MINI_PACK_GUMROAD_URLS[pack.id];
@@ -65,14 +66,21 @@ export default function MiniPackUnlockModal({ pack, onClose, onUnlock }: MiniPac
   };
 
   const handleCodeFocus = () => {
+    ignoreBackdropCloseRef.current = true;
     setCodeFocused(true);
     window.setTimeout(() => {
-      codeInputRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    }, 100);
+      ignoreBackdropCloseRef.current = false;
+    }, 500);
   };
 
   const handleCodeBlur = () => {
     window.setTimeout(() => setCodeFocused(false), 200);
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    if (ignoreBackdropCloseRef.current || codeFocused) return;
+    onClose();
   };
 
   const compactEntry = codeFocused;
@@ -132,12 +140,10 @@ export default function MiniPackUnlockModal({ pack, onClose, onUnlock }: MiniPac
         top: offsetTop,
         height: viewportHeight || undefined,
       }}
-      onClick={onClose}
+      onClick={handleBackdropClick}
     >
       <div
-        className={`bg-white rounded-3xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden flex flex-col ${
-          compactEntry ? 'self-center' : 'self-end sm:self-center max-h-full'
-        }`}
+        className="bg-white rounded-3xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden flex flex-col self-end sm:self-center max-h-full"
         style={{
           maxHeight: viewportHeight ? `${Math.max(200, viewportHeight - 32)}px` : 'calc(100dvh - 2rem)',
         }}
