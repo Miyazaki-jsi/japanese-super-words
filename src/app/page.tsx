@@ -2023,9 +2023,7 @@ export default function Home() {
                   className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm hover:border-red-100 hover:shadow-md transition-all pressable"
                 >
                   <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-                    <span className="text-white text-sm font-black" aria-hidden>
-                      ▶
-                    </span>
+                    <YoutubeIcon className="w-5 h-5 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-black text-slate-900 leading-tight">

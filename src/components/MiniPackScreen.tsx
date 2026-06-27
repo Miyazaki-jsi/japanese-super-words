@@ -431,38 +431,88 @@ export default function MiniPackScreen({
               <RubyText japanese={turn.staffLine} reading={turn.staffReading} className="text-[13px] font-bold text-slate-500 mt-1" />
             </div>
           </div>
-          <div className="space-y-1.5">
-            {turn.choices.map((choice, i) => {
-              const isSelected = selectedRoleplay === i;
-              const showResult = selectedRoleplay !== null;
-              let style = 'border border-slate-200 bg-white';
-              if (showResult && isSelected) {
-                style = choice.correct ? 'border-emerald-400 bg-emerald-50' : 'border-red-300 bg-red-50';
-              } else if (showResult && choice.correct) {
-                style = 'border-emerald-300 bg-emerald-50/70';
-              }
-              return (
-                <button
-                  key={choice.label}
-                  type="button"
-                  disabled={selectedRoleplay !== null}
-                  onClick={() => {
-                    setSelectedRoleplay(i);
-                    setRoleplayDone(true);
-                  }}
-                  className={`btn-press w-full text-left rounded-xl px-3 py-2.5 ${style}`}
-                >
-                  <p className="text-[13px] font-bold text-slate-800">{choice.label}</p>
-                  {choice.sublabel && <p className="text-[9px] text-slate-400 font-mono">{choice.sublabel}</p>}
-                  {isSelected && (
-                    <p className={`text-[10px] font-bold mt-1 ${choice.correct ? 'text-emerald-700' : 'text-red-600'}`}>
-                      {choice.feedback}
-                    </p>
-                  )}
-                </button>
-              );
-            })}
+          <div className="pt-1">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-slate-600">Your reply</p>
+              <span className="text-[9px] font-bold text-slate-400">あなたの返答</span>
+            </div>
+            <div className="space-y-1.5">
+              {turn.choices.map((choice, i) => {
+                const isSelected = selectedRoleplay === i;
+                const showResult = selectedRoleplay !== null;
+                const selectedChoice = selectedRoleplay !== null ? turn.choices[selectedRoleplay] : null;
+                const pickedWrong = showResult && selectedChoice !== null && !selectedChoice.correct;
+                const choiceLetter = String.fromCharCode(65 + i);
+                let style =
+                  'border border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/30';
+                if (showResult && isSelected) {
+                  style = choice.correct
+                    ? 'border-emerald-400 bg-emerald-50'
+                    : 'border-red-300 bg-red-50';
+                } else if (showResult && choice.correct) {
+                  style = 'border-emerald-300 bg-emerald-50/70';
+                } else if (showResult) {
+                  style = 'border-slate-100 bg-slate-50 opacity-55';
+                }
+                const showFeedback =
+                  isSelected || (showResult && choice.correct && pickedWrong);
+                return (
+                  <button
+                    key={choice.label}
+                    type="button"
+                    disabled={selectedRoleplay !== null}
+                    onClick={() => {
+                      setSelectedRoleplay(i);
+                      setRoleplayDone(true);
+                    }}
+                    className={`btn-press w-full text-left rounded-xl px-3 py-2.5 flex items-start gap-2.5 ${style} disabled:cursor-default`}
+                  >
+                    <span
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 ${
+                        showResult && isSelected && choice.correct
+                          ? 'bg-emerald-500 text-white'
+                          : showResult && isSelected && !choice.correct
+                            ? 'bg-red-400 text-white'
+                            : showResult && choice.correct
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {showResult && isSelected && choice.correct ? (
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      ) : showResult && isSelected && !choice.correct ? (
+                        <XCircle className="w-3.5 h-3.5" />
+                      ) : showResult && choice.correct ? (
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      ) : (
+                        choiceLetter
+                      )}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-bold text-slate-800 leading-snug">{choice.label}</p>
+                      {choice.sublabel && (
+                        <p className="text-[9px] text-slate-400 font-mono mt-0.5">{choice.sublabel}</p>
+                      )}
+                      {showFeedback && (
+                        <p
+                          className={`text-[10px] font-bold mt-1.5 leading-snug ${
+                            choice.correct ? 'text-emerald-700' : 'text-red-600'
+                          }`}
+                        >
+                          {choice.feedback}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+          {roleplayDone && selectedRoleplay !== null && !turn.choices[selectedRoleplay].correct && (
+            <p className="text-[10px] font-semibold text-slate-500 text-center">
+              正解は緑のチェックマークで表示されています
+            </p>
+          )}
           {roleplayDone && (
             <button
               type="button"
