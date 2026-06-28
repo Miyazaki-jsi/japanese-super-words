@@ -2162,6 +2162,28 @@ export const tripPackDays: TripPackDay[] = [
   },
 ];
 
+const paidTripDays = tripPackDays.filter((day) => day.dayNumber > 1);
+
+export const TRIP_PACK_PAID_DAY_COUNT = paidTripDays.length;
+export const TRIP_PACK_FIRST_PAID_DAY = paidTripDays[0]?.dayNumber ?? 2;
+export const TRIP_PACK_LAST_DAY_NUMBER = tripPackDays[tripPackDays.length - 1]?.dayNumber ?? 7;
+export const TRIP_PACK_PAID_DAY_LABEL = paidTripDays.length
+  ? `Days ${paidTripDays[0].dayNumber}–${paidTripDays[paidTripDays.length - 1].dayNumber}`
+  : 'Days 2–7';
+
+export const TRIP_PACK_TOTAL_PHRASE_COUNT = tripPackDays.reduce((sum, day) => sum + day.wordIds.length, 0);
+export const TRIP_PACK_TOTAL_ROLEPLAY_COUNT = tripPackDays.reduce(
+  (sum, day) => sum + day.roleplays.length,
+  0,
+);
+export const TRIP_PACK_TOTAL_QUIZ_COUNT = tripPackDays.reduce((sum, day) => sum + day.quizCount, 0);
+export const TRIP_PACK_PAID_PHRASE_COUNT = paidTripDays.reduce((sum, day) => sum + day.wordIds.length, 0);
+export const TRIP_PACK_PAID_ROLEPLAY_COUNT = paidTripDays.reduce(
+  (sum, day) => sum + day.roleplays.length,
+  0,
+);
+export const TRIP_PACK_PAID_QUIZ_COUNT = paidTripDays.reduce((sum, day) => sum + day.quizCount, 0);
+
 export function getTripPackWords(day: TripPackDay): WordCard[] {
   const map = new Map(sampleWords.map((w) => [w.id, w]));
   return day.wordIds.map((id) => map.get(id)).filter((w): w is WordCard => Boolean(w));

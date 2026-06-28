@@ -2,11 +2,25 @@ type AnalyticsProps = Record<string, string | number | boolean | null | undefine
 
 const MAX_STORED = 40;
 const STORAGE_KEY = 'japanese-super-words-analytics-log';
+const VISITOR_ID_KEY = 'japanese-super-words-visitor-id';
+
+function getVisitorId(): string | undefined {
+  try {
+    let id = localStorage.getItem(VISITOR_ID_KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem(VISITOR_ID_KEY, id);
+    }
+    return id;
+  } catch {
+    return undefined;
+  }
+}
 
 export function trackEvent(event: string, props?: AnalyticsProps): void {
   if (typeof window === 'undefined') return;
 
-  const payload = { event, ...props, ts: Date.now() };
+  const payload = { event, ...props, visitorId: getVisitorId(), ts: Date.now() };
 
   if (process.env.NODE_ENV === 'development') {
     console.debug('[analytics]', payload);

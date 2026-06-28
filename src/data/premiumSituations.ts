@@ -1,4 +1,5 @@
 import type { SituationId } from './words';
+import { sampleWords } from './words';
 import type { LucideIcon } from 'lucide-react';
 import {
   AlertTriangle,
@@ -396,7 +397,11 @@ export const PREMIUM_SCENE_HIGHLIGHTS = [
 ] as const;
 
 export const PREMIUM_SITUATION_COUNT = allPremiumSituations.length;
-export const PREMIUM_PHRASE_COUNT = PREMIUM_SITUATION_COUNT * 30;
+
+const premiumSituationIds = new Set(allPremiumSituations.map((situation) => situation.id));
+export const PREMIUM_PHRASE_COUNT = sampleWords.filter((word) =>
+  premiumSituationIds.has(word.situation),
+).length;
 
 export function getPremiumSituationsByCategory(categoryId: PremiumSituationCategoryId): PremiumSituationMeta[] {
   return allPremiumSituations

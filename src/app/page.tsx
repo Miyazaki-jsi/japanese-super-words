@@ -10,6 +10,7 @@ import {
   TRIP_PACK_PRICE_USD,
   TRIP_PACK_PRICE_JPY_NOTE,
   clearAllUnlocks,
+  getJapanProPhraseCount,
   readJapanProUnlocked,
   readTripPackUnlocked,
   saveUnlockTier,
@@ -114,7 +115,6 @@ type FilterType = 'all' | 'unlearned';
 type MessageStep = 'form' | 'confirm' | 'success';
 
 const TRIP_DATE_STORAGE_KEY = 'japanese-super-words-trip-date';
-const SUPER_TEST_INTRO_MS = 3500;
 const SUPER_TEST_INTRO_EXIT_MS = 450;
 
 function getTodayISO(): string {
@@ -636,6 +636,7 @@ export default function Home() {
   const [superTestFinished, setSuperTestFinished] = useState(false);
   const [showSuperTestIntro, setShowSuperTestIntro] = useState(false);
   const [superTestIntroExiting, setSuperTestIntroExiting] = useState(false);
+  const [showSuperTestExitConfirm, setShowSuperTestExitConfirm] = useState(false);
   const [savedPhraseLevel, setSavedPhraseLevel] = useState<SavedPhraseLevel | null>(null);
   const [phraseCheckResult, setPhraseCheckResult] = useState<{
     level: PhraseLevelMeta;
@@ -644,7 +645,6 @@ export default function Home() {
   } | null>(null);
   const [showPhraseLevelUpModal, setShowPhraseLevelUpModal] = useState<PhraseLevelMeta | null>(null);
   const superTestIntroExitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const superTestIntroDoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const applyDeepLink = useCallback((target: DeepLinkTarget) => {
     if (target.type === 'situation') {
@@ -1175,7 +1175,8 @@ export default function Home() {
     setSuperTestFinished(false);
     setShowSuperTestIntro(false);
     setSuperTestIntroExiting(false);
-    clearSuperTestIntroTimers();
+    setShowSuperTestExitConfirm(false);
+    clearSuperTestIntroExitTimer();
     setTripDate(null);
     setTripDateDraft('');
     setIsEditingTripDate(false);
@@ -1356,14 +1357,10 @@ export default function Home() {
     return unlockedWords.filter((card) => wordMatchesQuery(card, q)).slice(0, 8);
   }, [wordSearchQuery, unlockedWords]);
 
-  const clearSuperTestIntroTimers = () => {
+  const clearSuperTestIntroExitTimer = () => {
     if (superTestIntroExitTimerRef.current) {
       clearTimeout(superTestIntroExitTimerRef.current);
       superTestIntroExitTimerRef.current = null;
-    }
-    if (superTestIntroDoneTimerRef.current) {
-      clearTimeout(superTestIntroDoneTimerRef.current);
-      superTestIntroDoneTimerRef.current = null;
     }
   };
 
@@ -1380,26 +1377,32 @@ export default function Home() {
     setSuperTestSelectedAnswer(null);
     setSuperTestFinished(false);
     setPhraseCheckResult(null);
+    setShowSuperTestExitConfirm(false);
     setShowSuperTestIntro(!skipIntro);
     setSuperTestIntroExiting(false);
     setCurrentScreen('super_test');
+    clearSuperTestIntroExitTimer();
+
+    if (skipIntro) {
+      trackEvent('phrase_level_check_started', {
+        questionCount: questions.length,
+        usesLearnedOnly: phraseCheckUsesLearned,
+      });
+    }
+  };
+
+  const handleConfirmStartSuperTest = () => {
+    clearSuperTestIntroExitTimer();
+    setSuperTestIntroExiting(true);
+    superTestIntroExitTimerRef.current = setTimeout(() => {
+      setShowSuperTestIntro(false);
+      setSuperTestIntroExiting(false);
+      superTestIntroExitTimerRef.current = null;
+    }, SUPER_TEST_INTRO_EXIT_MS);
     trackEvent('phrase_level_check_started', {
-      questionCount: questions.length,
+      questionCount: superTestQuestions.length,
       usesLearnedOnly: phraseCheckUsesLearned,
     });
-
-    clearSuperTestIntroTimers();
-    if (!skipIntro) {
-      superTestIntroExitTimerRef.current = setTimeout(() => {
-        setSuperTestIntroExiting(true);
-        superTestIntroExitTimerRef.current = null;
-      }, SUPER_TEST_INTRO_MS - SUPER_TEST_INTRO_EXIT_MS);
-      superTestIntroDoneTimerRef.current = setTimeout(() => {
-        setShowSuperTestIntro(false);
-        setSuperTestIntroExiting(false);
-        superTestIntroDoneTimerRef.current = null;
-      }, SUPER_TEST_INTRO_MS);
-    }
   };
 
   const handleSuperTestAnswer = (choiceIndex: number) => {
@@ -1418,11 +1421,11 @@ export default function Home() {
     }, 1000);
   };
 
-  const handleExitSuperTest = () => {
-    clearSuperTestIntroTimers();
+  const goHome = useCallback(() => {
+    clearSuperTestIntroExitTimer();
     setShowSuperTestIntro(false);
     setSuperTestIntroExiting(false);
-    setCurrentScreen('home');
+    setShowSuperTestExitConfirm(false);
     setSuperTestQuestions([]);
     setSuperTestIndex(0);
     setSuperTestScore(0);
@@ -1430,11 +1433,33 @@ export default function Home() {
     setSuperTestFinished(false);
     setPhraseCheckResult(null);
     setShowPhraseLevelUpModal(null);
+    setUnlockModal(null);
+    setSelectedSituation(null);
+    setActiveMiniPackId(null);
+    setIsRandomStudyMode(false);
+    setCurrentScreen('home');
+  }, []);
+
+  const handleExitSuperTest = () => {
+    goHome();
+  };
+
+  const handleSuperTestBack = () => {
+    if (superTestFinished) {
+      goHome();
+      return;
+    }
+    setShowSuperTestExitConfirm(true);
+  };
+
+  const handleConfirmExitSuperTest = () => {
+    setShowSuperTestExitConfirm(false);
+    goHome();
   };
 
   useEffect(() => {
     return () => {
-      clearSuperTestIntroTimers();
+      clearSuperTestIntroExitTimer();
     };
   }, []);
 
@@ -1476,7 +1501,12 @@ export default function Home() {
     <main className="min-h-screen bg-slate-50 text-slate-800 pb-20 font-sans selection:bg-indigo-500 selection:text-white antialiased">
       {/* HEADER */}
       <header className="bg-[#f0ad4e] text-white px-5 py-4 shadow-sm sticky top-0 z-20 flex justify-between items-center">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <button
+          type="button"
+          onClick={goHome}
+          className="flex items-center gap-2.5 min-w-0 flex-1 text-left touch-manipulation active:opacity-90 transition-opacity"
+          aria-label="トップページへ戻る"
+        >
           <JsiLogo variant="icon" className="h-11 drop-shadow-sm" priority />
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-base font-extrabold tracking-tight leading-none text-white truncate">
@@ -1486,7 +1516,7 @@ export default function Home() {
               日本語スーパーワード
             </p>
           </div>
-        </div>
+        </button>
         <button
           onClick={() => setShowSettingsModal(true)}
           className="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-colors"
@@ -2448,6 +2478,14 @@ export default function Home() {
                   superTestIntroExiting ? 'animate-super-test-intro-exit' : 'animate-fade-in'
                 }`}
               >
+                <button
+                  type="button"
+                  onClick={handleSuperTestBack}
+                  className="absolute top-5 left-5 p-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white transition-colors touch-manipulation"
+                  aria-label="戻る"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   <div className="absolute -top-16 -left-16 w-48 h-48 rounded-full bg-white/10 animate-intro-float" />
                   <div
@@ -2480,10 +2518,15 @@ export default function Home() {
                     </span>
                   </p>
                   <div className="w-full max-w-[220px] mx-auto pt-2">
-                    <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                      <div className="h-full bg-white rounded-full animate-super-test-intro-progress" />
-                    </div>
-                    <p className="text-[10px] font-bold text-white/60 mt-2">Get ready…</p>
+                    <button
+                      type="button"
+                      onClick={handleConfirmStartSuperTest}
+                      disabled={superTestIntroExiting}
+                      className="w-full py-3.5 bg-white text-indigo-700 font-extrabold rounded-2xl shadow-lg shadow-indigo-900/20 hover:bg-indigo-50 active:scale-[0.98] transition-all pressable disabled:opacity-70 disabled:pointer-events-none"
+                    >
+                      START
+                      <span className="block text-xs font-bold text-indigo-500/90 mt-0.5">始める</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2500,7 +2543,7 @@ export default function Home() {
           >
             <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-slate-100 shadow-sm">
               <button
-                onClick={handleExitSuperTest}
+                onClick={handleSuperTestBack}
                 className="bg-slate-50 hover:bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -3719,6 +3762,52 @@ export default function Home() {
         </div>
       )}
 
+      {/* SUPER TEST EXIT CONFIRM MODAL */}
+      {showSuperTestExitConfirm && (
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-[32px] p-6 max-w-sm w-full space-y-5 shadow-2xl border border-indigo-100 animate-scale-up">
+            <div className="text-center space-y-3">
+              <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <ClipboardCheck className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-black text-slate-900 leading-tight">
+                  Quit the level check?
+                </h3>
+                <p className="text-sm font-bold text-indigo-600">
+                  本当にやめますか？
+                </p>
+                <p className="text-xs text-slate-500 leading-relaxed px-2">
+                  Your progress in this session will be lost.
+                  <br />
+                  <span className="text-[10px] text-slate-400">
+                    このチェックの進捗は保存されません。
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSuperTestExitConfirm(false)}
+                className="flex-1 py-3 rounded-2xl text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+              >
+                Continue
+                <span className="block text-[10px] font-semibold text-slate-400 mt-0.5">続ける</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmExitSuperTest}
+                className="flex-1 py-3 rounded-2xl text-sm font-extrabold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-100 pressable"
+              >
+                Quit
+                <span className="block text-[10px] font-semibold text-indigo-100 mt-0.5">やめる</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* RESET DATA CONFIRM MODAL */}
       {showResetConfirmModal && (
         <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in">
@@ -3780,7 +3869,7 @@ export default function Home() {
                 Welcome to Japan Pro!
               </h3>
               <p className="text-sm font-bold text-amber-600">
-                {PREMIUM_SITUATION_COUNT} real Japan scenes · {PREMIUM_PHRASE_COUNT}+ phrases
+                {PREMIUM_SITUATION_COUNT} real Japan scenes · {getJapanProPhraseCount()}+ phrases
               </p>
               <p className="text-[11px] text-slate-500 font-semibold">
                 Japan Pro が解放されました

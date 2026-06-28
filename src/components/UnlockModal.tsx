@@ -9,7 +9,17 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
-import { tripPackDays } from '@/data/tripPack';
+import {
+  tripPackDays,
+  TRIP_PACK_FIRST_PAID_DAY,
+  TRIP_PACK_LAST_DAY_NUMBER,
+  TRIP_PACK_PAID_DAY_COUNT,
+  TRIP_PACK_PAID_DAY_LABEL,
+  TRIP_PACK_PAID_PHRASE_COUNT,
+  TRIP_PACK_PAID_QUIZ_COUNT,
+  TRIP_PACK_PAID_ROLEPLAY_COUNT,
+  TRIP_PACK_TOTAL_PHRASE_COUNT,
+} from '@/data/tripPack';
 import { MINI_PACK_COUNT } from '@/data/miniPacks';
 import {
   PREMIUM_PHRASE_COUNT,
@@ -43,20 +53,20 @@ const TRIP_CONTEXT_COPY: Record<Exclude<UnlockContext, 'premium' | 'upsell'>, { 
   hub: {
     title: 'Unlock the Full 7-Day Course',
     titleJa: '7日間コースを解放',
-    lead: 'Day 1 is free. Get all 6 remaining guided lessons before your trip.',
-    leadJa: 'Day 1 は無料。残り6日分のレッスンをすべて使えます。',
+    lead: `Day 1 is free. Get all ${TRIP_PACK_PAID_DAY_COUNT} remaining guided lessons before your trip.`,
+    leadJa: `Day 1 は無料。残り${TRIP_PACK_PAID_DAY_COUNT}日分のレッスンをすべて使えます。`,
   },
   day: {
     title: 'This Lesson Is Locked',
     titleJa: 'このレッスンはロック中',
-    lead: 'Days 2–7 unlock with the full course. Complete Day 1 free first.',
-    leadJa: 'Day 2〜7 はフルコース購入で解放。まず Day 1 を無料で。',
+    lead: `${TRIP_PACK_PAID_DAY_LABEL} unlock with the full course. Complete Day 1 free first.`,
+    leadJa: `Day ${TRIP_PACK_FIRST_PAID_DAY}〜${TRIP_PACK_LAST_DAY_NUMBER} はフルコース購入で解放。まず Day 1 を無料で。`,
   },
   complete: {
     title: 'Day 1 Complete!',
     titleJa: 'Day 1 クリア！',
-    lead: 'You crushed Day 1. Unlock the rest to be fully trip-ready.',
-    leadJa: 'お疲れさまでした。残りのレッスンを解放して旅行準備を完了しましょう。',
+    lead: `You crushed Day 1. Unlock ${TRIP_PACK_PAID_PHRASE_COUNT} more phrases, ${TRIP_PACK_PAID_ROLEPLAY_COUNT} roleplays & ${TRIP_PACK_PAID_QUIZ_COUNT} quizzes.`,
+    leadJa: `お疲れさまでした。残り${TRIP_PACK_PAID_PHRASE_COUNT}フレーズ · ロールプレイ${TRIP_PACK_PAID_ROLEPLAY_COUNT} · クイズ${TRIP_PACK_PAID_QUIZ_COUNT}問を解放しましょう。`,
   },
 };
 
@@ -76,8 +86,14 @@ const PRO_CONTEXT_COPY: Record<'premium' | 'upsell', { title: string; titleJa: s
 };
 
 const TRIP_FEATURES = [
-  { en: '6 more guided lessons (~15 min each)', ja: '6日分のガイド付きレッスン' },
-  { en: '90 more phrases · 30 roleplays · 48 quiz Qs', ja: '90フレーズ · ロールプレイ30 · クイズ48問' },
+  {
+    en: `${TRIP_PACK_PAID_DAY_COUNT} more guided lessons · ${TRIP_PACK_TOTAL_PHRASE_COUNT} phrases in full course`,
+    ja: `残り${TRIP_PACK_PAID_DAY_COUNT}日分 · 全${TRIP_PACK_TOTAL_PHRASE_COUNT}フレーズ`,
+  },
+  {
+    en: `${TRIP_PACK_PAID_PHRASE_COUNT} more phrases · ${TRIP_PACK_PAID_ROLEPLAY_COUNT} roleplays · ${TRIP_PACK_PAID_QUIZ_COUNT} quiz Qs`,
+    ja: `${TRIP_PACK_PAID_PHRASE_COUNT}フレーズ · ロールプレイ${TRIP_PACK_PAID_ROLEPLAY_COUNT} · クイズ${TRIP_PACK_PAID_QUIZ_COUNT}問`,
+  },
   { en: 'Offline cheat sheet', ja: 'オフライン・チートシート' },
 ];
 
@@ -285,7 +301,7 @@ export default function UnlockModal({
                   <p className="text-[10px] font-semibold text-indigo-600/80 mt-0.5">
                     {daysUntilTrip === 0
                       ? '今日から日本！残りレッスンを今すぐ'
-                      : `来日まであと${daysUntilTrip}日 · 残り6日分を解放`}
+                      : `来日まであと${daysUntilTrip}日 · 残り${TRIP_PACK_PAID_DAY_COUNT}日分を解放`}
                   </p>
                 </div>
               </div>

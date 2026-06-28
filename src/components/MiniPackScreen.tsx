@@ -183,39 +183,48 @@ export default function MiniPackScreen({
     setQuizSelected(choiceIndex);
     const isCorrect = choiceIndex === quizQuestions[quizIndex].correctIndex;
     if (isCorrect) setQuizScore((s) => s + 1);
+  };
 
-    setTimeout(() => {
-      if (quizIndex < quizQuestions.length - 1) {
-        setQuizIndex((i) => i + 1);
-        setQuizSelected(null);
+  const advanceQuiz = () => {
+    if (quizSelected === null) return;
+    if (quizIndex < quizQuestions.length - 1) {
+      setQuizIndex((i) => i + 1);
+      setQuizSelected(null);
+    } else {
+      markCompleted();
+      setStep('complete');
+    }
+  };
+
+  const handleHeaderBack = () => {
+    if (step === 'hub' || step === 'intro') {
+      onClose();
+      return;
+    }
+    if (step === 'roleplay' && (roleplayIndex > 0 || selectedRoleplay !== null)) {
+      if (selectedRoleplay !== null) {
+        setSelectedRoleplay(null);
+        setRoleplayDone(false);
       } else {
-        markCompleted();
-        setStep('complete');
+        setRoleplayIndex((i) => i - 1);
+        setSelectedRoleplay(null);
+        setRoleplayDone(false);
       }
-    }, 900);
+      return;
+    }
+    if (step === 'complete') {
+      setStep('hub');
+      return;
+    }
+    setStep('intro');
   };
 
   const header = (
     <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-slate-100 shadow-sm">
       <button
         type="button"
-        onClick={() => {
-          if (step === 'hub') onClose();
-          else if (step === 'study' && studyIndex > 0) setStudyIndex((i) => i - 1);
-          else if (step === 'roleplay' && (roleplayIndex > 0 || selectedRoleplay !== null)) {
-            if (selectedRoleplay !== null) {
-              setSelectedRoleplay(null);
-              setRoleplayDone(false);
-            } else {
-              setRoleplayIndex((i) => i - 1);
-              setSelectedRoleplay(null);
-              setRoleplayDone(false);
-            }
-          } else if (step === 'quiz' && quizIndex > 0 && quizSelected === null) {
-            setQuizIndex((i) => i - 1);
-          } else setStep(step === 'complete' ? 'hub' : 'intro');
-        }}
-        className="btn-press bg-slate-50 hover:bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800"
+        onClick={handleHeaderBack}
+        className="btn-press relative z-10 bg-slate-50 hover:bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 touch-manipulation"
         aria-label="Back"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -597,6 +606,15 @@ export default function MiniPackScreen({
               );
             })}
           </div>
+          {isAnswered && (
+            <button
+              type="button"
+              onClick={advanceQuiz}
+              className="btn-press w-full py-3.5 rounded-2xl bg-indigo-600 text-white font-black text-sm"
+            >
+              Next / 次へ
+            </button>
+          )}
       </div>
     );
   }

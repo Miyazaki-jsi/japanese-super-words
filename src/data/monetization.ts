@@ -1,3 +1,8 @@
+import { tripPackDays } from './tripPack';
+import { allPremiumSituations } from './premiumSituations';
+import { miniPacks } from './miniPacks';
+import { sampleWords } from './words';
+
 export const TRIP_PACK_UNLOCK_STORAGE_KEY = 'japanese-super-words-trip-pack-unlocked';
 export const JAPAN_PRO_UNLOCK_STORAGE_KEY = 'japanese-super-words-japan-pro-unlocked';
 export const LEGACY_PREMIUM_STORAGE_KEY = 'japanese-super-words-premium';
@@ -62,4 +67,19 @@ export function clearAllUnlocks(): void {
 export function canAccessTripPackDay(dayNumber: number, isUnlocked?: boolean): boolean {
   const unlocked = isUnlocked ?? readTripPackUnlocked();
   return unlocked || dayNumber <= TRIP_PACK_FREE_DAY_MAX;
+}
+
+export function getJapanProPhraseCount(): number {
+  const ids = new Set<string>();
+  for (const day of tripPackDays) {
+    for (const id of day.wordIds) ids.add(id);
+  }
+  for (const pack of miniPacks) {
+    for (const id of pack.wordIds) ids.add(id);
+  }
+  const premiumSituationIds = new Set(allPremiumSituations.map((situation) => situation.id));
+  for (const word of sampleWords) {
+    if (premiumSituationIds.has(word.situation)) ids.add(word.id);
+  }
+  return ids.size;
 }

@@ -31,8 +31,13 @@ import {
   TripPackDay,
   TripPackRoleplayTurn,
   TRIP_PACK_STORAGE_KEY,
-  TRIP_PACK_QUIZ_COUNT_DEFAULT,
-  TRIP_PACK_ROLEPLAY_COUNT,
+  TRIP_PACK_PAID_DAY_COUNT,
+  TRIP_PACK_PAID_DAY_LABEL,
+  TRIP_PACK_PAID_PHRASE_COUNT,
+  TRIP_PACK_PAID_QUIZ_COUNT,
+  TRIP_PACK_TOTAL_PHRASE_COUNT,
+  TRIP_PACK_TOTAL_QUIZ_COUNT,
+  TRIP_PACK_TOTAL_ROLEPLAY_COUNT,
   getAllTripPackWords,
   getRecommendedTripPackDay,
   getTripPackDayEstimateMinutes,
@@ -215,7 +220,7 @@ export default function TripPackScreen({
       ? recommendedLesson
       : tripPackDays[0];
   const todayLesson = heroLesson ?? tripPackDays[0];
-  const totalPhrases = tripPackDays.reduce((sum, d) => sum + d.wordIds.length, 0);
+  const totalPhrases = TRIP_PACK_TOTAL_PHRASE_COUNT;
   const progressPercent = Math.round((completedDays.length / tripPackDays.length) * 100);
 
   useEffect(() => {
@@ -593,7 +598,7 @@ export default function TripPackScreen({
               日本で困らない7日間プログラム
             </p>
             <p className="text-[10px] text-indigo-100/90 font-semibold mt-1">
-              {totalPhrases} phrases · {TRIP_PACK_ROLEPLAY_COUNT} roleplays · {TRIP_PACK_QUIZ_COUNT_DEFAULT} quiz Qs / day
+              {totalPhrases} phrases · {TRIP_PACK_TOTAL_ROLEPLAY_COUNT} roleplays · {TRIP_PACK_TOTAL_QUIZ_COUNT} quiz Qs
               {!isPackUnlocked && (
                 <span className="block mt-0.5 text-amber-200/90">
                   Full course {TRIP_PACK_PRICE_USD} one-time · {TRIP_PACK_PRICE_JPY_NOTE}
@@ -643,10 +648,10 @@ export default function TripPackScreen({
                     Day 1 Complete
                   </span>
                   <h4 className="text-lg font-black text-slate-900 mt-2 leading-tight">
-                    Unlock Days 2–7
+                    Unlock {TRIP_PACK_PAID_DAY_LABEL}
                   </h4>
                   <p className="text-[11px] font-semibold text-slate-600 mt-1">
-                    残り6日分を解放 · roleplays · quizzes · cheatsheet
+                    残り{TRIP_PACK_PAID_DAY_COUNT}日分 · {TRIP_PACK_PAID_PHRASE_COUNT} phrases · {TRIP_PACK_PAID_QUIZ_COUNT} quizzes
                   </p>
                   <p className="text-sm font-black text-amber-700 mt-2">
                     {TRIP_PACK_PRICE_USD}{' '}
@@ -1245,7 +1250,7 @@ export default function TripPackScreen({
                 onClick={() => openUnlockModal('complete')}
                 className="btn-press w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-sm shadow-md"
               >
-                Unlock 6 more days · {TRIP_PACK_PRICE_USD} / 残り6日を解放
+                Unlock {TRIP_PACK_PAID_DAY_COUNT} more days · {TRIP_PACK_PRICE_USD} / 残り{TRIP_PACK_PAID_DAY_COUNT}日を解放
               </button>
             )}
             <button
