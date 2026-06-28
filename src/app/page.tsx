@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import Link from 'next/link';
 import { sampleWords, WordCard, SituationId } from '@/data/words';
 import { TRIP_PACK_STORAGE_KEY } from '@/data/tripPack';
 import {
@@ -3755,6 +3756,15 @@ export default function Home() {
                     <span className="block text-sm font-extrabold">Reset Saved Data</span>
                     <span className="block text-[11px] font-semibold text-red-400 mt-0.5">保存データをリセット</span>
                   </button>
+
+                  <Link
+                    href="/privacy"
+                    onClick={closeSettingsModal}
+                    className="block w-full py-3 rounded-2xl border border-slate-100 bg-white text-center text-slate-500 hover:text-indigo-600 hover:border-indigo-100 pressable"
+                  >
+                    <span className="block text-xs font-extrabold">Privacy Policy</span>
+                    <span className="block text-[10px] font-semibold text-slate-400 mt-0.5">プライバシーポリシー</span>
+                  </Link>
                 </>
               )}
             </div>

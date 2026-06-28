@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Analytics Admin · Japanese Super Words',
+  title: 'アナリティクス管理 · Japanese Super Words',
   robots: { index: false, follow: false },
 };
 

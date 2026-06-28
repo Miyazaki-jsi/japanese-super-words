@@ -6,13 +6,21 @@ import AdminLogoutButton from './AdminLogoutButton';
 
 function formatMoney(cents: number, currency: string): string {
   try {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('ja-JP', {
       style: 'currency',
       currency: currency.toUpperCase(),
     }).format(cents / 100);
   } catch {
     return `$${(cents / 100).toFixed(2)}`;
   }
+}
+
+function formatTier(tier: string | null | undefined): string {
+  if (!tier) return '—';
+  if (tier === 'trip') return 'Trip Course';
+  if (tier === 'pro') return 'Japan Pro';
+  if (tier === 'unknown') return '不明';
+  return tier;
 }
 
 function pct(part: number, whole: number): string {
@@ -67,19 +75,18 @@ function FunnelRow({
 function SetupPanel() {
   return (
     <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-amber-50">
-      <h2 className="text-lg font-semibold">Setup required</h2>
+      <h2 className="text-lg font-semibold">セットアップが必要です</h2>
       <p className="mt-2 text-sm text-amber-100/90">
-        Add environment variables in Vercel, then run the SQL schema in Supabase.
+        Vercel に環境変数を設定し、Supabase で SQL を実行してください。
       </p>
       <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-amber-100/90">
-        <li>Create a free Supabase project</li>
-        <li>Run <code className="rounded bg-black/20 px-1">supabase/schema.sql</code> in the SQL editor</li>
-        <li>Set <code className="rounded bg-black/20 px-1">SUPABASE_URL</code> and <code className="rounded bg-black/20 px-1">SUPABASE_SERVICE_ROLE_KEY</code></li>
-        <li>Set <code className="rounded bg-black/20 px-1">ADMIN_PASSWORD</code> and <code className="rounded bg-black/20 px-1">ADMIN_SESSION_SECRET</code></li>
-        <li>Point Gumroad webhook to <code className="rounded bg-black/20 px-1">/api/webhooks/gumroad</code></li>
+        <li>Supabase で無料プロジェクトを作成</li>
+        <li>SQL Editor で <code className="rounded bg-black/20 px-1">supabase/schema.sql</code> を実行</li>
+        <li><code className="rounded bg-black/20 px-1">SUPABASE_URL</code> と <code className="rounded bg-black/20 px-1">SUPABASE_SERVICE_ROLE_KEY</code> を設定</li>
+        <li><code className="rounded bg-black/20 px-1">ADMIN_PASSWORD</code> と <code className="rounded bg-black/20 px-1">ADMIN_SESSION_SECRET</code> を設定</li>
       </ol>
       <p className="mt-4 text-sm text-amber-100/80">
-        See <code className="rounded bg-black/20 px-1">.env.example</code> for the full list.
+        詳細は <code className="rounded bg-black/20 px-1">.env.example</code> を参照してください。
       </p>
     </div>
   );
@@ -110,9 +117,9 @@ export default async function AdminDashboardPage({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
             Japanese Super Words
           </p>
-          <h1 className="mt-2 text-3xl font-bold text-white">Analytics</h1>
+          <h1 className="mt-2 text-3xl font-bold text-white">アナリティクス</h1>
           <p className="mt-2 text-sm text-slate-400">
-            Last {periodDays} days · since {new Date(stats.since).toLocaleDateString('en-US')}
+            直近 {periodDays} 日間 · {new Date(stats.since).toLocaleDateString('ja-JP')} 以降
           </p>
         </div>
 
@@ -125,7 +132,7 @@ export default async function AdminDashboardPage({
                 : 'border border-slate-700 text-slate-300 hover:text-white'
             }`}
           >
-            7 days
+            7日間
           </Link>
           <Link
             href="/admin?days=30"
@@ -135,7 +142,7 @@ export default async function AdminDashboardPage({
                 : 'border border-slate-700 text-slate-300 hover:text-white'
             }`}
           >
-            30 days
+            30日間
           </Link>
           <AdminLogoutButton />
         </div>
@@ -148,47 +155,47 @@ export default async function AdminDashboardPage({
       ) : null}
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Unique visitors" value={stats.visitors} hint="Anonymous browser IDs" />
+        <StatCard label="ユニーク訪問者" value={stats.visitors} hint="匿名ブラウザID" />
         <StatCard
-          label="YouTube visitors"
+          label="YouTube 経由"
           value={stats.youtubeVisitors}
-          hint={pct(stats.youtubeVisitors, stats.visitors) + ' of visitors'}
+          hint={`訪問者の ${pct(stats.youtubeVisitors, stats.visitors)}`}
         />
-        <StatCard label="Gumroad purchases" value={stats.purchases} />
+        <StatCard label="購入数" value={stats.purchases} hint="Gumroad 連携時" />
         <StatCard
-          label="Revenue"
+          label="売上"
           value={formatMoney(stats.revenueCents, stats.revenueCurrency)}
-          hint="From Gumroad webhook"
+          hint="Gumroad 連携時"
         />
       </section>
 
       <section className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Intro completed" value={stats.introCompletes} />
-        <StatCard label="Day 1 completed" value={stats.day1Completes} />
-        <StatCard label="Unlock success" value={stats.unlockSuccesses} />
+        <StatCard label="イントロ完了" value={stats.introCompletes} />
+        <StatCard label="Day 1 完了" value={stats.day1Completes} />
+        <StatCard label="アンロック成功" value={stats.unlockSuccesses} />
         <StatCard
-          label="Code activation rate"
+          label="コード入力率"
           value={pct(stats.unlockSuccesses, stats.purchases)}
-          hint="unlock_success / purchases"
+          hint="アンロック成功 ÷ 購入数"
         />
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <h2 className="text-lg font-semibold text-white">Unlock funnel</h2>
-          <p className="mt-1 text-sm text-slate-400">Modal → Gumroad click → code entered</p>
+          <h2 className="text-lg font-semibold text-white">アンロックの流れ</h2>
+          <p className="mt-1 text-sm text-slate-400">モーダル表示 → 購入ページ → コード入力成功</p>
           <div className="mt-6 space-y-4">
-            <FunnelRow label="Unlock modal shown" count={stats.unlockModalShown} max={funnelMax} />
-            <FunnelRow label="Gumroad click" count={stats.gumroadClicks} max={funnelMax} />
-            <FunnelRow label="Unlock success" count={stats.unlockSuccesses} max={funnelMax} />
+            <FunnelRow label="モーダル表示" count={stats.unlockModalShown} max={funnelMax} />
+            <FunnelRow label="購入ページクリック" count={stats.gumroadClicks} max={funnelMax} />
+            <FunnelRow label="アンロック成功" count={stats.unlockSuccesses} max={funnelMax} />
           </div>
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <h2 className="text-lg font-semibold text-white">Daily visitors</h2>
+          <h2 className="text-lg font-semibold text-white">日別訪問者</h2>
           <div className="mt-6 space-y-3">
             {stats.dailyVisitors.length === 0 ? (
-              <p className="text-sm text-slate-400">No data yet.</p>
+              <p className="text-sm text-slate-400">まだデータがありません。</p>
             ) : (
               stats.dailyVisitors.map((row) => (
                 <div key={row.date} className="flex items-center justify-between text-sm">
@@ -203,11 +210,11 @@ export default async function AdminDashboardPage({
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <h2 className="text-lg font-semibold text-white">Top YouTube videos</h2>
-          <p className="mt-1 text-sm text-slate-400">From <code>?video=...</code> attribution</p>
+          <h2 className="text-lg font-semibold text-white">YouTube 動画別</h2>
+          <p className="mt-1 text-sm text-slate-400"><code>?video=...</code> 付きリンクから</p>
           <div className="mt-6 space-y-3">
             {stats.topVideos.length === 0 ? (
-              <p className="text-sm text-slate-400">No video tags yet.</p>
+              <p className="text-sm text-slate-400">まだデータがありません。</p>
             ) : (
               stats.topVideos.map((row) => (
                 <div key={row.video} className="flex items-center justify-between gap-4 text-sm">
@@ -220,10 +227,10 @@ export default async function AdminDashboardPage({
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <h2 className="text-lg font-semibold text-white">Traffic sources</h2>
+          <h2 className="text-lg font-semibold text-white">流入元</h2>
           <div className="mt-6 space-y-3">
             {stats.topSources.length === 0 ? (
-              <p className="text-sm text-slate-400">No source tags yet.</p>
+              <p className="text-sm text-slate-400">まだデータがありません。</p>
             ) : (
               stats.topSources.map((row) => (
                 <div key={row.source} className="flex items-center justify-between text-sm">
@@ -237,22 +244,22 @@ export default async function AdminDashboardPage({
       </section>
 
       <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-        <h2 className="text-lg font-semibold text-white">Recent Gumroad purchases</h2>
+        <h2 className="text-lg font-semibold text-white">最近の購入</h2>
         <div className="mt-6 overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="text-slate-400">
               <tr>
-                <th className="pb-3 pr-4 font-medium">Date</th>
-                <th className="pb-3 pr-4 font-medium">Product</th>
-                <th className="pb-3 pr-4 font-medium">Tier</th>
-                <th className="pb-3 font-medium">Amount</th>
+                <th className="pb-3 pr-4 font-medium">日時</th>
+                <th className="pb-3 pr-4 font-medium">商品</th>
+                <th className="pb-3 pr-4 font-medium">プラン</th>
+                <th className="pb-3 font-medium">金額</th>
               </tr>
             </thead>
             <tbody>
               {stats.recentPurchases.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-4 text-slate-400">
-                    No purchases recorded yet.
+                    まだ購入データがありません。
                   </td>
                 </tr>
               ) : (
@@ -260,11 +267,11 @@ export default async function AdminDashboardPage({
                   <tr key={purchase.saleId} className="border-t border-slate-800">
                     <td className="py-3 pr-4 text-slate-300">
                       {purchase.purchasedAt
-                        ? new Date(purchase.purchasedAt).toLocaleString('en-US')
+                        ? new Date(purchase.purchasedAt).toLocaleString('ja-JP')
                         : '—'}
                     </td>
                     <td className="py-3 pr-4 text-white">{purchase.productName ?? '—'}</td>
-                    <td className="py-3 pr-4 text-slate-300">{purchase.tier ?? '—'}</td>
+                    <td className="py-3 pr-4 text-slate-300">{formatTier(purchase.tier)}</td>
                     <td className="py-3 text-white">
                       {typeof purchase.priceCents === 'number'
                         ? formatMoney(purchase.priceCents, purchase.currency ?? 'usd')

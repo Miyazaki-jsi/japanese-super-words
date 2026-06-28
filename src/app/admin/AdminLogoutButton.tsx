@@ -17,7 +17,7 @@ export default function AdminLogoutButton() {
       onClick={handleLogout}
       className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-slate-500 hover:text-white"
     >
-      Log out
+      ログアウト
     </button>
   );
 }
