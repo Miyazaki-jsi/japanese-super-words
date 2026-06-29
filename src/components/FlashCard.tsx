@@ -12,6 +12,17 @@ interface FlashCardProps {
   isFavorite: boolean;
   onToggleLearned: (id: string, learned: boolean) => void;
   onToggleFavorite: (id: string, favorite: boolean) => void;
+  /** `review` = spaced-repetition session (neutral buttons, Remembered / Review again) */
+  mode?: 'learn' | 'review';
+}
+
+function ActionLabel({ en, ja }: { en: string; ja: string }) {
+  return (
+    <span className="flex flex-col items-center leading-tight">
+      <span>{en}</span>
+      <span className="text-[9px] font-semibold opacity-75">{ja}</span>
+    </span>
+  );
 }
 
 export default function FlashCard({
@@ -20,10 +31,22 @@ export default function FlashCard({
   isFavorite,
   onToggleLearned,
   onToggleFavorite,
+  mode = 'learn',
 }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [animateStar, setAnimateStar] = useState(false);
   const situationLabel = getSituationLabel(card.situation);
+  const isReview = mode === 'review';
+
+  const negativeLabel = isReview
+    ? { en: 'Review again', ja: 'もう一度' }
+    : { en: 'Still learning', ja: 'まだ覚えてない' };
+  const positiveLabel = isReview
+    ? { en: 'Remembered', ja: '覚えた' }
+    : { en: 'Learned', ja: '覚えた' };
+
+  const showNegativeActive = !isReview && !isLearned;
+  const showPositiveActive = !isReview && isLearned;
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -46,6 +69,50 @@ export default function FlashCard({
   const handleListen = (e: React.MouseEvent) => {
     e.stopPropagation();
     speakJapanese(card.reading || card.japanese);
+  };
+
+  const negativeButtonClass = (dark: boolean) => {
+    if (dark) {
+      return showNegativeActive
+        ? 'bg-amber-500 text-white shadow-sm shadow-amber-200'
+        : 'bg-slate-800 text-slate-300 hover:bg-amber-500 hover:text-white border border-slate-700';
+    }
+    return showNegativeActive
+      ? 'bg-amber-50 text-amber-600 border border-amber-200'
+      : 'bg-slate-50 text-slate-600 hover:bg-amber-50 hover:text-amber-600 border border-slate-100';
+  };
+
+  const positiveButtonClass = (dark: boolean) => {
+    if (dark) {
+      return showPositiveActive
+        ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-850'
+        : 'bg-slate-800 text-slate-300 hover:bg-emerald-500 hover:text-white border border-slate-700';
+    }
+    return showPositiveActive
+      ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+      : 'bg-slate-50 text-slate-600 hover:bg-emerald-500 hover:text-white border border-slate-100';
+  };
+
+  const negativeIconClass = (dark: boolean) => {
+    if (dark) {
+      return showNegativeActive
+        ? 'bg-amber-600 text-white'
+        : 'bg-slate-700 text-slate-300';
+    }
+    return showNegativeActive
+      ? 'bg-amber-100 text-amber-600'
+      : 'bg-slate-200 text-slate-500';
+  };
+
+  const positiveIconClass = (dark: boolean) => {
+    if (dark) {
+      return showPositiveActive
+        ? 'bg-emerald-600/40 text-white'
+        : 'bg-slate-700 text-slate-300';
+    }
+    return showPositiveActive
+      ? 'bg-emerald-600/40 text-white'
+      : 'bg-slate-200 text-slate-500';
   };
 
   return (
@@ -111,29 +178,21 @@ export default function FlashCard({
           <div className="flex justify-between gap-3 pt-4 border-t border-slate-50">
             <button
               onClick={(e) => handleButtonClick(e, false)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
-                !isLearned
-                  ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                  : 'bg-slate-50 text-slate-400 hover:bg-amber-50 hover:text-amber-600 border border-transparent'
-              }`}
+              className={`flex-1 py-2 px-2 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 ${negativeButtonClass(false)}`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center ${!isLearned ? 'bg-amber-100 text-amber-600' : 'bg-slate-200 text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${negativeIconClass(false)}`}>
                 <HelpCircle className="w-4 h-4" />
               </span>
-              Still learning
+              <ActionLabel en={negativeLabel.en} ja={negativeLabel.ja} />
             </button>
             <button
               onClick={(e) => handleButtonClick(e, true)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
-                isLearned
-                  ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
-                  : 'bg-slate-50 text-slate-600 hover:bg-emerald-500 hover:text-white border border-slate-100'
-              }`}
+              className={`flex-1 py-2 px-2 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 ${positiveButtonClass(false)}`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center ${isLearned ? 'bg-emerald-600/40 text-white' : 'bg-slate-200 text-slate-500'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${positiveIconClass(false)}`}>
                 <CheckCircle className="w-4 h-4" />
               </span>
-              Learned
+              <ActionLabel en={positiveLabel.en} ja={positiveLabel.ja} />
             </button>
           </div>
         </div>
@@ -179,29 +238,21 @@ export default function FlashCard({
           <div className="flex justify-between gap-3 pt-4 border-t border-slate-800">
             <button
               onClick={(e) => handleButtonClick(e, false)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
-                !isLearned
-                  ? 'bg-amber-500 text-white shadow-sm shadow-amber-200'
-                  : 'bg-slate-800 text-slate-400 hover:bg-amber-500 hover:text-white'
-              }`}
+              className={`flex-1 py-2 px-2 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 ${negativeButtonClass(true)}`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center ${!isLearned ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${negativeIconClass(true)}`}>
                 <HelpCircle className="w-4 h-4" />
               </span>
-              Still learning
+              <ActionLabel en={negativeLabel.en} ja={negativeLabel.ja} />
             </button>
             <button
               onClick={(e) => handleButtonClick(e, true)}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 ${
-                isLearned
-                  ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-850'
-                  : 'bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white'
-              }`}
+              className={`flex-1 py-2 px-2 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 ${positiveButtonClass(true)}`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center ${isLearned ? 'bg-emerald-600/40 text-white' : 'bg-slate-700 text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${positiveIconClass(true)}`}>
                 <CheckCircle className="w-4 h-4" />
               </span>
-              Learned
+              <ActionLabel en={positiveLabel.en} ja={positiveLabel.ja} />
             </button>
           </div>
         </div>

@@ -71,6 +71,19 @@ import {
 import { trackEvent } from '@/lib/analytics';
 import { speakJapanese } from '@/lib/speakJapanese';
 import {
+  clearStudyHabits,
+  getDueWordIds,
+  getUpcomingReviewCount,
+  readStreak,
+  recordSrsAgain,
+  recordSrsSuccess,
+  recordStudyDay,
+  removeSrsEntry,
+  scheduleSrsEntry,
+  syncSrsWithLearned,
+  type StreakData,
+} from '@/lib/studyHabits';
+import {
   Utensils,
   ShoppingBag,
   Plane,
@@ -108,9 +121,10 @@ import {
   Luggage,
   LayoutGrid,
   Volume2,
+  Flame,
 } from 'lucide-react';
 
-type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'trip_pack' | 'mini_pack';
+type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'srs_review' | 'trip_pack' | 'mini_pack';
 type HomeTab = 'packs' | 'situations' | 'review';
 type FilterType = 'all' | 'unlearned';
 type MessageStep = 'form' | 'confirm' | 'success';
@@ -571,6 +585,16 @@ export default function Home() {
   const [randomStudyCountInput, setRandomStudyCountInput] = useState('5');
   const [randomStudyCountError, setRandomStudyCountError] = useState('');
 
+  const [streakInfo, setStreakInfo] = useState<StreakData>({
+    currentStreak: 0,
+    longestStreak: 0,
+    lastStudyDate: null,
+  });
+  const [dueReviewCount, setDueReviewCount] = useState(0);
+  const [srsReviewCards, setSrsReviewCards] = useState<WordCard[]>([]);
+  const [srsReviewIndex, setSrsReviewIndex] = useState(0);
+  const [srsReviewComplete, setSrsReviewComplete] = useState(false);
+
   const handleRandomStudyToggleLearned = (id: string, learned: boolean) => {
     handleToggleLearned(id, learned);
     // 200ms delay to allow the user to see the button press feedback before transitioning
@@ -745,8 +769,11 @@ export default function Home() {
         const learnedList = JSON.parse(savedLearned);
         setLearnedIds(learnedList);
         initialLearnedCount = learnedList.length;
+        syncSrsWithLearned(learnedList);
+        setDueReviewCount(getUpcomingReviewCount(learnedList));
       } catch (e) { console.error(e); }
     }
+    setStreakInfo(readStreak());
     if (savedFavorites) {
       try { setFavoriteIds(JSON.parse(savedFavorites)); } catch (e) { console.error(e); }
     }
@@ -871,7 +898,13 @@ export default function Home() {
   // Scroll to top when navigating between screens
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [currentScreen, selectedSituation, isRandomStudyMode]);
+  }, [currentScreen, selectedSituation, isRandomStudyMode, srsReviewIndex, srsReviewComplete]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    syncSrsWithLearned(learnedIds);
+    setDueReviewCount(getUpcomingReviewCount(learnedIds));
+  }, [learnedIds, isLoaded]);
 
   useEffect(() => {
     if (!showSettingsModal) return;
@@ -930,7 +963,12 @@ export default function Home() {
       label: '復習',
       enLabel: 'Review',
       icon: BookOpen,
-      badge: favoriteIds.length > 0 ? favoriteIds.length : undefined,
+      badge:
+        dueReviewCount > 0
+          ? dueReviewCount
+          : favoriteIds.length > 0
+            ? favoriteIds.length
+            : undefined,
     },
   ];
 
@@ -970,6 +1008,8 @@ export default function Home() {
       levelId: result.level.id,
       leveledUp: result.leveledUp,
     });
+    const streak = recordStudyDay();
+    setStreakInfo(streak);
   }, [superTestFinished, superTestScore, superTestQuestions.length]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1012,8 +1052,16 @@ export default function Home() {
       const newRank = getRankInfo(newXP);
       setCurrentRankName(newRank.name);
     }
+    if (learned) {
+      scheduleSrsEntry(id);
+      const streak = recordStudyDay();
+      setStreakInfo(streak);
+    } else {
+      removeSrsEntry(id);
+    }
     setLearnedIds(updated);
     localStorage.setItem('japanese-super-words-progress', JSON.stringify(updated));
+    setDueReviewCount(getUpcomingReviewCount(updated));
   };
 
   // Save favorite status
@@ -1169,6 +1217,12 @@ export default function Home() {
     setCurrentScreen('home');
     setSelectedSituation(null);
     setIsRandomStudyMode(false);
+    setSrsReviewCards([]);
+    setSrsReviewIndex(0);
+    setSrsReviewComplete(false);
+    clearStudyHabits();
+    setStreakInfo({ currentStreak: 0, longestStreak: 0, lastStudyDate: null });
+    setDueReviewCount(0);
     setSuperTestQuestions([]);
     setSuperTestIndex(0);
     setSuperTestScore(0);
@@ -1248,6 +1302,50 @@ export default function Home() {
 
   const getContextUnlearnedCards = (): WordCard[] =>
     getContextAllCards().filter((card) => !learnedIds.includes(card.id));
+
+  const handleStartSrsReview = () => {
+    const dueIds = getDueWordIds(learnedIds);
+    const cards = dueIds
+      .map((id) => sampleWords.find((w) => w.id === id))
+      .filter((w): w is WordCard => !!w)
+      .sort(() => Math.random() - 0.5);
+    if (cards.length === 0) return;
+    setSrsReviewCards(cards);
+    setSrsReviewIndex(0);
+    setSrsReviewComplete(false);
+    setCurrentScreen('srs_review');
+    trackEvent('srs_review_start', { count: cards.length });
+  };
+
+  const handleExitSrsReview = () => {
+    setSrsReviewCards([]);
+    setSrsReviewIndex(0);
+    setSrsReviewComplete(false);
+    setCurrentScreen('home');
+    setHomeTab('review');
+  };
+
+  const handleSrsReviewOutcome = (id: string, remembered: boolean) => {
+    if (remembered) {
+      recordSrsSuccess(id);
+    } else {
+      recordSrsAgain(id);
+    }
+    const streak = recordStudyDay();
+    setStreakInfo(streak);
+    setDueReviewCount(getUpcomingReviewCount(learnedIds));
+
+    setTimeout(() => {
+      setSrsReviewIndex((prevIndex) => {
+        if (prevIndex < srsReviewCards.length - 1) {
+          return prevIndex + 1;
+        }
+        setSrsReviewComplete(true);
+        trackEvent('srs_review_complete', { count: srsReviewCards.length });
+        return prevIndex;
+      });
+    }, 200);
+  };
 
   const launchRandomStudy = (cards: WordCard[], count?: number) => {
     if (cards.length === 0) return;
@@ -1438,6 +1536,9 @@ export default function Home() {
     setSelectedSituation(null);
     setActiveMiniPackId(null);
     setIsRandomStudyMode(false);
+    setSrsReviewCards([]);
+    setSrsReviewIndex(0);
+    setSrsReviewComplete(false);
     setCurrentScreen('home');
   }, []);
 
@@ -1601,9 +1702,19 @@ export default function Home() {
                       <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                         <div className="bg-emerald-500 h-full transition-all duration-500" style={{ width: `${xpPercentage}%` }} />
                       </div>
-                      <p className="text-[10px] text-slate-400 font-bold mt-0.5 font-mono">
-                        {learnedIds.length}/{totalDbWords} · {totalXP}/{rank.nextXP} XP
-                      </p>
+                      <div className="flex items-center justify-between gap-2 mt-0.5">
+                        <p className="text-[10px] text-slate-400 font-bold font-mono truncate">
+                          {learnedIds.length}/{totalDbWords} · {totalXP}/{rank.nextXP} XP
+                        </p>
+                        {streakInfo.currentStreak > 0 ? (
+                          <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-orange-600 flex-shrink-0">
+                            <Flame className="w-3 h-3 fill-orange-500 text-orange-500" />
+                            {streakInfo.currentStreak}d
+                          </span>
+                        ) : !streakInfo.lastStudyDate ? (
+                          <span className="text-[9px] font-bold text-slate-400 flex-shrink-0">Start streak</span>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2237,6 +2348,69 @@ export default function Home() {
                   <p className="text-[11px] text-slate-400 font-semibold mt-0.5">復習・フレーズレベルチェック</p>
                 </div>
 
+                <div className="rounded-2xl bg-gradient-to-br from-orange-50 via-white to-amber-50 border border-orange-100 p-4 shadow-sm space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-inner flex-shrink-0">
+                        <Flame className="w-6 h-6 fill-orange-500 text-orange-500" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-base font-black text-slate-900 leading-tight">
+                          {streakInfo.currentStreak > 0
+                            ? `${streakInfo.currentStreak} day streak`
+                            : 'Build your streak'}
+                        </p>
+                        <p className="text-[11px] font-semibold text-orange-700/80 mt-0.5">
+                          {streakInfo.currentStreak > 0
+                            ? `${streakInfo.currentStreak}日連続学習中`
+                            : '今日からストリークを始めよう'}
+                        </p>
+                        {streakInfo.longestStreak > streakInfo.currentStreak && (
+                          <p className="text-[10px] font-semibold text-slate-400 mt-1">
+                            Best {streakInfo.longestStreak} days · 最高 {streakInfo.longestStreak}日
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {dueReviewCount > 0 && (
+                      <span className="text-xs font-black font-mono bg-orange-600 text-white px-2.5 py-1 rounded-full flex-shrink-0">
+                        {dueReviewCount}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl bg-white/80 border border-orange-100/80 px-3 py-2.5">
+                    <p className="text-[11px] font-bold text-slate-700">
+                      {dueReviewCount > 0
+                        ? `${dueReviewCount} word${dueReviewCount === 1 ? '' : 's'} due today`
+                        : learnedIds.length > 0
+                          ? 'No reviews due today — great job!'
+                          : 'Mark words as Learned to start spaced review'}
+                    </p>
+                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                      {dueReviewCount > 0
+                        ? `今日の復習 ${dueReviewCount}語`
+                        : learnedIds.length > 0
+                          ? '今日の復習はありません'
+                          : 'Learnedにすると復習スケジュールが始まります'}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleStartSrsReview}
+                    disabled={dueReviewCount === 0}
+                    className={`w-full rounded-xl py-3 px-4 flex items-center justify-center gap-2 font-extrabold text-sm transition-all pressable ${
+                      dueReviewCount > 0
+                        ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-200'
+                        : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    {dueReviewCount > 0 ? 'Start today\'s review / 今日の復習' : 'Review reminder / 復習リマインダー'}
+                  </button>
+                </div>
+
                 <div className="rounded-2xl bg-white border border-slate-100 p-4 shadow-sm space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -2436,9 +2610,16 @@ export default function Home() {
                     <p className="text-[10px] text-slate-400 font-semibold">/ {totalDbWords} words</p>
                   </div>
                   <div className="rounded-2xl bg-white border border-slate-100 p-4 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Study Rank</p>
-                    <p className="text-2xl font-black text-[#f0ad4e] mt-1">{rank.enName}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold">{rank.name} · XP</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Streak</p>
+                    <p className="text-2xl font-black text-orange-500 mt-1 font-mono flex items-center gap-1">
+                      {streakInfo.currentStreak > 0 && (
+                        <Flame className="w-5 h-5 fill-orange-500 text-orange-500" />
+                      )}
+                      {streakInfo.currentStreak}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-semibold">
+                      {streakInfo.currentStreak > 0 ? 'days · 日連続' : 'Start today · 今日から'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -2767,6 +2948,79 @@ export default function Home() {
             ) : null}
           </div>
           </>
+        ) : currentScreen === 'srs_review' ? (
+          /* ==================== SRS REVIEW SCREEN ==================== */
+          <div key="srs-review-screen" className="space-y-5 animate-fade-in">
+            <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-slate-100 shadow-sm">
+              <button
+                onClick={handleExitSrsReview}
+                className="bg-slate-50 hover:bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div className="text-center">
+                <h2 className="text-sm font-black text-slate-800 tracking-tight leading-none">
+                  Today&apos;s Review
+                </h2>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">今日の復習</p>
+                {!srsReviewComplete && srsReviewCards.length > 0 && (
+                  <p className="text-xs text-orange-600 font-bold font-mono mt-1">
+                    {srsReviewIndex + 1} / {srsReviewCards.length}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={handleExitSrsReview}
+                className="bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl text-xs font-bold text-red-600 transition-colors"
+              >
+                Exit / 終了
+              </button>
+            </div>
+
+            {srsReviewComplete ? (
+              <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 p-6 text-center space-y-4 shadow-sm">
+                <div className="w-16 h-16 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto shadow-inner">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">Review complete!</h3>
+                  <p className="text-sm font-semibold text-slate-500 mt-1">復習完了 · {srsReviewCards.length} words</p>
+                </div>
+                {streakInfo.currentStreak > 0 && (
+                  <p className="inline-flex items-center gap-1.5 text-sm font-black text-orange-600 bg-white px-3 py-1.5 rounded-full border border-orange-100">
+                    <Flame className="w-4 h-4 fill-orange-500 text-orange-500" />
+                    {streakInfo.currentStreak} day streak · {streakInfo.currentStreak}日連続
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleExitSrsReview}
+                  className="w-full rounded-xl py-3 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm shadow-md shadow-orange-200 transition-colors pressable"
+                >
+                  Back to Review / 復習タブへ
+                </button>
+              </div>
+            ) : srsReviewCards.length > 0 ? (
+              <div className="space-y-4">
+                <p className="text-center text-[11px] font-semibold text-slate-500 px-2">
+                  Tap card to flip · Remembered = next interval · Review again = sooner
+                  <span className="block text-[10px] text-slate-400 mt-0.5">
+                    カードをタップで裏返し · 覚えた=次回へ · もう一度=早めに復習
+                  </span>
+                </p>
+                <div key={srsReviewCards[srsReviewIndex].id} className="animate-card-slide">
+                  <FlashCard
+                    card={srsReviewCards[srsReviewIndex]}
+                    isLearned={learnedIds.includes(srsReviewCards[srsReviewIndex].id)}
+                    isFavorite={favoriteIds.includes(srsReviewCards[srsReviewIndex].id)}
+                    mode="review"
+                    onToggleLearned={handleSrsReviewOutcome}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
         ) : (
           /* ==================== DETAIL / LIST SCREEN ==================== */
           isRandomStudyMode ? (
