@@ -68,7 +68,10 @@ export default function FlashCard({
 
   const handleListen = (e: React.MouseEvent) => {
     e.stopPropagation();
-    speakJapanese(card.reading || card.japanese);
+    speakJapanese(card.reading || card.japanese, {
+      cardId: card.id,
+      situation: card.situation,
+    });
   };
 
   const negativeButtonClass = (dark: boolean) => {

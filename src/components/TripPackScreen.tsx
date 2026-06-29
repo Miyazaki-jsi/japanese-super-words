@@ -26,6 +26,7 @@ import {
 import FlashCard from '@/components/FlashCard';
 import RubyText from '@/components/RubyText';
 import UnlockModal from '@/components/UnlockModal';
+import { speakJapanese } from '@/lib/speakJapanese';
 import { WordCard } from '@/data/words';
 import {
   TripPackDay,
@@ -128,15 +129,6 @@ type TripPackScreenProps = {
   onToggleFavorite: (id: string, favorite: boolean) => void;
   onClose: () => void;
 };
-
-function speakJapanese(text: string) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'ja-JP';
-  utterance.rate = 0.92;
-  window.speechSynthesis.speak(utterance);
-}
 
 function buildQuizQuestions(cards: WordCard[], count = 3): TripPackQuizQuestion[] {
   const shuffled = [...cards].sort(() => Math.random() - 0.5);
@@ -858,7 +850,12 @@ export default function TripPackScreen({
               </div>
               <button
                 type="button"
-                onClick={() => speakJapanese(card.reading || card.japanese)}
+                onClick={() =>
+                  speakJapanese(card.reading || card.japanese, {
+                    cardId: card.id,
+                    situation: card.situation,
+                  })
+                }
                 className="p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex-shrink-0"
                 aria-label="Listen"
               >
@@ -1292,7 +1289,12 @@ export default function TripPackScreen({
           <p className="text-xs text-slate-400 font-mono mt-1">{q.card.romaji}</p>
           <button
             type="button"
-            onClick={() => speakJapanese(q.card.reading || q.card.japanese)}
+            onClick={() =>
+              speakJapanese(q.card.reading || q.card.japanese, {
+                cardId: q.card.id,
+                situation: q.card.situation,
+              })
+            }
             className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600"
           >
             <Volume2 className="w-3 h-3" /> Listen

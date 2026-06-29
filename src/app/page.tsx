@@ -1569,14 +1569,20 @@ export default function Home() {
     if (currentScreen !== 'super_test' || superTestFinished || showSuperTestIntro) return;
     const question = superTestQuestions[superTestIndex];
     if (question?.kind === 'listening' && question.card) {
-      speakJapanese(question.card.japanese);
+      speakJapanese(question.card.reading || question.card.japanese, {
+        cardId: question.card.id,
+        situation: question.card.situation,
+      });
     }
   }, [currentScreen, superTestIndex, superTestFinished, showSuperTestIntro, superTestQuestions]);
 
   const handleReplayListening = () => {
     const question = superTestQuestions[superTestIndex];
     if (question?.kind === 'listening' && question.card) {
-      speakJapanese(question.card.japanese);
+      speakJapanese(question.card.reading || question.card.japanese, {
+        cardId: question.card.id,
+        situation: question.card.situation,
+      });
     }
   };
 

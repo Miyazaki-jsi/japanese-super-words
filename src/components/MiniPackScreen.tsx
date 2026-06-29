@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import FlashCard from '@/components/FlashCard';
 import RubyText from '@/components/RubyText';
+import { speakJapanese } from '@/lib/speakJapanese';
 import { WordCard } from '@/data/words';
 import {
   JAPAN_PRO_PRICE_USD,
@@ -48,15 +49,6 @@ type MiniPackScreenProps = {
   onUnlockStateChange?: () => void;
   onRequestProUnlock?: () => void;
 };
-
-function speakJapanese(text: string) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'ja-JP';
-  utterance.rate = 0.92;
-  window.speechSynthesis.speak(utterance);
-}
 
 function buildQuizQuestions(cards: WordCard[], count: number): MiniPackQuizQuestion[] {
   const shuffled = [...cards].sort(() => Math.random() - 0.5);
@@ -574,7 +566,12 @@ export default function MiniPackScreen({
             <p className="text-xs text-slate-400 font-mono mt-1">{q.card.romaji}</p>
             <button
               type="button"
-              onClick={() => speakJapanese(q.card.reading || q.card.japanese)}
+              onClick={() =>
+                speakJapanese(q.card.reading || q.card.japanese, {
+                  cardId: q.card.id,
+                  situation: q.card.situation,
+                })
+              }
               className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600"
             >
               <Volume2 className="w-3 h-3" /> Listen
