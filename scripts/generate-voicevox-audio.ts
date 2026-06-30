@@ -3,6 +3,7 @@
  *
  * Prerequisites: VOICEVOX running at http://127.0.0.1:50021
  * Usage: npm run generate:voicevox
+ *        npm run generate:voicevox -- --situation date
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -12,6 +13,14 @@ import {
   voicevoxWordCards,
 } from '../src/data/voicevoxCatalog';
 import { voicevoxTextHash } from '../src/lib/voicevoxTextHash';
+import type { SituationId } from '../src/data/words';
+
+function parseSituationArg(): SituationId | null {
+  const index = process.argv.indexOf('--situation');
+  if (index === -1) return null;
+  const value = process.argv[index + 1]?.trim();
+  return value ? (value as SituationId) : null;
+}
 
 const VOICEVOX_URL = process.env.VOICEVOX_URL ?? 'http://127.0.0.1:50021';
 const SPEAKER = Number(process.env.VOICEVOX_SPEAKER ?? 8);
@@ -47,6 +56,15 @@ async function synthesize(text: string): Promise<ArrayBuffer> {
 }
 
 async function main() {
+  const situationFilter = parseSituationArg();
+  const wordCards = situationFilter
+    ? voicevoxWordCards.filter((card) => card.situation === situationFilter)
+    : voicevoxWordCards;
+  if (situationFilter && wordCards.length === 0) {
+    console.error(`No word cards found for situation: ${situationFilter}`);
+    process.exit(1);
+  }
+
   const versionRes = await fetch(`${VOICEVOX_URL}/version`, {
     signal: AbortSignal.timeout(4_000),
   }).catch(() => null);
@@ -62,8 +80,9 @@ async function main() {
   let ok = 0;
   let failed = 0;
 
-  console.log(`Generating ${voicevoxWordCards.length} word card files…`);
-  for (const card of voicevoxWordCards) {
+  const scopeLabel = situationFilter ? ` (${situationFilter})` : '';
+  console.log(`Generating ${wordCards.length} word card files${scopeLabel}…`);
+  for (const card of wordCards) {
     const text = card.reading || card.japanese;
     const outDir = path.join(OUT_ROOT, card.situation);
     const outPath = path.join(outDir, `${card.id}.wav`);
@@ -79,6 +98,12 @@ async function main() {
       console.error(error);
       failed++;
     }
+  }
+
+  if (situationFilter) {
+    console.log(`Done. ${ok} ok, ${failed} failed.`);
+    if (failed > 0) process.exit(1);
+    return;
   }
 
   const roleplayReadings = collectTripPackStaffReadings();
