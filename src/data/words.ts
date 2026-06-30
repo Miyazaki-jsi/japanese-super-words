@@ -587,6 +587,44 @@ export const sampleWords: WordCard[] = [
   { id: 'sa29', japanese: 'セット数は何セットですか？', reading: 'せっとすうはなんせっとですか？', romaji: 'Setto-sū wa nan setto desu ka?', english: 'How many sauna rounds is the set?', situation: 'sauna' },
   { id: 'sa30', japanese: '外気浴はどこですか？', reading: 'がいきよくはどこですか？', romaji: 'Gaikiyoku wa doko desu ka?', english: 'Where is the outdoor cooling area?', situation: 'sauna' },
 
+  // ==================== PREMIUM: DATE (30 items) ====================
+  // --- Nouns ---
+  { id: 'dt1', japanese: 'デート', reading: 'でーと', romaji: 'Dēto', english: 'Date (romantic outing)', situation: 'date' },
+  { id: 'dt2', japanese: '夜景', reading: 'やけい', romaji: 'Yakei', english: 'Night view', situation: 'date' },
+  { id: 'dt3', japanese: 'プレゼント', reading: 'ぷれぜんと', romaji: 'Purezento', english: 'Present / gift', situation: 'date' },
+  { id: 'dt4', japanese: 'お誘い', reading: 'おさそい', romaji: 'Osasoi', english: 'Invitation', situation: 'date' },
+  { id: 'dt5', japanese: '待ち合わせ', reading: 'まちあわせ', romaji: 'Machiawase', english: 'Meeting place / rendezvous', situation: 'date' },
+  // --- Verbs ---
+  { id: 'dt6', japanese: '誘う', reading: 'さそう', romaji: 'Sasou', english: 'To invite (someone out)', situation: 'date' },
+  { id: 'dt7', japanese: '付き合う', reading: 'つきあう', romaji: 'Tsukiau', english: 'To go out with / date', situation: 'date' },
+  { id: 'dt8', japanese: '乾杯する', reading: 'かんぱいする', romaji: 'Kanpai suru', english: 'To toast / cheers', situation: 'date' },
+  // --- Adjectives ---
+  { id: 'dt9', japanese: '素敵な', reading: 'すてきな', romaji: 'Suteki na', english: 'Lovely / wonderful', situation: 'date' },
+  { id: 'dt10', japanese: '楽しい', reading: 'たのしい', romaji: 'Tanoshii', english: 'Fun / enjoyable', situation: 'date' },
+  { id: 'dt11', japanese: '美味しい', reading: 'おいしい', romaji: 'Oishii', english: 'Delicious', situation: 'date' },
+  // --- Adverbs ---
+  { id: 'dt12', japanese: '一緒に', reading: 'いっしょに', romaji: 'Issho ni', english: 'Together', situation: 'date' },
+  { id: 'dt13', japanese: 'ゆっくり', reading: 'ゆっくり', romaji: 'Yukkuri', english: 'Slowly / leisurely', situation: 'date' },
+  // --- Phrases ---
+  { id: 'dt14', japanese: '素敵な場所ですね。', reading: 'すてきなばしょですね。', romaji: 'Suteki na basho desu ne.', english: 'What a lovely place.', situation: 'date' },
+  { id: 'dt15', japanese: '今度一緒に食事しませんか？', reading: 'こんどいっしょにしょくじしませんか？', romaji: 'Konndo issho ni shokuji shimasen ka?', english: 'Would you like to have a meal together sometime?', situation: 'date' },
+  { id: 'dt16', japanese: '何時に会いましょうか？', reading: 'なんじにあいましょうか？', romaji: 'Nanji ni aimashō ka?', english: 'What time shall we meet?', situation: 'date' },
+  { id: 'dt17', japanese: '駅の改札前で待ち合わせしましょう。', reading: 'えきのかいさつまえでまちあわせしましょう。', romaji: 'Eki no kaisatsumae de machiawase shimashō.', english: "Let's meet in front of the ticket gates at the station.", situation: 'date' },
+  { id: 'dt18', japanese: '今日はおごります。', reading: 'きょうはおごります。', romaji: 'Kyō wa ogurimasu.', english: "Today is my treat.", situation: 'date' },
+  { id: 'dt19', japanese: '割り勘にしましょう。', reading: 'わりかんにしましょう。', romaji: 'Warikan ni shimashō.', english: "Let's split the bill.", situation: 'date' },
+  { id: 'dt20', japanese: 'また会いたいです。', reading: 'またあいたいです。', romaji: 'Mata aitai desu.', english: "I'd like to see you again.", situation: 'date' },
+  // --- Extra ---
+  { id: 'dt21', japanese: '花束', reading: 'はなたば', romaji: 'Hanataba', english: 'Bouquet of flowers', situation: 'date' },
+  { id: 'dt22', japanese: '手をつなぐ', reading: 'てをつなぐ', romaji: 'Te o tsunagu', english: 'To hold hands', situation: 'date' },
+  { id: 'dt23', japanese: 'ドキドキ', reading: 'どきどき', romaji: 'Dokidoki', english: 'Heart pounding (excited / nervous)', situation: 'date' },
+  { id: 'dt24', japanese: 'お疲れ様でした。', reading: 'おつかれさまでした。', romaji: 'Otsukaresama deshita.', english: 'Thanks for your hard work today.', situation: 'date' },
+  { id: 'dt25', japanese: 'おすすめの店を知っていますか？', reading: 'おすすめのみせをしっていますか？', romaji: 'Osusume no mise o shitte imasu ka?', english: 'Do you know a good restaurant?', situation: 'date' },
+  { id: 'dt26', japanese: '静かな場所がいいです。', reading: 'しずかなばしょがいいです。', romaji: 'Shizuka na basho ga ii desu.', english: "I'd prefer a quiet place.", situation: 'date' },
+  { id: 'dt27', japanese: '予約してあります。', reading: 'よやくしてあります。', romaji: 'Yoyaku shite arimasu.', english: 'I have a reservation.', situation: 'date' },
+  { id: 'dt28', japanese: 'とても楽しいです。', reading: 'とてもたのしいです。', romaji: 'Totemo tanoshii desu.', english: "I'm having a great time.", situation: 'date' },
+  { id: 'dt29', japanese: '次はどこに行きましょうか？', reading: 'つぎはどこにいきましょうか？', romaji: 'Tsugi wa doko ni ikimashō ka?', english: 'Where should we go next?', situation: 'date' },
+  { id: 'dt30', japanese: 'お送りします。', reading: 'おおくりします。', romaji: 'Ookuri shimasu.', english: "I'll walk you home / see you off.", situation: 'date' },
+
   // ==================== PREMIUM: DON QUIJOTE (30 items) ====================
   // --- Nouns ---
   { id: 'dq1', japanese: '激安', reading: 'げきやす', romaji: 'Gekiyasu', english: 'Super cheap / bargain prices', situation: 'don_quijote' },
