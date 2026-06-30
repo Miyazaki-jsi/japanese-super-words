@@ -1,4 +1,5 @@
 import type { MiniPackId } from '@/data/miniPacks';
+import { JAPAN_PRO_GUMROAD_URL } from '@/data/monetization';
 import {
   JAPAN_PRO_UNLOCK_STORAGE_KEY,
   LEGACY_PREMIUM_STORAGE_KEY,
@@ -26,6 +27,10 @@ export const MINI_PACK_GUMROAD_URLS: Record<MiniPackId, string> = {
     process.env.NEXT_PUBLIC_MINI_PACK_GUMROAD_URL?.trim() ||
     '',
 };
+
+export function getMiniPackGumroadUrl(packId: MiniPackId): string {
+  return MINI_PACK_GUMROAD_URLS[packId] || JAPAN_PRO_GUMROAD_URL;
+}
 
 function readJapanProUnlocked(): boolean {
   if (typeof window === 'undefined') return false;

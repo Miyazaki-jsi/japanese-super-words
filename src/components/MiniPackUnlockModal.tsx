@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Check, ExternalLink, Lock, X } from 'lucide-react';
 import type { MiniPack } from '@/data/miniPacks';
-import { MINI_PACK_GUMROAD_URLS } from '@/data/miniPackUnlock';
+import { getMiniPackGumroadUrl } from '@/data/miniPackUnlock';
 import { saveUnlockTier } from '@/data/monetization';
 import { trackEvent } from '@/lib/analytics';
 import { useVisualViewport } from '@/lib/useVisualViewport';
@@ -24,7 +24,7 @@ export default function MiniPackUnlockModal({ pack, onClose, onUnlock }: MiniPac
   const ignoreBackdropCloseRef = useRef(false);
   const { height: viewportHeight, offsetTop } = useVisualViewport();
 
-  const gumroadUrl = MINI_PACK_GUMROAD_URLS[pack.id];
+  const gumroadUrl = getMiniPackGumroadUrl(pack.id);
   const features = [
     { en: `${pack.wordIds.length} curated phrases`, ja: `${pack.wordIds.length}フレーズ厳選` },
     { en: `${pack.roleplays.length} roleplay scenes`, ja: `ロールプレイ${pack.roleplays.length}シーン` },

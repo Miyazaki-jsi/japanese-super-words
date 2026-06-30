@@ -1,4 +1,5 @@
 import type { UnlockTier } from '@/data/monetization';
+import { verifyGumroadLicense } from '@/lib/gumroadLicense';
 
 function parseCodeList(envValue: string | undefined): Set<string> {
   if (!envValue?.trim()) return new Set();
@@ -22,10 +23,17 @@ if (isDev) {
 
 export type UnlockGrant = { kind: 'tier'; tier: UnlockTier };
 
-export function verifyUnlockCodeOnServer(code: string): UnlockGrant | null {
+export function verifyStaticUnlockCode(code: string): UnlockGrant | null {
   const normalized = code.trim().toLowerCase();
   if (!normalized) return null;
   if (proCodes.has(normalized)) return { kind: 'tier', tier: 'pro' };
   if (tripCodes.has(normalized)) return { kind: 'tier', tier: 'trip' };
   return null;
+}
+
+/** Static env codes first, then Gumroad license-key API (unique keys per sale). */
+export async function verifyUnlockCodeOnServer(code: string): Promise<UnlockGrant | null> {
+  const staticGrant = verifyStaticUnlockCode(code);
+  if (staticGrant) return staticGrant;
+  return verifyGumroadLicense(code);
 }

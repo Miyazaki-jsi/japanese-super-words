@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid unlock code.' }, { status: 400 });
     }
 
-    const grant: UnlockGrant | null = verifyUnlockCodeOnServer(code);
+    const grant: UnlockGrant | null = await verifyUnlockCodeOnServer(code);
 
     if (!grant) {
       return NextResponse.json({ error: 'Invalid unlock code.' }, { status: 401 });

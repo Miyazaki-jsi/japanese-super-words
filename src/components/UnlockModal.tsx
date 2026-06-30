@@ -45,6 +45,7 @@ type UnlockModalProps = {
   tier: UnlockTier;
   context: UnlockContext;
   daysUntilTrip?: number | null;
+  initialCode?: string;
   onClose: () => void;
   onUnlock: (tier: UnlockTier) => void;
 };
@@ -109,10 +110,11 @@ export default function UnlockModal({
   tier,
   context,
   daysUntilTrip,
+  initialCode = '',
   onClose,
   onUnlock,
 }: UnlockModalProps) {
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(initialCode);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [codeFocused, setCodeFocused] = useState(false);
@@ -134,6 +136,10 @@ export default function UnlockModal({
   useEffect(() => {
     trackEvent('unlock_modal_shown', { tier, context });
   }, [tier, context]);
+
+  useEffect(() => {
+    if (initialCode) setCode(initialCode);
+  }, [initialCode]);
 
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;

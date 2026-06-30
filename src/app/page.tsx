@@ -70,6 +70,7 @@ import {
 } from '@/data/phraseLevel';
 import { trackEvent } from '@/lib/analytics';
 import { speakJapanese } from '@/lib/speakJapanese';
+import { usePurchaseReturnUnlock } from '@/lib/usePurchaseReturnUnlock';
 import {
   clearStudyHabits,
   getDueWordIds,
@@ -619,6 +620,7 @@ export default function Home() {
   
   const [isLoaded, setIsLoaded] = useState(false);
   const [unlockModal, setUnlockModal] = useState<{ tier: UnlockTier; context: UnlockContext } | null>(null);
+  const [pendingUnlockCode, setPendingUnlockCode] = useState('');
   const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(false);
   const [isTripPackUnlocked, setIsTripPackUnlocked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -1095,9 +1097,21 @@ export default function Home() {
       setShowPremiumUnlockedModal(true);
     }
     setUnlockModal(null);
+    setPendingUnlockCode('');
     setCurrentScreen('home');
     setSelectedSituation(null);
   };
+
+  usePurchaseReturnUnlock({
+    onUnlocked: handleUnlockSuccess,
+    onNeedsManualUnlock: (payload) => {
+      setPendingUnlockCode(payload.licenseKey);
+      setUnlockModal({
+        tier: payload.tierHint ?? 'trip',
+        context: 'hub',
+      });
+    },
+  });
 
   const handleOpenTripUnlock = (context: UnlockContext = 'hub') => {
     closeSettingsModal();
@@ -3523,7 +3537,11 @@ export default function Home() {
           tier={unlockModal.tier}
           context={unlockModal.context}
           daysUntilTrip={daysUntilTrip}
-          onClose={() => setUnlockModal(null)}
+          initialCode={pendingUnlockCode}
+          onClose={() => {
+            setUnlockModal(null);
+            setPendingUnlockCode('');
+          }}
           onUnlock={handleUnlockSuccess}
         />
       )}
