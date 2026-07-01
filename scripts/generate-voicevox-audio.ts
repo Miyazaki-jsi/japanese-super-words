@@ -4,6 +4,7 @@
  * Prerequisites: VOICEVOX running at http://127.0.0.1:50021
  * Usage: npm run generate:voicevox
  *        npm run generate:voicevox -- --situation date
+ *        npm run generate:voicevox -- --cards r3,r16,r17
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -13,6 +14,7 @@ import {
   voicevoxWordCards,
 } from '../src/data/voicevoxCatalog';
 import { voicevoxTextHash } from '../src/lib/voicevoxTextHash';
+import { getVoicevoxReading } from '../src/lib/voicevoxReading';
 import type { SituationId } from '../src/data/words';
 
 function parseSituationArg(): SituationId | null {
@@ -20,6 +22,14 @@ function parseSituationArg(): SituationId | null {
   if (index === -1) return null;
   const value = process.argv[index + 1]?.trim();
   return value ? (value as SituationId) : null;
+}
+
+function parseCardsArg(): Set<string> | null {
+  const index = process.argv.indexOf('--cards');
+  if (index === -1) return null;
+  const value = process.argv[index + 1]?.trim();
+  if (!value) return null;
+  return new Set(value.split(',').map((id) => id.trim()).filter(Boolean));
 }
 
 const VOICEVOX_URL = process.env.VOICEVOX_URL ?? 'http://127.0.0.1:50021';
@@ -57,11 +67,15 @@ async function synthesize(text: string): Promise<ArrayBuffer> {
 
 async function main() {
   const situationFilter = parseSituationArg();
-  const wordCards = situationFilter
+  const cardFilter = parseCardsArg();
+  let wordCards = situationFilter
     ? voicevoxWordCards.filter((card) => card.situation === situationFilter)
     : voicevoxWordCards;
-  if (situationFilter && wordCards.length === 0) {
-    console.error(`No word cards found for situation: ${situationFilter}`);
+  if (cardFilter) {
+    wordCards = wordCards.filter((card) => cardFilter.has(card.id));
+  }
+  if (wordCards.length === 0) {
+    console.error('No word cards matched the requested filter.');
     process.exit(1);
   }
 
@@ -80,10 +94,14 @@ async function main() {
   let ok = 0;
   let failed = 0;
 
-  const scopeLabel = situationFilter ? ` (${situationFilter})` : '';
+  const scopeLabel = cardFilter
+    ? ` (${[...cardFilter].join(', ')})`
+    : situationFilter
+      ? ` (${situationFilter})`
+      : '';
   console.log(`Generating ${wordCards.length} word card files${scopeLabel}…`);
   for (const card of wordCards) {
-    const text = card.reading || card.japanese;
+    const text = getVoicevoxReading(card);
     const outDir = path.join(OUT_ROOT, card.situation);
     const outPath = path.join(outDir, `${card.id}.wav`);
     process.stdout.write(`${card.id} … `);
@@ -100,7 +118,7 @@ async function main() {
     }
   }
 
-  if (situationFilter) {
+  if (situationFilter || cardFilter) {
     console.log(`Done. ${ok} ok, ${failed} failed.`);
     if (failed > 0) process.exit(1);
     return;
