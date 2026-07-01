@@ -10,6 +10,7 @@
     "generate:voicevox": "npx tsx scripts/generate-voicevox-audio.ts",
     "setup:gumroad": "bash scripts/setup-gumroad.sh",
     "setup:admin": "bash scripts/setup-admin.sh",
+    "provision:admin": "bash scripts/provision-admin.sh",
     "verify:supabase": "npx tsx scripts/verify-supabase.ts"
   },
   "dependencies": {
