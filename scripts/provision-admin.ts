@@ -10,7 +10,8 @@ import { resolve } from 'node:path';
 const SUPABASE_API = 'https://api.supabase.com/v1';
 const VERCEL_API = 'https://api.vercel.com';
 
-const VERCEL_TOKEN = process.env.VERCEL_TOKEN?.trim();
+const VERCEL_TOKEN =
+  process.env.VERCEL_TOKEN?.trim() || process.env.VERCELL_TOKEN?.trim();
 const SUPABASE_ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN?.trim();
 const VERCEL_PROJECT = process.env.VERCEL_PROJECT?.trim() || 'japanese-super-words';
 const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID?.trim();

@@ -28,6 +28,11 @@ if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] && [ -z "${SUPABASE_URL:-}" ]; then
   exit 1
 fi
 
+if [ -z "${VERCEL_TOKEN:-}" ] && [ -n "${VERCELL_TOKEN:-}" ]; then
+  export VERCEL_TOKEN="$VERCELL_TOKEN"
+  echo "Note: using VERCELL_TOKEN — rename secret to VERCEL_TOKEN when you can."
+fi
+
 if [ -z "${VERCEL_TOKEN:-}" ]; then
   echo "ERROR: Set VERCEL_TOKEN to push env vars to Vercel."
   echo "  Vercel token: https://vercel.com/account/tokens (scope: project env vars)"
