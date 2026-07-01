@@ -3,6 +3,8 @@ import {
   getConfiguredGumroadProductCounts,
   isGumroadLicenseVerifyConfigured,
 } from '@/lib/gumroadLicense';
+import { isAdminAuthConfigured } from '@/lib/adminAuth';
+import { isAnalyticsDbConfigured } from '@/lib/supabaseServer';
 
 /** Public readiness check — booleans/counts only, no secrets exposed. */
 export async function GET() {
@@ -17,6 +19,8 @@ export async function GET() {
     raw ? raw.split(',').map((c) => c.trim()).filter(Boolean).length : 0;
 
   const gumroadLicenseVerify = isGumroadLicenseVerifyConfigured();
+  const adminAuthConfigured = isAdminAuthConfigured();
+  const adminDbConfigured = isAnalyticsDbConfigured();
 
   return NextResponse.json({
     ok: true,
@@ -37,6 +41,14 @@ export async function GET() {
       proUrl.length > 0 &&
       (countCodes(tripCodes) > 0 || productCounts.trip > 0) &&
       (countCodes(proCodes) > 0 || productCounts.pro > 0),
+    admin: {
+      authConfigured: adminAuthConfigured,
+      dbConfigured: adminDbConfigured,
+      ready: adminAuthConfigured && adminDbConfigured,
+      loginPath: '/admin/login',
+      script: 'npm run setup:admin',
+      schemaSql: 'supabase/schema.sql',
+    },
     webhookSetup: {
       pingUrl: '/api/webhooks/gumroad',
       envVar: 'GUMROAD_SELLER_ID',
