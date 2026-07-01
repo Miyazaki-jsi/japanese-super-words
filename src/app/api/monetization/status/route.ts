@@ -37,5 +37,10 @@ export async function GET() {
       proUrl.length > 0 &&
       (countCodes(tripCodes) > 0 || productCounts.trip > 0) &&
       (countCodes(proCodes) > 0 || productCounts.pro > 0),
+    webhookSetup: {
+      pingUrl: '/api/webhooks/gumroad',
+      envVar: 'GUMROAD_SELLER_ID',
+      script: 'npm run setup:gumroad',
+    },
   });
 }
