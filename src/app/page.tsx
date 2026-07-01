@@ -3383,6 +3383,21 @@ export default function Home() {
                 </p>
               </div>
 
+              <button
+                type="button"
+                onClick={() =>
+                  speakJapanese(searchWordPopup.reading || searchWordPopup.japanese, {
+                    cardId: searchWordPopup.id,
+                    situation: searchWordPopup.situation,
+                  })
+                }
+                className="mx-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold transition-colors"
+                aria-label="Listen"
+              >
+                <Volume2 className="w-4 h-4" />
+                Listen
+              </button>
+
               <div className="flex items-center justify-center gap-2 pt-1">
                 <button
                   type="button"
