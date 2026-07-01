@@ -1,5 +1,6 @@
 import { getVoicevoxWordCard } from '@/data/voicevoxCatalog';
 import { synthesizeVoicevoxWav } from '@/lib/voicevoxSynth';
+import { getVoicevoxReading } from '@/lib/voicevoxReading';
 
 type RouteContext = {
   params: Promise<{ cardId: string }>;
@@ -12,7 +13,7 @@ export async function GET(_request: Request, context: RouteContext) {
     return new Response('Card not found', { status: 404 });
   }
 
-  const wav = await synthesizeVoicevoxWav(card.reading || card.japanese);
+  const wav = await synthesizeVoicevoxWav(getVoicevoxReading(card));
   if (!wav) {
     return new Response(
       'VOICEVOX engine unavailable. Start the VOICEVOX app, or run npm run generate:voicevox.',
