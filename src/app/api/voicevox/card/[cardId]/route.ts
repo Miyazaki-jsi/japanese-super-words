@@ -13,7 +13,7 @@ export async function GET(_request: Request, context: RouteContext) {
     return new Response('Card not found', { status: 404 });
   }
 
-  const wav = await synthesizeVoicevoxWav(getVoicevoxReading(card));
+  const wav = await synthesizeVoicevoxWav(getVoicevoxReading(card), { cardId: card.id });
   if (!wav) {
     return new Response(
       'VOICEVOX engine unavailable. Start the VOICEVOX app, or run npm run generate:voicevox.',

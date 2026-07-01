@@ -15,6 +15,7 @@ import {
 } from '../src/data/voicevoxCatalog';
 import { voicevoxTextHash } from '../src/lib/voicevoxTextHash';
 import { getVoicevoxReading } from '../src/lib/voicevoxReading';
+import { synthesizeVoicevoxWav } from '../src/lib/voicevoxSynth';
 import type { SituationId } from '../src/data/words';
 
 function parseSituationArg(): SituationId | null {
@@ -33,37 +34,7 @@ function parseCardsArg(): Set<string> | null {
 }
 
 const VOICEVOX_URL = process.env.VOICEVOX_URL ?? 'http://127.0.0.1:50021';
-const SPEAKER = Number(process.env.VOICEVOX_SPEAKER ?? 8);
 const OUT_ROOT = path.join(process.cwd(), 'public/audio/voicevox');
-
-async function synthesize(text: string): Promise<ArrayBuffer> {
-  const queryParams = new URLSearchParams({
-    text,
-    speaker: String(SPEAKER),
-  });
-  const queryRes = await fetch(`${VOICEVOX_URL}/audio_query?${queryParams.toString()}`, {
-    method: 'POST',
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!queryRes.ok) {
-    throw new Error(`audio_query failed (${queryRes.status})`);
-  }
-
-  const query = (await queryRes.json()) as { speedScale?: number };
-  query.speedScale = 0.92;
-
-  const synthRes = await fetch(`${VOICEVOX_URL}/synthesis?speaker=${SPEAKER}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(query),
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!synthRes.ok) {
-    throw new Error(`synthesis failed (${synthRes.status})`);
-  }
-
-  return synthRes.arrayBuffer();
-}
 
 async function main() {
   const situationFilter = parseSituationArg();
@@ -107,7 +78,8 @@ async function main() {
     process.stdout.write(`${card.id} … `);
     try {
       await mkdir(outDir, { recursive: true });
-      const wav = await synthesize(text);
+      const wav = await synthesizeVoicevoxWav(text, { cardId: card.id });
+      if (!wav) throw new Error('synthesis failed');
       await writeFile(outPath, Buffer.from(wav));
       console.log('ok');
       ok++;
@@ -136,7 +108,8 @@ async function main() {
     const outPath = path.join(textDir, `${hash}.wav`);
     process.stdout.write(`text:${hash.slice(0, 8)} … `);
     try {
-      const wav = await synthesize(reading);
+      const wav = await synthesizeVoicevoxWav(reading);
+      if (!wav) throw new Error('synthesis failed');
       await writeFile(outPath, Buffer.from(wav));
       console.log('ok');
       ok++;
