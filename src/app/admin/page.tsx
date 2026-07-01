@@ -82,8 +82,9 @@ function SetupPanel() {
       <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-amber-100/90">
         <li>Supabase で無料プロジェクトを作成</li>
         <li>SQL Editor で <code className="rounded bg-black/20 px-1">supabase/schema.sql</code> を実行</li>
-        <li><code className="rounded bg-black/20 px-1">SUPABASE_URL</code> と <code className="rounded bg-black/20 px-1">SUPABASE_SERVICE_ROLE_KEY</code> を設定</li>
-        <li><code className="rounded bg-black/20 px-1">ADMIN_PASSWORD</code> と <code className="rounded bg-black/20 px-1">ADMIN_SESSION_SECRET</code> を設定</li>
+        <li><code className="rounded bg-black/20 px-1">SUPABASE_URL</code> と <code className="rounded bg-black/20 px-1">SUPABASE_SERVICE_ROLE_KEY</code> を Vercel に設定</li>
+        <li><code className="rounded bg-black/20 px-1">ADMIN_PASSWORD</code> と <code className="rounded bg-black/20 px-1">ADMIN_SESSION_SECRET</code> を Vercel に設定</li>
+        <li>再デプロイ後、<code className="rounded bg-black/20 px-1">npm run setup:admin</code> の手順で確認</li>
       </ol>
       <p className="mt-4 text-sm text-amber-100/80">
         詳細は <code className="rounded bg-black/20 px-1">.env.example</code> を参照してください。

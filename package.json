@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate:voicevox": "npx tsx scripts/generate-voicevox-audio.ts"
+    "generate:voicevox": "npx tsx scripts/generate-voicevox-audio.ts",
+    "setup:gumroad": "bash scripts/setup-gumroad.sh",
+    "setup:admin": "bash scripts/setup-admin.sh",
+    "verify:supabase": "npx tsx scripts/verify-supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
