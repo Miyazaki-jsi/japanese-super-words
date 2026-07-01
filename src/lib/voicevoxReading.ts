@@ -18,12 +18,39 @@ const CONVERSATIONAL_JAPANESE_CARD_IDS = new Set([
   'lnb17',
 ]);
 
+/**
+ * Cards where an all-hiragana reading makes OpenJTalk misparse topic-marker は
+ * as part of an unrelated verb — e.g. "ふくろはいりません" is read as 袋 + 入りません
+ * ("doesn't enter", は pronounced "ha") instead of 袋 + は + 要りません
+ * ("don't need", は correctly pronounced "wa"). Using the kanji text disambiguates it.
+ */
+const KANJI_DISAMBIGUATED_CARD_IDS = new Set([
+  's20', // 袋は要りません。
+  's25', // レシートは要りません。
+  'dp26', // 袋は要りません。
+]);
+
 export function getVoicevoxReading(card: Pick<WordCard, 'id' | 'reading' | 'japanese'>): string {
   if (VOICEVOX_READING_OVERRIDES[card.id]) {
     return VOICEVOX_READING_OVERRIDES[card.id];
   }
-  if (CONVERSATIONAL_JAPANESE_CARD_IDS.has(card.id)) {
+  if (CONVERSATIONAL_JAPANESE_CARD_IDS.has(card.id) || KANJI_DISAMBIGUATED_CARD_IDS.has(card.id)) {
     return card.japanese;
   }
   return card.reading ?? card.japanese;
+}
+
+/**
+ * Free-text (trip pack roleplay) synthesis overrides, keyed by the exact
+ * all-hiragana `staffReading` string. The hiragana stays unchanged for
+ * furigana display (RubyText); only the audio synthesis input is swapped
+ * for the kanji version to fix は/topic-marker misparsing (see
+ * KANJI_DISAMBIGUATED_CARD_IDS above for the underlying issue).
+ */
+const VOICEVOX_TEXT_SYNTHESIS_OVERRIDES: Record<string, string> = {
+  'れしーとはいりますか？': 'レシートは要りますか？',
+};
+
+export function getVoicevoxSynthesisText(text: string): string {
+  return VOICEVOX_TEXT_SYNTHESIS_OVERRIDES[text] ?? text;
 }

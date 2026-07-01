@@ -5,6 +5,7 @@
  * Usage: npm run generate:voicevox
  *        npm run generate:voicevox -- --situation date
  *        npm run generate:voicevox -- --cards r3,r16,r17
+ *        npm run generate:voicevox -- --textonly
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -14,7 +15,7 @@ import {
   voicevoxWordCards,
 } from '../src/data/voicevoxCatalog';
 import { voicevoxTextHash } from '../src/lib/voicevoxTextHash';
-import { getVoicevoxReading } from '../src/lib/voicevoxReading';
+import { getVoicevoxReading, getVoicevoxSynthesisText } from '../src/lib/voicevoxReading';
 import { synthesizeVoicevoxWav } from '../src/lib/voicevoxSynth';
 import type { SituationId } from '../src/data/words';
 
@@ -39,16 +40,7 @@ const OUT_ROOT = path.join(process.cwd(), 'public/audio/voicevox');
 async function main() {
   const situationFilter = parseSituationArg();
   const cardFilter = parseCardsArg();
-  let wordCards = situationFilter
-    ? voicevoxWordCards.filter((card) => card.situation === situationFilter)
-    : voicevoxWordCards;
-  if (cardFilter) {
-    wordCards = wordCards.filter((card) => cardFilter.has(card.id));
-  }
-  if (wordCards.length === 0) {
-    console.error('No word cards matched the requested filter.');
-    process.exit(1);
-  }
+  const textOnly = process.argv.includes('--textonly');
 
   const versionRes = await fetch(`${VOICEVOX_URL}/version`, {
     signal: AbortSignal.timeout(4_000),
@@ -65,35 +57,48 @@ async function main() {
   let ok = 0;
   let failed = 0;
 
-  const scopeLabel = cardFilter
-    ? ` (${[...cardFilter].join(', ')})`
-    : situationFilter
-      ? ` (${situationFilter})`
-      : '';
-  console.log(`Generating ${wordCards.length} word card files${scopeLabel}…`);
-  for (const card of wordCards) {
-    const text = getVoicevoxReading(card);
-    const outDir = path.join(OUT_ROOT, card.situation);
-    const outPath = path.join(outDir, `${card.id}.wav`);
-    process.stdout.write(`${card.id} … `);
-    try {
-      await mkdir(outDir, { recursive: true });
-      const wav = await synthesizeVoicevoxWav(text, { cardId: card.id });
-      if (!wav) throw new Error('synthesis failed');
-      await writeFile(outPath, Buffer.from(wav));
-      console.log('ok');
-      ok++;
-    } catch (error) {
-      console.log('fail');
-      console.error(error);
-      failed++;
+  if (!textOnly) {
+    let wordCards = situationFilter
+      ? voicevoxWordCards.filter((card) => card.situation === situationFilter)
+      : voicevoxWordCards;
+    if (cardFilter) {
+      wordCards = wordCards.filter((card) => cardFilter.has(card.id));
     }
-  }
+    if (wordCards.length === 0) {
+      console.error('No word cards matched the requested filter.');
+      process.exit(1);
+    }
 
-  if (situationFilter || cardFilter) {
-    console.log(`Done. ${ok} ok, ${failed} failed.`);
-    if (failed > 0) process.exit(1);
-    return;
+    const scopeLabel = cardFilter
+      ? ` (${[...cardFilter].join(', ')})`
+      : situationFilter
+        ? ` (${situationFilter})`
+        : '';
+    console.log(`Generating ${wordCards.length} word card files${scopeLabel}…`);
+    for (const card of wordCards) {
+      const text = getVoicevoxReading(card);
+      const outDir = path.join(OUT_ROOT, card.situation);
+      const outPath = path.join(outDir, `${card.id}.wav`);
+      process.stdout.write(`${card.id} … `);
+      try {
+        await mkdir(outDir, { recursive: true });
+        const wav = await synthesizeVoicevoxWav(text, { cardId: card.id });
+        if (!wav) throw new Error('synthesis failed');
+        await writeFile(outPath, Buffer.from(wav));
+        console.log('ok');
+        ok++;
+      } catch (error) {
+        console.log('fail');
+        console.error(error);
+        failed++;
+      }
+    }
+
+    if (situationFilter || cardFilter) {
+      console.log(`Done. ${ok} ok, ${failed} failed.`);
+      if (failed > 0) process.exit(1);
+      return;
+    }
   }
 
   const roleplayReadings = collectTripPackStaffReadings();
@@ -104,11 +109,12 @@ async function main() {
   console.log(`Generating ${roleplayReadings.length} trip pack roleplay files…`);
   for (const reading of roleplayReadings) {
     const hash = voicevoxTextHash(reading);
-    manifest[hash] = reading;
+    const synthText = getVoicevoxSynthesisText(reading);
+    manifest[hash] = synthText;
     const outPath = path.join(textDir, `${hash}.wav`);
     process.stdout.write(`text:${hash.slice(0, 8)} … `);
     try {
-      const wav = await synthesizeVoicevoxWav(reading);
+      const wav = await synthesizeVoicevoxWav(synthText);
       if (!wav) throw new Error('synthesis failed');
       await writeFile(outPath, Buffer.from(wav));
       console.log('ok');
