@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "generate:voicevox": "npx tsx scripts/generate-voicevox-audio.ts",
+    "verify:card-ids": "npx tsx scripts/verify-card-ids.ts",
     "setup:gumroad": "bash scripts/setup-gumroad.sh",
     "setup:admin": "bash scripts/setup-admin.sh",
     "provision:admin": "bash scripts/provision-admin.sh",

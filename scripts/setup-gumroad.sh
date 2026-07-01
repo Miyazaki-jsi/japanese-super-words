@@ -38,25 +38,68 @@ if [ -z "${GUMROAD_ACCESS_TOKEN:-}" ]; then
   echo "5. Settings → Advanced → Webhooks → Ping:"
   echo "   $WEBHOOK_URL"
   echo ""
+  echo "6. Vercel → Project → Settings → Environment Variables:"
+  echo "   GUMROAD_SELLER_ID=<your seller id from Gumroad Settings → Advanced>"
+  echo "   (Required for webhookSellerConfigured + seller verification on POST)"
+  echo ""
   echo "Then set Vercel env (if not already):"
   echo "  GUMROAD_TRIP_PRODUCT_IDS=$TRIP_PERMALINK"
   echo "  GUMROAD_PRO_PRODUCT_IDS=$PRO_PERMALINK"
   exit 0
 fi
 
+gumroad_api() {
+  local method="$1"
+  local path="$2"
+  shift 2
+  curl -sf -X "$method" "https://api.gumroad.com/v2${path}" \
+    -d "access_token=${GUMROAD_ACCESS_TOKEN}" \
+    "$@"
+}
+
+fetch_seller_id() {
+  gumroad_api GET /user | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+user = data.get('user') or {}
+print(user.get('user_id') or user.get('id') or '')
+"
+}
+
+list_webhooks() {
+  gumroad_api GET /resource_subscriptions | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for sub in data.get('resource_subscriptions', []):
+    print(f\"  {sub.get('resource_name')}: {sub.get('post_url')}\")
+"
+}
+
 register_webhook() {
   local resource="$1"
   echo "Registering webhook: $resource → $WEBHOOK_URL"
-  curl -sf -X PUT "https://api.gumroad.com/v2/resource_subscriptions" \
-    -d "access_token=${GUMROAD_ACCESS_TOKEN}" \
+  gumroad_api PUT /resource_subscriptions \
     -d "resource_name=${resource}" \
     -d "post_url=${WEBHOOK_URL}" \
     | python3 -c "import sys,json; d=json.load(sys.stdin); print('  ok:', d.get('success', False))"
 }
 
-list_products() {
-  curl -sf "https://api.gumroad.com/v2/products?access_token=${GUMROAD_ACCESS_TOKEN}"
-}
+echo "Fetching Gumroad seller ID..."
+SELLER_ID="$(fetch_seller_id)"
+if [ -n "$SELLER_ID" ]; then
+  echo "  seller_id: $SELLER_ID"
+  echo ""
+  echo "Add to Vercel (Production + Preview):"
+  echo "  GUMROAD_SELLER_ID=$SELLER_ID"
+  echo ""
+else
+  echo "  (could not read seller_id — set GUMROAD_SELLER_ID manually from Gumroad Settings → Advanced)"
+  echo ""
+fi
+
+echo "Current webhook subscriptions:"
+list_webhooks || echo "  (none or API error)"
+echo ""
 
 echo "Registering sale + refund webhooks..."
 register_webhook sale
@@ -64,7 +107,7 @@ register_webhook refund
 
 echo ""
 echo "Products on your Gumroad account:"
-list_products | python3 - <<'PY'
+gumroad_api GET /products | python3 - <<'PY'
 import json, sys
 data = json.load(sys.stdin)
 for p in data.get("products", []):
@@ -72,6 +115,8 @@ for p in data.get("products", []):
 PY
 
 echo ""
-echo "Done. Verify:"
-echo "  curl -s ${APP_URL}/api/monetization/status"
+echo "Done. Verify production:"
+echo "  curl -s ${APP_URL}/api/monetization/status | python3 -m json.tool"
 echo "  curl -s ${APP_URL}/api/webhooks/gumroad"
+echo ""
+echo "webhookSellerConfigured becomes true after GUMROAD_SELLER_ID is set on Vercel and redeployed."

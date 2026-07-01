@@ -75,7 +75,7 @@ async function findSupabaseProjectByName(name: string): Promise<{ id: string; re
   return { id: hit.id, ref: hit.ref ?? hit.id };
 }
 
-async function createSupabaseProject(orgId: string): Promise<{ ref: string }> {
+async function createSupabaseProject(orgId: string): Promise<{ id: string; ref: string }> {
   const dbPass = randomBytes(24).toString('base64url');
   const res = await supabaseFetch('/projects', {
     method: 'POST',
@@ -90,7 +90,7 @@ async function createSupabaseProject(orgId: string): Promise<{ ref: string }> {
   const data = (await res.json()) as { id: string; ref?: string };
   const ref = data.ref ?? data.id;
   console.log(`Created Supabase project "${SUPABASE_PROJECT_NAME}" (ref=${ref})`);
-  return { ref };
+  return { id: data.id, ref };
 }
 
 async function waitForSupabaseProject(ref: string): Promise<void> {

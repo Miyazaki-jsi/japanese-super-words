@@ -49,5 +49,10 @@ export async function GET() {
       script: 'npm run setup:admin',
       schemaSql: 'supabase/schema.sql',
     },
+    webhookSetup: {
+      pingUrl: '/api/webhooks/gumroad',
+      envVar: 'GUMROAD_SELLER_ID',
+      script: 'npm run setup:gumroad',
+    },
   });
 }
