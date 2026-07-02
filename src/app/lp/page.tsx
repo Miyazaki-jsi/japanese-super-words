@@ -181,7 +181,7 @@ export default function LandingPage() {
               <div className="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-16 md:gap-24">
                 <Stat value="100k+" label="Learners across platforms" />
                 <div className="hidden h-8 w-px bg-white/10 sm:block" />
-                <Stat value="40+" label="Travel situations" />
+                <Stat value="48" label="Travel situations" />
                 <div className="hidden h-8 w-px bg-white/10 sm:block" />
                 <Stat
                   value={PHRASE_COUNT.toLocaleString('en-US')}

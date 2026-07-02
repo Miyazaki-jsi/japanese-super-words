@@ -26,6 +26,14 @@ export const MINI_PACK_GUMROAD_URLS: Record<MiniPackId, string> = {
     process.env.NEXT_PUBLIC_FOODIE_GUMROAD_URL?.trim() ||
     process.env.NEXT_PUBLIC_MINI_PACK_GUMROAD_URL?.trim() ||
     '',
+  onsen_intro:
+    process.env.NEXT_PUBLIC_ONSEN_INTRO_GUMROAD_URL?.trim() ||
+    process.env.NEXT_PUBLIC_MINI_PACK_GUMROAD_URL?.trim() ||
+    '',
+  trouble_survival:
+    process.env.NEXT_PUBLIC_TROUBLE_SURVIVAL_GUMROAD_URL?.trim() ||
+    process.env.NEXT_PUBLIC_MINI_PACK_GUMROAD_URL?.trim() ||
+    '',
 };
 
 export function getMiniPackGumroadUrl(packId: MiniPackId): string {
@@ -53,7 +61,14 @@ export function saveMiniPackUnlock(packId: MiniPackId): void {
 
 export function clearAllMiniPackUnlocks(): void {
   if (typeof window === 'undefined') return;
-  const ids: MiniPackId[] = ['hatsumode', 'arrival_24h', 'night_japan', 'foodie'];
+  const ids: MiniPackId[] = [
+    'hatsumode',
+    'arrival_24h',
+    'night_japan',
+    'foodie',
+    'onsen_intro',
+    'trouble_survival',
+  ];
   ids.forEach((id) => {
     localStorage.removeItem(getMiniPackStorageKey(id));
     localStorage.removeItem(getMiniPackCompletedKey(id));

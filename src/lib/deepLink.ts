@@ -20,7 +20,14 @@ const VALID_SITUATIONS = new Set<string>([
   'theme_park', 'atm_payments', 'shinkansen',
 ]);
 
-const VALID_MINI_PACKS = new Set<string>(['hatsumode', 'arrival_24h', 'night_japan', 'foodie']);
+const VALID_MINI_PACKS = new Set<string>([
+  'hatsumode',
+  'arrival_24h',
+  'night_japan',
+  'foodie',
+  'onsen_intro',
+  'trouble_survival',
+]);
 
 export function parseDeepLink(search: string): DeepLinkTarget | null {
   const params = new URLSearchParams(search);

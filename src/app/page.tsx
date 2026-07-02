@@ -24,7 +24,7 @@ import TripPackScreen from '@/components/TripPackScreen';
 import MiniPackScreen from '@/components/MiniPackScreen';
 import UnlockModal, { type UnlockContext } from '@/components/UnlockModal';
 import {
-  miniPacks,
+  getDisplayMiniPacks,
   MINI_PACK_COUNT,
   type MiniPackId,
   getMiniPackById,
@@ -124,6 +124,8 @@ import {
   LayoutGrid,
   Volume2,
   Flame,
+  Droplets,
+  ShieldAlert,
 } from 'lucide-react';
 
 type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'srs_review' | 'trip_pack' | 'mini_pack';
@@ -1444,6 +1446,8 @@ export default function Home() {
     arrival_24h: Plane,
     night_japan: Moon,
     foodie: Utensils,
+    onsen_intro: Droplets,
+    trouble_survival: ShieldAlert,
   };
 
   const getSituationInfo = (id: SituationId | null) => {
@@ -2150,7 +2154,7 @@ export default function Home() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
-                    {miniPacks.map((pack) => {
+                    {getDisplayMiniPacks().map((pack) => {
                       const PackIcon = miniPackIcons[pack.id];
                       const unlocked = readMiniPackUnlocked(pack.id);
                       return (
@@ -2158,11 +2162,11 @@ export default function Home() {
                           key={pack.id}
                           type="button"
                           onClick={() => handleMiniPackOpen(pack.id)}
-                          className={`relative rounded-2xl overflow-hidden text-left pressable shadow-sm border ${
+                          className={`relative h-full rounded-2xl overflow-hidden text-left pressable shadow-sm border ${
                             unlocked ? 'border-emerald-200' : 'border-slate-100'
                           }`}
                         >
-                          <div className={`bg-gradient-to-br ${pack.accent} p-3.5 text-white`}>
+                          <div className={`h-full bg-gradient-to-br ${pack.accent} p-3.5 text-white`}>
                             <div className="flex items-start justify-between gap-1 mb-2">
                               <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
                                 <PackIcon className="w-4 h-4" />

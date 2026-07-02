@@ -43,6 +43,15 @@ export const SITUATION_LABELS: Record<SituationId, SituationLabel> = {
   hatsumode: { ja: '初詣', en: 'New Year Shrine' },
   depachika: { ja: 'デパ地下', en: 'Depachika Food Hall' },
   game_center: { ja: 'ゲームセンター', en: 'Game Center' },
+  coin_locker: { ja: 'コインロッカー', en: 'Coin Locker' },
+  vending_machine: { ja: '自販機', en: 'Vending Machines' },
+  tourist_information: { ja: '観光案内所', en: 'Tourist Information' },
+  trash_carry_out: { ja: 'ゴミ・持ち帰り', en: 'Trash & Carry-Out' },
+  kaiten_sushi: { ja: '回転寿司', en: 'Conveyor Belt Sushi' },
+  post_office: { ja: '郵便局', en: 'Post Office' },
+  cabaret_club: { ja: 'キャバクラ', en: 'Cabaret Club' },
+  tachinomi: { ja: '立ち飲み', en: 'Standing Bar' },
+  photo_etiquette: { ja: '撮影マナー', en: 'Photo Etiquette' },
 };
 
 export function getSituationLabel(id: SituationId | string): SituationLabel {

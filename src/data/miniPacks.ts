@@ -2,7 +2,13 @@ import { sampleWords, WordCard } from './words';
 import { TripPackRoleplay } from './tripPack';
 import { hatsumodePackWords } from './hatsumodePackWords';
 
-export type MiniPackId = 'hatsumode' | 'arrival_24h' | 'night_japan' | 'foodie';
+export type MiniPackId =
+  | 'hatsumode'
+  | 'arrival_24h'
+  | 'night_japan'
+  | 'foodie'
+  | 'onsen_intro'
+  | 'trouble_survival';
 
 export type MiniPack = {
   id: MiniPackId;
@@ -423,9 +429,238 @@ export const miniPacks: MiniPack[] = [
       },
     ],
   },
+  {
+    id: 'onsen_intro',
+    title: '温泉入門',
+    titleEn: 'Onsen Basics',
+    goal: '入浴の作法・タトゥー・露天風呂',
+    goalEn: 'Bath etiquette, tattoos & outdoor baths',
+    emoji: '♨️',
+    accent: 'from-cyan-600 via-teal-600 to-emerald-700',
+    priceUsd: '$2.99',
+    priceJpyNote: '≈ ¥450',
+    wordIds: [
+      'on1', 'on2', 'on3', 'on4', 'on5', 'on6', 'on7', 'on8', 'on9', 'on10',
+      'on11', 'on12', 'on13', 'on14', 'on15', 'on16', 'on17', 'on18', 'on19', 'on20',
+      'on21', 'on22', 'on23', 'on24', 'on25', 'on26', 'on27', 'on28', 'on29', 'on30',
+    ],
+    quizCount: 5,
+    roleplays: [
+      {
+        sceneTitle: '受付で',
+        sceneTitleEn: 'At the front desk',
+        turns: [{
+          staffLine: '日帰り入浴ですか？',
+          staffReading: 'ひがえりにゅうよくですか？',
+          staffEnglish: 'Is this for day-use bathing?',
+          choices: [
+            {
+              label: 'はい、日帰り入浴です。',
+              sublabel: 'Hai, higaeri nyūyoku desu.',
+              correct: true,
+              feedback: 'Perfect — day-use bathing confirmed.',
+            },
+            {
+              label: 'タトゥーがあります。',
+              sublabel: 'Tatū ga arimasu.',
+              correct: true,
+              feedback: 'Important to ask early — rules vary by onsen.',
+            },
+            {
+              label: '混浴はありますか？',
+              sublabel: 'Konyoku wa arimasu ka?',
+              correct: false,
+              feedback: 'They asked about day-use — answer that first.',
+            },
+          ],
+        }],
+      },
+      {
+        sceneTitle: '脱衣所',
+        sceneTitleEn: 'In the changing room',
+        turns: [{
+          staffLine: 'お風呂に入る前に、体を洗ってください。',
+          staffReading: 'おふろにはいるまえに、からだをあらってください。',
+          staffEnglish: 'Please wash your body before entering the bath.',
+          choices: [
+            {
+              label: '先に体を洗います。',
+              sublabel: 'Saki ni karada o araimasu.',
+              correct: true,
+              feedback: 'Great — washing first is essential onsen etiquette.',
+            },
+            {
+              label: 'タオルは湯船に入れてはいけません。',
+              sublabel: 'Taoru wa yubune ni irete wa ikemasen.',
+              correct: false,
+              feedback: 'True rule, but they told you to wash first — confirm that.',
+            },
+            {
+              label: '男湯はどこですか？',
+              sublabel: 'Danyu wa doko desu ka?',
+              correct: false,
+              feedback: 'You are already in the changing area — acknowledge washing first.',
+            },
+          ],
+        }],
+      },
+      {
+        sceneTitle: '入浴後',
+        sceneTitleEn: 'After bathing',
+        turns: [{
+          staffLine: 'いかがでしたか？',
+          staffReading: 'いかがでしたか？',
+          staffEnglish: 'How was it?',
+          choices: [
+            {
+              label: 'とてもリラックスできました。',
+              sublabel: 'Totemo rirakkusu dekimashita.',
+              correct: true,
+              feedback: 'Natural reply after a good soak.',
+            },
+            {
+              label: '牛乳をください。',
+              sublabel: 'Gyūnyū o kudasai.',
+              correct: true,
+              feedback: 'Classic post-onsen treat in Japan!',
+            },
+            {
+              label: '入浴券をください。',
+              sublabel: 'Nyūyokuken o kudasai.',
+              correct: false,
+              feedback: 'You already bathed — time to relax and leave.',
+            },
+          ],
+        }],
+      },
+    ],
+  },
+  {
+    id: 'trouble_survival',
+    title: '困った時',
+    titleEn: 'When Trouble Hits',
+    goal: '財布紛失・薬局・交番・道に迷う',
+    goalEn: 'Lost wallet, pharmacy, police box & getting lost',
+    emoji: '🆘',
+    accent: 'from-red-600 via-rose-600 to-orange-600',
+    priceUsd: '$2.99',
+    priceJpyNote: '≈ ¥450',
+    wordIds: [
+      'le1', 'le3', 'le4', 'le5', 'le8', 'le11', 'le12', 'le14', 'le15', 'le16',
+      'le19', 'le21', 'le22', 'le28',
+      'kb14', 'kb16', 'kb17', 'kb20', 'kb24', 'kb30',
+      'ph1', 'ph4', 'ph14', 'ph25', 'ph24', 'ph29',
+      'h15', 'h16', 'h20',
+    ],
+    quizCount: 5,
+    roleplays: [
+      {
+        sceneTitle: '交番で',
+        sceneTitleEn: 'At the police box',
+        turns: [{
+          staffLine: 'どうしましたか？',
+          staffReading: 'どうしましたか？',
+          staffEnglish: 'What happened?',
+          choices: [
+            {
+              label: '財布をなくしました。',
+              sublabel: 'Saifu o nakushimashita.',
+              correct: true,
+              feedback: 'Clear — they will help you file a report.',
+            },
+            {
+              label: '届出をお願いします。',
+              sublabel: 'Todokede o onegai shimasu.',
+              correct: true,
+              feedback: 'Good — ask to file an official lost-item report.',
+            },
+            {
+              label: 'お会計をお願いします。',
+              sublabel: 'Okaikei o onegai shimasu.',
+              correct: false,
+              feedback: 'This is a police box, not a shop.',
+            },
+          ],
+        }],
+      },
+      {
+        sceneTitle: '薬局で',
+        sceneTitleEn: 'At a pharmacy',
+        turns: [{
+          staffLine: 'どうされましたか？',
+          staffReading: 'どうされましたか？',
+          staffEnglish: 'What seems to be the problem?',
+          choices: [
+            {
+              label: '頭が痛いです。',
+              sublabel: 'Atama ga itai desu.',
+              correct: true,
+              feedback: 'Clear symptom — staff can recommend medicine.',
+            },
+            {
+              label: '風邪薬はありますか？',
+              sublabel: 'Kazegusuri wa arimasu ka?',
+              correct: true,
+              feedback: 'Also fine if you know what you need.',
+            },
+            {
+              label: '救急車を呼んでください。',
+              sublabel: 'Kyūkyūsha o yonde kudasai.',
+              correct: false,
+              feedback: 'A headache usually does not need an ambulance — describe symptoms first.',
+            },
+          ],
+        }],
+      },
+      {
+        sceneTitle: '道に迷った',
+        sceneTitleEn: 'Lost on the street',
+        turns: [{
+          staffLine: '大丈夫ですか？',
+          staffReading: 'だいじょうぶですか？',
+          staffEnglish: 'Are you okay?',
+          choices: [
+            {
+              label: '道に迷いました。',
+              sublabel: 'Michi ni mayoimashita.',
+              correct: true,
+              feedback: 'Honest and clear — people will help.',
+            },
+            {
+              label: 'ここはどこですか？',
+              sublabel: 'Koko wa doko desu ka?',
+              correct: true,
+              feedback: 'Good follow-up to find out where you are.',
+            },
+            {
+              label: 'ごちそうさまでした。',
+              sublabel: 'Gochisōsama deshita.',
+              correct: false,
+              feedback: 'That is after a meal — you are lost, not finished eating.',
+            },
+          ],
+        }],
+      },
+    ],
+  },
+];
+
+/** 2-column grid order: TL, TR, ML, MR, BL, BR */
+export const MINI_PACK_DISPLAY_ORDER: MiniPackId[] = [
+  'night_japan',
+  'arrival_24h',
+  'trouble_survival',
+  'onsen_intro',
+  'foodie',
+  'hatsumode',
 ];
 
 export const MINI_PACK_COUNT = miniPacks.length;
+
+export function getDisplayMiniPacks(): MiniPack[] {
+  const byId = new Map(miniPacks.map((pack) => [pack.id, pack]));
+  return MINI_PACK_DISPLAY_ORDER.map((id) => byId.get(id)!);
+}
 
 export function getMiniPackById(id: MiniPackId): MiniPack | undefined {
   return miniPacks.find((p) => p.id === id);

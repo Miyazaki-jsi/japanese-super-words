@@ -1,6 +1,7 @@
 import { premiumTravelEssentialWords } from './premiumTravelEssentialWords';
 import { premiumNewSituationWords } from './premiumNewSituationWords';
 import { premiumExtraSituationWords } from './premiumExtraSituationWords';
+import { premiumBatch2SituationWords } from './premiumBatch2SituationWords';
 import { hatsumodePackWords } from './hatsumodePackWords';
 
 export type SituationId =
@@ -43,7 +44,16 @@ export type SituationId =
   | 'shinkansen'
   | 'hatsumode'
   | 'depachika'
-  | 'game_center';
+  | 'game_center'
+  | 'coin_locker'
+  | 'vending_machine'
+  | 'tourist_information'
+  | 'trash_carry_out'
+  | 'kaiten_sushi'
+  | 'post_office'
+  | 'cabaret_club'
+  | 'tachinomi'
+  | 'photo_etiquette';
 
 export interface WordCard {
   id: string;
@@ -818,5 +828,6 @@ export const sampleWords: WordCard[] = [
   ...premiumTravelEssentialWords,
   ...premiumNewSituationWords,
   ...premiumExtraSituationWords,
+  ...premiumBatch2SituationWords,
   ...hatsumodePackWords,
 ];
