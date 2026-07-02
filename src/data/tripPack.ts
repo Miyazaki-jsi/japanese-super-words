@@ -71,9 +71,9 @@ export const tripPackDays: TripPackDay[] = [
         sceneTitleEn: 'Buying a Shinkansen ticket',
         turns: [
           {
-            staffLine: 'いらっしゃいませ。どちらまで行かれますか？',
-            staffReading: 'いらっしゃいませ。どちらまでいかれますか？',
-            staffEnglish: 'Welcome. Where are you headed?',
+            staffLine: 'どちらまで行かれますか？',
+            staffReading: 'どちらまでいかれますか？',
+            staffEnglish: 'Where are you headed?',
             choices: [
               choice(
                 '東京までお願いします。',
@@ -99,16 +99,16 @@ export const tripPackDays: TripPackDay[] = [
             ],
           },
           {
-            staffLine: '何月何日のご利用ですか？',
-            staffReading: 'なんがつなんにちのごりようですか？',
-            staffEnglish: 'What date will you travel?',
+            staffLine: 'ご利用日はいつですか？',
+            staffReading: 'ごりようびはいつですか？',
+            staffEnglish: 'What day will you travel?',
             choices: [
               choice(
-                '明日お願いします。',
-                'Ashita onegai shimasu.',
+                '明日でお願いします。',
+                'Ashita de onegai shimasu.',
                 true,
-                'Perfect — staff will find tomorrow\'s trains.',
-                'あしたおねがいします。',
+                'Natural — answers when they will travel.',
+                'あしたでおねがいします。',
               ),
               choice(
                 '新幹線の切符を買いたいです。',
@@ -162,7 +162,7 @@ export const tripPackDays: TripPackDay[] = [
           },
           {
             staffLine: '13,320円になります。よろしいですか？',
-            staffReading: 'えんになります。よろしいですか？',
+            staffReading: 'いちまんさんぜんさんびゃくにじゅうえんになります。よろしいですか？',
             staffEnglish: 'That will be ¥13,320. Is that okay?',
             choices: [
               choice(
@@ -195,9 +195,9 @@ export const tripPackDays: TripPackDay[] = [
         sceneTitleEn: 'Finding your platform',
         turns: [
           {
-            staffLine: '新幹線のご案内でしょうか？',
-            staffReading: 'しんかんせんのごあんないでしょうか？',
-            staffEnglish: 'Are you looking for the Shinkansen?',
+            staffLine: 'どうしましたか？',
+            staffReading: 'どうしましたか？',
+            staffEnglish: 'How can I help you?',
             choices: [
               choice(
                 'のぞみ123号は何番ホームですか？',
@@ -253,54 +253,54 @@ export const tripPackDays: TripPackDay[] = [
         ],
       },
       {
-        sceneTitle: '改札を通る',
-        sceneTitleEn: 'Passing through the ticket gate',
+        sceneTitle: '新幹線の改札',
+        sceneTitleEn: 'Finding the Shinkansen gate',
         turns: [
           {
-            staffLine: '新幹線券をお持ちですか？',
-            staffReading: 'しんかんせんけんをおもちですか？',
-            staffEnglish: 'Do you have your Shinkansen ticket?',
+            staffLine: 'すみません、どうかしましたか？',
+            staffReading: 'すみません、どうかしましたか？',
+            staffEnglish: 'Excuse me — do you need help?',
             choices: [
+              choice(
+                'すみません、新幹線の改札はどこですか？',
+                'Sumimasen, Shinkansen no kaisatsu wa doko desu ka?',
+                true,
+                'Natural — ask where the Shinkansen gate is.',
+                'すみません、しんかんせんのかいさつはどこですか？',
+              ),
               choice(
                 'はい、こちらです。',
                 'Hai, kochira desu.',
-                true,
-                'Natural — show your ticket as you say this.',
+                false,
+                'They asked if you need help — ask where the gate is.',
                 'はい、こちらです。',
               ),
               choice(
                 '切符をどうぞ。',
                 'Kippu o dōzo.',
-                true,
-                'Also natural when handing over your ticket.',
-                'きっぷをどうぞ。',
-              ),
-              choice(
-                'すみません、道に迷いました。',
-                'Sumimasen, michi ni mayoimashita.',
                 false,
-                'You are at the gate — show your ticket.',
-                'すみません、みちにまよいました。',
+                'You hand over tickets at the gate — first find where it is.',
+                'きっぷをどうぞ。',
               ),
             ],
           },
           {
-            staffLine: '13番ホームへお進みください。',
-            staffReading: 'じゅうさんばんほーむへおすすみください。',
-            staffEnglish: 'Please proceed to platform 13.',
+            staffLine: '13番ホームの青い改札です。切符を入れてお通りください。',
+            staffReading: 'じゅうさんばんほーむのあおいかいさつです。きっぷをいれておとおりください。',
+            staffEnglish: 'The blue gate for platform 13. Insert your ticket and go through.',
             choices: [
               choice(
                 'ありがとうございます。',
                 'Arigatō gozaimasu.',
                 true,
-                'Polite — then follow the signs.',
+                'Polite — then head to the gate.',
                 'ありがとうございます。',
               ),
               choice(
                 '次の電車は何時ですか？',
                 'Tsugi no densha wa nanji desu ka?',
                 false,
-                'They already told you — head to platform 13.',
+                'They showed you the gate — go through and check the departure board.',
                 'つぎのでんしゃはなんじですか？',
               ),
               choice(
@@ -315,62 +315,62 @@ export const tripPackDays: TripPackDay[] = [
         ],
       },
       {
-        sceneTitle: '車内で',
-        sceneTitleEn: 'On the train',
+        sceneTitle: 'カート売店',
+        sceneTitleEn: 'Buying from the snack cart',
         turns: [
           {
-            staffLine: 'すみません、こちら指定席でございます。',
-            staffReading: 'すみません、こちらしていせきでございます。',
-            staffEnglish: 'Excuse me, this is a reserved seat.',
+            staffLine: 'お弁当とお飲み物はいかがですか？',
+            staffReading: 'おべんとうとおのみものはいかがですか？',
+            staffEnglish: 'Would you like a bento or a drink?',
             choices: [
               choice(
-                'すみません。どこに座ればいいですか？',
+                'コーヒーを一つお願いします。',
+                'Kōhī o hitotsu onegai shimasu.',
+                true,
+                'Natural — order one coffee from the cart.',
+                'こーひーをひとつおねがいします。',
+              ),
+              choice(
+                'すみません、どこに座ればいいですか？',
                 'Sumimasen. Doko ni suwareba ii desu ka?',
-                true,
-                'Polite — ask where your seat is.',
-                'すみません。どこにすわればいいですか？',
-              ),
-              choice(
-                '私の席はどこですか？',
-                'Watashi no seki wa doko desu ka?',
-                true,
-                'Direct and clear — staff will help you.',
-                'わたしのせきはどこですか？',
-              ),
-              choice(
-                'ありがとうございます。',
-                'Arigatō gozaimasu.',
                 false,
-                'They said you are in a reserved seat — ask where to sit.',
-                'ありがとうございます。',
+                'The cart vendor is selling food — place your order.',
+                'すみません、どこにすわればいいですか？',
+              ),
+              choice(
+                '切符をどうぞ。',
+                'Kippu o dōzo.',
+                false,
+                'You already passed the gate — order a drink or snack.',
+                'きっぷをどうぞ。',
               ),
             ],
           },
           {
-            staffLine: '15号車の12番です。あちらです。',
-            staffReading: 'じゅうごごうしゃのじゅうにばんです。あちらです。',
-            staffEnglish: 'Car 15, seat 12. That way.',
+            staffLine: 'コーヒーで500円です。どうぞ。',
+            staffReading: 'こーひーでごひゃくえんです。どうぞ。',
+            staffEnglish: 'Coffee is 500 yen. Here you go.',
             choices: [
               choice(
                 'ありがとうございます。',
                 'Arigatō gozaimasu.',
                 true,
-                'Perfect — thank them and find your seat.',
+                'Perfect — thank them and enjoy your coffee.',
                 'ありがとうございます。',
               ),
               choice(
                 '乗り換えは必要ですか？',
                 'Norikae wa hitsuyō desu ka?',
                 false,
-                'You are on the right train — go to car 15.',
+                'They told you the price — pay and take your coffee.',
                 'のりかえはひつようですか？',
               ),
               choice(
-                '切符をどうぞ。',
-                'Kippu o dōzo.',
+                'お弁当を温めますか？',
+                'Obentō o atatamemasu ka?',
                 false,
-                'You already passed the gate.',
-                'きっぷをどうぞ。',
+                'That is what konbini staff ask — not the cart vendor.',
+                'おべんとうをあたためますか？',
               ),
             ],
           },
@@ -540,10 +540,10 @@ export const tripPackDays: TripPackDay[] = [
             staffEnglish: 'Wi-Fi password is your room number and name. Breakfast is from 7 AM on the 1st floor.',
             choices: [
               choice(
-                '朝食は何時からですか？',
-                'Chōshoku wa nanji kara desu ka?',
+                '朝食は何時までですか？',
+                'Chōshoku wa nanji made desu ka?',
                 true,
-                'Good to confirm — they said 7 AM.',
+                'Natural follow-up — they told you it starts at 7 AM.',
               ),
               choice(
                 'エレベーターはどこですか？',
@@ -1084,10 +1084,11 @@ export const tripPackDays: TripPackDay[] = [
                 'Point and confirm your choice.',
               ),
               choice(
-                'おすすめは何ですか？',
-                'Osusume wa nan desu ka?',
+                '現金だけですか？',
+                'Genkin dake desu ka?',
                 true,
-                'They just recommended tonkotsu — good confirmation.',
+                'Ticket machines are often cash-only — smart to check.',
+                'げんきんだけですか？',
               ),
               choice(
                 'ごちそうさまでした。',
@@ -1212,56 +1213,56 @@ export const tripPackDays: TripPackDay[] = [
         ],
       },
       {
-        sceneTitle: '食後の会計',
-        sceneTitleEn: 'After the meal',
+        sceneTitle: '食後にお店を出る',
+        sceneTitleEn: 'Leaving after your meal',
         turns: [
           {
-            staffLine: 'ごちそうさまでした。',
-            staffReading: 'ごちそうさまでした。',
-            staffEnglish: 'Thank you for the meal. (Staff says this)',
+            staffLine: 'お味はいかがでしたか？',
+            staffReading: 'おあじはいかがでしたか？',
+            staffEnglish: 'How was your meal?',
             choices: [
-              choice(
-                'ごちそうさまでした。',
-                'Gochisōsama deshita.',
-                true,
-                'Reply with the same phrase — great manners!',
-              ),
               choice(
                 'おいしかったです。',
                 'Oishikatta desu.',
                 true,
-                'Staff love hearing this.',
+                'Natural — staff love hearing this.',
+              ),
+              choice(
+                'ごちそうさまでした。',
+                'Gochisōsama deshita.',
+                true,
+                'What you say when leaving — not what staff says.',
               ),
               choice(
                 'これをお願いします。',
                 'Kore o onegai shimasu.',
                 false,
-                'You already ate — time to leave.',
+                'You already ate — time to thank them and leave.',
               ),
             ],
           },
           {
-            staffLine: 'お会計はレジでお願いします。',
-            staffReading: 'おかいけいはれじでおねがいします。',
-            staffEnglish: 'Please pay at the register.',
+            staffLine: 'ありがとうございました。またお越しください。',
+            staffReading: 'ありがとうございました。またおこしください。',
+            staffEnglish: 'Thank you. Please come again.',
             choices: [
-              choice(
-                'お会計をお願いします。',
-                'Okaikei o onegai shimasu.',
-                true,
-                'Standard way to ask for the bill.',
-              ),
               choice(
                 'ありがとうございました。',
                 'Arigatō gozaimashita.',
                 true,
-                'Polite thank-you when leaving.',
+                'Polite reply when leaving.',
               ),
               choice(
-                'メニューを見せてください。',
-                'Menyū o misete kudasai.',
+                'また来ます。',
+                'Mata kimasu.',
+                true,
+                'Warm way to say you will be back.',
+              ),
+              choice(
+                'お会計をお願いします。',
+                'Okaikei o onegai shimasu.',
                 false,
-                'You already finished eating.',
+                'You already paid at the ticket machine before eating.',
               ),
             ],
           },
@@ -1370,27 +1371,33 @@ export const tripPackDays: TripPackDay[] = [
             ],
           },
           {
-            staffLine: 'お通しの枝豆です。本日380円です。',
-            staffReading: 'おとおしのえだまめです。ほんじつさんびゃくはちじゅうえんです。',
-            staffEnglish: 'Today\'s otōshi is edamame. ¥380.',
+            staffLine: 'お待たせしました。生ビールです。お通しの枝豆です。',
+            staffReading: 'おまたせしました。なまびーるです。おとおしのえだまめです。',
+            staffEnglish: 'Here you go — draft beer and edamame otōshi.',
             choices: [
+              choice(
+                'ありがとうございます。',
+                'Arigatō gozaimasu.',
+                true,
+                'Natural — thank them when your drink and otōshi arrive.',
+              ),
               choice(
                 'わかりました。',
                 'Wakarimashita.',
                 true,
-                'Otōshi is a table charge appetizer — standard at izakaya.',
+                'Fine if you are new to otōshi — a small dish that comes with your table.',
               ),
               choice(
                 'お通しは何ですか？',
                 'Otōshi wa nan desu ka?',
-                true,
-                'Fine to ask if you are not sure.',
+                false,
+                'They just said edamame — that small dish is your otōshi.',
               ),
               choice(
                 'お会計、別々でお願いします。',
                 'Okaikei, betsubetsu de onegai shimasu.',
                 false,
-                'They are explaining otōshi, not the bill.',
+                'Way too early — you just got your first drink.',
               ),
             ],
           },
@@ -1975,10 +1982,11 @@ export const tripPackDays: TripPackDay[] = [
                 'Acknowledge the estimate.',
               ),
               choice(
-                '空港までいくらですか？',
-                'Kūkō made ikura desu ka?',
+                '高速代は別ですか？',
+                'Kōsokudai wa betsu desu ka?',
                 true,
-                'They just estimated — confirm if unsure.',
+                'Good to check — highway tolls are often added on top.',
+                'こうそくだいはべつですか？',
               ),
               choice(
                 '領収書をください。',

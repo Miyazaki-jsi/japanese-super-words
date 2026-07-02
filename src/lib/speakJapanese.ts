@@ -47,20 +47,37 @@ function getVoicevoxTextApiUrl(text: string): string {
 function tryPlayUrl(url: string): Promise<boolean> {
   return new Promise((resolve) => {
     const audio = new Audio(url);
+    audio.preload = 'auto';
+    audio.volume = 1;
     currentAudio = audio;
+    let settled = false;
+    const timeout = window.setTimeout(() => finish(false), 5_000);
+
+    function finish(played: boolean): void {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      audio.onplaying = null;
+      audio.onerror = null;
+      audio.onabort = null;
+      if (!played) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      if (!played && currentAudio === audio) currentAudio = null;
+      resolve(played);
+    }
+
+    audio.onplaying = () => finish(true);
     audio.onended = () => {
       if (currentAudio === audio) currentAudio = null;
     };
-    audio.onerror = () => {
-      if (currentAudio === audio) currentAudio = null;
-      resolve(false);
-    };
+    audio.onerror = () => finish(false);
+    audio.onabort = () => finish(false);
+    audio.load();
     void audio.play().then(
-      () => resolve(true),
-      () => {
-        if (currentAudio === audio) currentAudio = null;
-        resolve(false);
-      }
+      () => undefined,
+      () => finish(false)
     );
   });
 }

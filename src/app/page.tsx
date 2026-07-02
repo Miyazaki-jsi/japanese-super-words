@@ -117,6 +117,7 @@ import {
   Settings,
   Search,
   MessageCircle,
+  Bug,
   Send,
   Moon,
   Luggage,
@@ -1150,6 +1151,16 @@ export default function Home() {
     setMessageFormError('');
     setMessageSendError('');
     setMessageStep('form');
+  };
+
+  const handleReportBug = () => {
+    setShowSettingsModal(true);
+    setMessageName(userName === 'ゲスト' ? '' : userName);
+    setMessageBody('');
+    setMessageFormError('');
+    setMessageSendError('');
+    setMessageStep('form');
+    trackEvent('bug_report_open', { source: 'home_footer' });
   };
 
   const handleMessageToConfirm = () => {
@@ -2197,6 +2208,25 @@ export default function Home() {
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
                 </a>
+
+                <button
+                  type="button"
+                  onClick={handleReportBug}
+                  className="flex items-center gap-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm hover:border-amber-200 hover:shadow-md transition-all pressable text-left"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <Bug className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-black text-slate-900 leading-tight">
+                      Report a bug or fix
+                    </p>
+                    <p className="text-[10px] font-semibold text-slate-500 mt-0.5 truncate">
+                      バグや修正を報告する。
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                </button>
               </div>
             )}
 
