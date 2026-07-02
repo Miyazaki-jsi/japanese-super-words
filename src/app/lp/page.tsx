@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, ChevronRight, Play, Volume2, Smartphone, Laptop } from 'lucide-react';
+import { ChevronRight, Smartphone, Laptop } from 'lucide-react';
 import { YOUTUBE_CHANNEL_URL } from '@/data/youtubeCompanions';
+import { sampleWords } from '@/data/words';
+
+const PHRASE_COUNT = sampleWords.length;
 
 const SOCIAL_LINKS = [
   { id: 'youtube', label: 'YouTube', href: YOUTUBE_CHANNEL_URL, icon: YoutubeIcon },
@@ -25,61 +29,6 @@ const SOCIAL_LINKS = [
     label: 'TikTok',
     href: 'https://www.tiktok.com/@japanesesuperimmersion?_r=1&_t=ZS-97O0Er7WjOp',
     icon: TikTokIcon,
-  },
-] as const;
-
-/** Travel phrases used across the LP */
-const TRAVEL_PHRASES = [
-  {
-    ja: 'お会計お願いします',
-    en: 'Check, please',
-    situation: 'Restaurant',
-  },
-  {
-    ja: '次の電車は何時ですか？',
-    en: 'What time is the next train?',
-    situation: 'Train station',
-  },
-  {
-    ja: 'おすすめは何ですか？',
-    en: 'What do you recommend?',
-    situation: 'Izakaya',
-  },
-] as const;
-
-const REVIEW_CARDS = [
-  {
-    id: 'check',
-    username: '@learner_mia',
-    avatar: 'M',
-    phrase: 'お会計お願いします',
-    phraseMeaning: 'Check, please',
-    situation: 'Restaurant',
-    comment:
-      'Used this at a ramen shop on day one in Tokyo. Hearing it in the video first made me confident enough to say it out loud.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=142',
-  },
-  {
-    id: 'train',
-    username: '@tokyo_dreamer',
-    avatar: 'T',
-    phrase: '次の電車は何時ですか？',
-    phraseMeaning: 'What time is the next train?',
-    situation: 'Train station',
-    comment:
-      'Saved me at Shinjuku station. The app linked the phrase to a real clip — I knew exactly how natives ask.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=318',
-  },
-  {
-    id: 'recommend',
-    username: '@nihongo_nate',
-    avatar: 'N',
-    phrase: 'おすすめは何ですか？',
-    phraseMeaning: 'What do you recommend?',
-    situation: 'Izakaya',
-    comment:
-      'No login, opened the app at the airport, and had three izakaya phrases ready before landing. Perfect for travel prep.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=521',
   },
 ] as const;
 
@@ -114,7 +63,6 @@ const APP_PATH = '/';
 
 export default function LandingPage() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
   const [navScrolled, setNavScrolled] = useState(false);
 
   const goToApp = useCallback(
@@ -131,11 +79,6 @@ export default function LandingPage() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    goToApp(searchQuery);
-  };
 
   return (
     <div className="min-h-screen bg-black font-[family-name:var(--font-geist-sans)] text-[#f5f5f7] antialiased selection:bg-[#2997ff]/25 selection:text-[#2997ff]">
@@ -221,13 +164,13 @@ export default function LandingPage() {
                 <AppleLink onClick={() => goToApp()} primary>
                   Start Learning Free
                 </AppleLink>
-                <AppleLink href="#community">See learner stories</AppleLink>
+                <AppleLink href="#community">Follow us</AppleLink>
               </div>
             </Reveal>
           </div>
 
           <Reveal delay={320} className="relative mx-auto mt-12 max-w-[920px] px-4 sm:mt-16 md:mt-20">
-            <HeroDevices />
+            <HeroScreenshot />
           </Reveal>
         </section>
 
@@ -240,7 +183,10 @@ export default function LandingPage() {
                 <div className="hidden h-8 w-px bg-white/10 sm:block" />
                 <Stat value="40+" label="Travel situations" />
                 <div className="hidden h-8 w-px bg-white/10 sm:block" />
-                <Stat value="0" label="Accounts needed to start" />
+                <Stat
+                  value={PHRASE_COUNT.toLocaleString('en-US')}
+                  label="Travel phrases included"
+                />
               </div>
             </Reveal>
           </div>
@@ -271,9 +217,11 @@ export default function LandingPage() {
                 </p>
               </Reveal>
 
-              <Reveal delay={120} className="mx-auto mt-12 max-w-[640px]">
-                <FeatureVisual id={feature.id} />
-              </Reveal>
+              {feature.id !== 'context' && (
+                <Reveal delay={120} className="mx-auto mt-12 max-w-[640px]">
+                  <FeatureVisual id={feature.id} />
+                </Reveal>
+              )}
             </div>
           </section>
         ))}
@@ -283,11 +231,11 @@ export default function LandingPage() {
           <div className="mx-auto max-w-[980px] px-6">
             <Reveal className="text-center">
               <h2 className="text-[32px] font-semibold tracking-[-0.03em] text-[#f5f5f7] sm:text-[40px] md:text-[48px]">
-                Loved by travelers worldwide.
+                Join our community.
               </h2>
               <p className="mx-auto mt-4 max-w-[28rem] text-[17px] leading-[1.47] text-[#a1a1a6] md:text-[19px]">
-                From YouTube comments to study sessions before takeoff — see what
-                people are saying.
+                Follow along on YouTube, X, Instagram, and TikTok for travel
+                phrases and Japan tips.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
@@ -302,56 +250,6 @@ export default function LandingPage() {
                     <link.icon className="h-3.5 w-3.5 opacity-60" />
                     {link.label}
                   </a>
-                ))}
-              </div>
-            </Reveal>
-
-            <div className="mt-14 space-y-3">
-              {REVIEW_CARDS.map((card, i) => (
-                <Reveal key={card.id} delay={i * 80}>
-                  <ReviewRow card={card} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Search ── */}
-        <section className="bg-black py-20 sm:py-28 md:py-32">
-          <div className="mx-auto max-w-[640px] px-6 text-center">
-            <Reveal>
-              <h2 className="text-[32px] font-semibold tracking-[-0.03em] text-[#f5f5f7] sm:text-[40px]">
-                Try a phrase. Right now.
-              </h2>
-              <p className="mt-4 text-[17px] leading-[1.47] text-[#a1a1a6] md:text-[19px]">
-                Search a travel phrase, or jump straight into the app.
-              </p>
-            </Reveal>
-
-            <Reveal delay={100} className="mt-10">
-              <form onSubmit={handleSearch} className="relative">
-                <Search className="pointer-events-none absolute left-5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#636366]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="お会計お願いします, 次の電車は何時ですか？…"
-                  className="w-full rounded-full border border-white/[0.1] bg-[#1d1d1f] py-4 pl-12 pr-6 text-[17px] tracking-[-0.01em] text-[#f5f5f7] outline-none transition-all duration-500 placeholder:text-[#636366] focus:border-[#2997ff]/50 focus:bg-[#161617] focus:shadow-[0_0_0_4px_rgba(41,151,255,0.15)]"
-                  lang="ja"
-                />
-              </form>
-
-              <div className="mt-5 flex flex-wrap justify-center gap-2">
-                {TRAVEL_PHRASES.map((p) => (
-                  <button
-                    key={p.ja}
-                    type="button"
-                    onClick={() => goToApp(p.ja)}
-                    className="rounded-full border border-white/[0.08] bg-[#1d1d1f] px-4 py-2 text-[14px] text-[#f5f5f7]/75 transition-all duration-500 hover:border-white/[0.15] hover:bg-[#2d2d2d]"
-                    lang="ja"
-                  >
-                    {p.ja}
-                  </button>
                 ))}
               </div>
             </Reveal>
@@ -507,190 +405,94 @@ function Stat({ value, label }: { value: string; label: string }) {
   );
 }
 
-function HeroDevices() {
+function HeroScreenshot() {
   return (
-    <div className="relative">
+    <div className="relative mx-auto w-full max-w-[780px]">
       <div
         aria-hidden
-        className="absolute inset-x-[10%] bottom-0 top-[20%] rounded-full bg-[#6366f1]/10 blur-3xl"
+        className="pointer-events-none absolute inset-x-[8%] bottom-[5%] top-[15%] rounded-full bg-[#6366f1]/15 blur-3xl"
       />
-
-      <div className="relative mx-auto w-full max-w-[780px] animate-intro-float">
-        <div className="relative z-10 mx-auto w-[88%]">
-          <div className="overflow-hidden rounded-t-[14px] bg-[#2d2d2d] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08]">
-            <div className="flex h-7 items-center gap-2 bg-[#1d1d1f] px-4">
-              <span className="h-[10px] w-[10px] rounded-full bg-[#ff5f57]" />
-              <span className="h-[10px] w-[10px] rounded-full bg-[#febc2e]" />
-              <span className="h-[10px] w-[10px] rounded-full bg-[#28c840]" />
-            </div>
-            <div className="aspect-[16/10] bg-[#161617] p-5 sm:p-6">
-              <AppUiPreview />
-            </div>
-          </div>
-          <div className="mx-auto h-[10px] w-[102%] -translate-x-[1%] rounded-b-md bg-gradient-to-b from-[#3a3a3c] to-[#2c2c2e]" />
-          <div className="mx-auto h-[3px] w-[18%] rounded-b-sm bg-[#636366]/60" />
-        </div>
-
-        <div className="absolute -bottom-4 right-0 z-20 w-[34%] sm:-bottom-8 sm:right-[-2%] sm:w-[30%]">
-          <div className="overflow-hidden rounded-[2rem] border-[4px] border-[#2d2d2d] bg-[#2d2d2d] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.06]">
-            <div className="absolute left-1/2 top-2 z-10 h-[18px] w-[72px] -translate-x-1/2 rounded-full bg-[#1d1d1f]" />
-            <div className="aspect-[9/19.5] bg-[#161617] px-2 pb-2 pt-7">
-              <AppUiPreview compact />
-            </div>
-          </div>
-        </div>
+      <div className="relative animate-intro-float">
+        <Image
+          src="/images/lp-hero-devices.png"
+          alt="Japanese Super Words on MacBook and iPhone — travel phrases with audio"
+          width={1024}
+          height={663}
+          priority
+          className="h-auto w-full drop-shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+        />
       </div>
-    </div>
-  );
-}
-
-function AppUiPreview({ compact = false }: { compact?: boolean }) {
-  const phrases = compact
-    ? [TRAVEL_PHRASES[0]]
-    : [
-        TRAVEL_PHRASES[0],
-        { ja: 'メニューを見せてください。', en: 'Please show me the menu.', situation: 'Restaurant' },
-        TRAVEL_PHRASES[1],
-      ];
-
-  return (
-    <div className={`flex h-full flex-col ${compact ? 'gap-1.5' : 'gap-3'}`}>
-      <div className="flex items-center justify-between">
-        <span
-          className={`font-semibold tracking-[-0.02em] text-[#f5f5f7] ${compact ? 'text-[9px]' : 'text-[13px]'}`}
-        >
-          Japanese Super Words
-        </span>
-        {!compact && (
-          <span className="rounded-full bg-[#2997ff] px-2 py-0.5 text-[10px] font-medium text-white">
-            Free
-          </span>
-        )}
-      </div>
-
-      <div className={compact ? 'space-y-1.5' : 'space-y-2'}>
-        {phrases.map((p) => (
-          <div
-            key={p.ja}
-            className={`flex items-center justify-between rounded-xl border border-white/[0.06] bg-[#1d1d1f] ${compact ? 'px-2 py-1.5' : 'px-3 py-2.5'}`}
-          >
-            <div className="min-w-0">
-              <p
-                className={`truncate font-semibold text-[#f5f5f7] ${compact ? 'text-[9px]' : 'text-[13px]'}`}
-                lang="ja"
-              >
-                {p.ja}
-              </p>
-              <p className={`text-[#636366] ${compact ? 'text-[6px]' : 'text-[10px]'}`}>
-                {p.en}
-              </p>
-            </div>
-            <Volume2
-              className={`shrink-0 text-[#2997ff] ${compact ? 'h-2.5 w-2.5' : 'h-4 w-4'}`}
-            />
-          </div>
-        ))}
-      </div>
-
-      {!compact && (
-        <div className="mt-auto flex items-center gap-2 rounded-xl bg-white/[0.04] px-3 py-2">
-          <Play className="h-3.5 w-3.5 fill-[#f5f5f7] text-[#f5f5f7]" />
-          <span className="text-[11px] text-[#a1a1a6]">Train station · Audio ready</span>
-        </div>
-      )}
     </div>
   );
 }
 
 function FeatureVisual({ id }: { id: string }) {
   if (id === 'friction') {
+    const steps = [
+      {
+        num: '1',
+        title: 'Open the link',
+        detail: 'No download. No sign-up. Just open in your browser.',
+      },
+      {
+        num: '2',
+        title: 'Pick a situation',
+        detail: 'Train station, ramen shop, hotel — choose where you need phrases.',
+      },
+      {
+        num: '3',
+        title: 'Tap and listen',
+        detail: 'See Japanese, English, and hear native audio right away.',
+      },
+    ];
+
     return (
-      <div className="overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#161617] p-8 sm:p-10">
-        <div className="mx-auto flex max-w-[280px] flex-col items-center gap-4 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.06] text-[24px]">
-            ✈️
-          </div>
-          <p className="text-[48px] font-semibold tracking-[-0.04em] text-[#f5f5f7]">0</p>
-          <p className="text-[15px] text-[#a1a1a6]">steps before your first travel phrase</p>
-        </div>
+      <div className="overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#161617] p-6 sm:p-8">
+        <ol className="space-y-4 text-left">
+          {steps.map((step) => (
+            <li
+              key={step.num}
+              className="flex gap-4 rounded-2xl border border-white/[0.06] bg-black/40 px-4 py-4 sm:px-5 sm:py-5"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2997ff] text-[14px] font-semibold text-white">
+                {step.num}
+              </span>
+              <div>
+                <p className="text-[16px] font-semibold tracking-[-0.02em] text-[#f5f5f7] sm:text-[17px]">
+                  {step.title}
+                </p>
+                <p className="mt-1 text-[14px] leading-relaxed text-[#a1a1a6] sm:text-[15px]">
+                  {step.detail}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     );
   }
 
-  if (id === 'context') {
+  if (id === 'anywhere') {
     return (
-      <div className="overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#161617]">
-        <div className="grid sm:grid-cols-2">
-          <div className="flex flex-col justify-center p-8 sm:p-10">
-            <p className="text-[13px] font-medium text-[#a1a1a6]">Izakaya · Travel</p>
-            <p className="mt-2 text-[22px] font-semibold leading-snug tracking-[-0.03em] text-[#f5f5f7] sm:text-[26px]" lang="ja">
-              おすすめは何ですか？
-            </p>
-            <p className="mt-1 text-[15px] text-[#a1a1a6]">What do you recommend?</p>
+      <div className="flex justify-center gap-4 sm:gap-6">
+        {[
+          { icon: Smartphone, label: 'Phone' },
+          { icon: Laptop, label: 'Laptop' },
+        ].map(({ icon: Icon, label }, i) => (
+          <div
+            key={label}
+            className="flex h-28 w-28 flex-col items-center justify-center gap-2 rounded-[20px] border border-white/[0.06] bg-[#161617] transition-transform duration-700 hover:scale-[1.03] sm:h-32 sm:w-32"
+            style={{ transitionDelay: `${i * 80}ms` }}
+          >
+            <Icon className="h-8 w-8 text-[#a1a1a6]" strokeWidth={1.5} />
+            <span className="text-[12px] text-[#636366]">{label}</span>
           </div>
-          <div className="flex items-center justify-center bg-[#000000] p-8 sm:p-10">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.08] backdrop-blur">
-              <Play className="h-7 w-7 fill-white text-white" />
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     );
   }
 
-  return (
-    <div className="flex justify-center gap-4 sm:gap-6">
-      {[
-        { icon: Smartphone, label: 'Phone' },
-        { icon: Laptop, label: 'Laptop' },
-      ].map(({ icon: Icon, label }, i) => (
-        <div
-          key={label}
-          className="flex h-28 w-28 flex-col items-center justify-center gap-2 rounded-[20px] border border-white/[0.06] bg-[#161617] transition-transform duration-700 hover:scale-[1.03] sm:h-32 sm:w-32"
-          style={{ transitionDelay: `${i * 80}ms` }}
-        >
-          <Icon className="h-8 w-8 text-[#a1a1a6]" strokeWidth={1.5} />
-          <span className="text-[12px] text-[#636366]">{label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ReviewRow({ card }: { card: (typeof REVIEW_CARDS)[number] }) {
-  return (
-    <a
-      href={card.videoUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex items-start gap-4 rounded-2xl border border-white/[0.06] bg-[#161617] px-5 py-4 transition-all duration-500 hover:border-white/[0.1] hover:bg-[#1d1d1f] sm:items-center sm:px-6 sm:py-5"
-    >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-[13px] font-semibold text-[#a1a1a6]">
-        {card.avatar}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-[14px] font-medium text-[#f5f5f7] group-hover:text-[#2997ff]">
-            {card.username}
-          </span>
-          <span className="text-[12px] text-[#636366]">
-            · {card.situation} · {card.phraseMeaning}
-          </span>
-        </div>
-        <p className="mt-1 text-[15px] leading-[1.45] text-[#a1a1a6]">{card.comment}</p>
-      </div>
-
-      <div className="hidden shrink-0 flex-col items-end gap-1 sm:flex">
-        <span className="max-w-[180px] text-right text-[15px] font-semibold leading-snug tracking-[-0.02em] text-[#f5f5f7]" lang="ja">
-          {card.phrase}
-        </span>
-        <span className="text-[12px] text-[#2997ff] opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          Watch clip ›
-        </span>
-      </div>
-    </a>
-  );
+  return null;
 }
 
 function TikTokIcon({ className }: { className?: string }) {
