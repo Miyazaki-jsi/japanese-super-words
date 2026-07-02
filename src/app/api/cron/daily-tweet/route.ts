@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   const dryRun = process.env.TWITTER_DRY_RUN === '1' || preview;
   const card = pickDailyPhrase();
   const appBaseUrl = getAppBaseUrl();
-  const { text, link } = buildDailyTweetText(card, appBaseUrl);
+  const { text, link, styleIndex } = buildDailyTweetText(card, appBaseUrl);
 
   if (dryRun || !isXTwitterConfigured()) {
     return NextResponse.json({
@@ -41,6 +41,7 @@ export async function GET(request: Request) {
         japanese: card.japanese,
         english: card.english,
       },
+      styleIndex,
       link,
       text,
       charCount: text.length,
