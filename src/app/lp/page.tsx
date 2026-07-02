@@ -415,7 +415,7 @@ function HeroScreenshot() {
       <div className="relative animate-intro-float">
         <Image
           src="/images/lp-hero-devices.png"
-          alt="Japanese Super Words on MacBook and iPhone — travel phrases with audio"
+          alt="Japanese Super Words app on desktop and phone — choose a plan and start learning"
           width={1024}
           height={663}
           priority
