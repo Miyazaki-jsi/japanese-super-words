@@ -17,6 +17,13 @@ export type TemplatePerformance = {
   avgImpressions: number;
 };
 
+export type SituationPerformance = {
+  situation: string;
+  posts: number;
+  avgLikes: number;
+  avgImpressions: number;
+};
+
 export async function saveTweetPost(record: TweetPostRecord): Promise<boolean> {
   if (!isAnalyticsDbConfigured()) return false;
 
@@ -128,6 +135,40 @@ export async function getTemplatePerformance(): Promise<TemplatePerformance[]> {
 
   return [...byTemplate.entries()].map(([templateId, bucket]) => ({
     templateId,
+    posts: bucket.likes.length,
+    avgLikes: avg(bucket.likes),
+    avgImpressions: avg(bucket.impressions),
+  }));
+}
+
+export async function getSituationPerformance(): Promise<SituationPerformance[]> {
+  if (!isAnalyticsDbConfigured()) return [];
+
+  const db = getSupabaseAdmin();
+  if (!db) return [];
+
+  const since = new Date();
+  since.setUTCDate(since.getUTCDate() - 90);
+
+  const { data, error } = await db
+    .from('x_daily_tweets')
+    .select('situation, likes, impressions')
+    .gte('posted_at', since.toISOString());
+
+  if (error || !data) return [];
+
+  const bySituation = new Map<string, { likes: number[]; impressions: number[] }>();
+
+  for (const row of data) {
+    const id = row.situation as string;
+    if (!bySituation.has(id)) bySituation.set(id, { likes: [], impressions: [] });
+    const bucket = bySituation.get(id)!;
+    bucket.likes.push(row.likes ?? 0);
+    bucket.impressions.push(row.impressions ?? 0);
+  }
+
+  return [...bySituation.entries()].map(([situation, bucket]) => ({
+    situation,
     posts: bucket.likes.length,
     avgLikes: avg(bucket.likes),
     avgImpressions: avg(bucket.impressions),

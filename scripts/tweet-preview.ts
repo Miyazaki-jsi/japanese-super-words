@@ -7,10 +7,10 @@ import {
   buildDailyTweetText,
   getAppBaseUrl,
   getMaxTweetChars,
-  pickDailyPhrase,
+  pickDailyPhraseSync,
 } from '../src/lib/dailyTweet';
 
-const card = pickDailyPhrase();
+const card = pickDailyPhraseSync();
 
 async function main() {
   const appBaseUrl = getAppBaseUrl();

@@ -6,7 +6,9 @@ export type TweetTemplateId =
   | 'mistake-vs-natural'
   | 'when-to-use'
   | 'culture-note'
-  | 'phrase-breakdown';
+  | 'phrase-breakdown'
+  | 'picture-this'
+  | 'dont-say-this';
 
 export type TweetBuildInput = {
   card: WordCard;
@@ -23,7 +25,69 @@ function bullets(lines: string[]): string {
   return lines.map((line) => `• ${line}`).join('\n');
 }
 
+function numbered(lines: string[]): string {
+  return lines.map((line, i) => `${i + 1}. ${line}`).join('\n');
+}
+
 export const TWEET_TEMPLATES: TweetTemplate[] = [
+  {
+    id: 'picture-this',
+    label: 'Real-life scenario (educational story)',
+    build: ({ card, link }) => {
+      const edu = buildEducationContext(card);
+      return [
+        '🇯🇵 Picture this in Japan',
+        '',
+        edu.scenarioStory,
+        '',
+        'What to say:',
+        `「${card.japanese}」`,
+        `${card.romaji} → ${card.english}`,
+        '',
+        'Why this works:',
+        edu.rememberThis,
+        '',
+        edu.nativeTip,
+        edu.textbookTrap ? `\nCommon mistake:\n${edu.textbookTrap}` : '',
+        '',
+        '🔊 Hear natural audio + practice the full scene:',
+        link,
+      ]
+        .filter(Boolean)
+        .join('\n');
+    },
+  },
+  {
+    id: 'dont-say-this',
+    label: 'Textbook trap vs what natives do',
+    build: ({ card, link }) => {
+      const edu = buildEducationContext(card);
+      return [
+        '🇯🇵 Japanese learners: save this before your trip',
+        '',
+        edu.textbookTrap ??
+          'Textbooks teach grammar. Japan runs on short, practical phrases.',
+        '',
+        'Instead, use:',
+        `「${card.japanese}」`,
+        `(${card.romaji})`,
+        `= ${card.english}`,
+        '',
+        '3 things to remember:',
+        numbered([
+          edu.rememberThis,
+          edu.whenToUse.split('.')[0] ?? edu.whenToUse,
+          edu.nativeTip.split('.')[0] ?? edu.nativeTip,
+        ]),
+        edu.relatedPhrase ? `\nBonus phrase: ${edu.relatedPhrase}` : '',
+        '',
+        'Practice with audio + more lines from this scene:',
+        link,
+      ]
+        .filter(Boolean)
+        .join('\n');
+    },
+  },
   {
     id: 'mini-lesson',
     label: 'Mini lesson (why it works)',
@@ -32,7 +96,8 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
       return [
         '🇯🇵 Useful Japanese for Japan (mini-lesson)',
         '',
-        `Situation: ${edu.sceneEn}`,
+        `Scene: ${edu.sceneEn}`,
+        edu.scenarioStory,
         '',
         'Phrase:',
         `「${card.japanese}」`,
@@ -41,6 +106,9 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
         '',
         'Why this is useful:',
         bullets(edu.whyBullets),
+        '',
+        'Takeaway:',
+        edu.rememberThis,
         '',
         'When to use it:',
         edu.whenToUse,
@@ -59,10 +127,11 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
     build: ({ card, link }) => {
       const edu = buildEducationContext(card);
       return [
-        '🇯🇵 Japanese learners: this one is worth saving',
+        '🇯🇵 This phrase will actually help you in Japan',
         '',
         edu.mistakeNote ??
-          'Textbooks teach grammar. Japan runs on short, practical phrases.',
+          edu.textbookTrap ??
+          'Many learners study grammar but freeze in real shops and stations.',
         '',
         `Natural in ${edu.sceneEn}:`,
         `「${card.japanese}」`,
@@ -71,6 +140,8 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
         '',
         'Why it works:',
         bullets(edu.whyBullets.slice(0, 3)),
+        '',
+        edu.nativeTip,
         '',
         'Hear it + practice the full scene:',
         link,
@@ -85,6 +156,8 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
       return [
         `🇯🇵 When do you say this in Japan? (${edu.sceneEn})`,
         '',
+        edu.scenarioStory,
+        '',
         edu.whenToUse,
         '',
         'Say:',
@@ -92,8 +165,10 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
         card.romaji,
         `(${card.english})`,
         '',
-        'Quick tip:',
-        edu.whyBullets[0] ?? 'Keep it short. Polite + clear wins.',
+        'Quick takeaway:',
+        edu.rememberThis,
+        '',
+        edu.cultureNote ?? edu.nativeTip,
         '',
         'Practice with audio + roleplay-style phrases:',
         link,
@@ -106,17 +181,19 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
     build: ({ card, link }) => {
       const edu = buildEducationContext(card);
       return [
-        `🇯🇵 Japan culture note + useful phrase`,
+        '🇯🇵 Japan culture note + useful phrase',
         '',
-        edu.cultureNote ??
-          `In ${edu.sceneEn.toLowerCase()} settings, short polite Japanese goes a long way.`,
+        edu.cultureNote ?? edu.nativeTip,
         '',
         'Useful line:',
         `「${card.japanese}」`,
         `→ ${card.english}`,
+        `(${card.romaji})`,
         '',
-        'Breakdown:',
+        'What to notice:',
         bullets(edu.whyBullets.slice(0, 3)),
+        '',
+        edu.rememberThis,
         '',
         'More phrases for this situation (with audio):',
         link,
@@ -128,23 +205,25 @@ export const TWEET_TEMPLATES: TweetTemplate[] = [
     label: 'Phrase breakdown',
     build: ({ card, link }) => {
       const edu = buildEducationContext(card);
-      const readingNote = card.reading !== card.japanese
-        ? `Reading: ${card.reading}`
-        : undefined;
+      const readingNote =
+        card.reading !== card.japanese ? `Reading: ${card.reading}` : undefined;
 
       return [
-        '🇯🇵 Phrase breakdown (save for your trip)',
+        '🇯🇵 Phrase breakdown (bookmark for your trip)',
         '',
         `「${card.japanese}」`,
         card.romaji,
         readingNote,
         `Meaning: ${card.english}`,
         '',
-        'What to notice:',
+        'Breakdown:',
         bullets(edu.whyBullets),
         '',
         `Context: ${edu.sceneEn}`,
         edu.whenToUse,
+        '',
+        'Remember:',
+        edu.rememberThis,
         '',
         'Train your ear + practice more from this scene:',
         link,

@@ -39,7 +39,7 @@ echo "  NEXT_PUBLIC_APP_URL=$APP_URL"
 echo "  X_TWEET_MAX_CHARS=2500      (long posts for X Premium)"
 echo ""
 echo "  Supabase: run new x_daily_tweets table from supabase/schema.sql"
-echo "  (needed for like-based template learning)"
+echo "  (needed for like-based template + situation learning)"
 echo ""
 
 echo "Step 3 — Preview (no post)"

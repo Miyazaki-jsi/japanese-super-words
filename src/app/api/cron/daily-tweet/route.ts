@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   const dryRun = process.env.TWITTER_DRY_RUN === '1' || preview;
-  const card = pickDailyPhrase();
+  const card = await pickDailyPhrase();
   const appBaseUrl = getAppBaseUrl();
   const { text, link, templateId, charCount } = await buildDailyTweetText(
     card,

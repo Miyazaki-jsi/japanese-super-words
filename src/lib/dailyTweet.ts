@@ -1,5 +1,5 @@
-import { sampleWords, type WordCard } from '@/data/words';
-import { pickTemplateIdForDay } from '@/lib/dailyTweetLearning';
+import { sampleWords, type SituationId, type WordCard } from '@/data/words';
+import { pickSituationForDay, pickTemplateIdForDay } from '@/lib/dailyTweetLearning';
 import { getTweetTemplate, type TweetTemplateId } from '@/lib/dailyTweetTemplates';
 
 const TWITTER_URL_CHARS = 23;
@@ -24,8 +24,8 @@ export function getMaxTweetChars(): number {
   return Math.max(280, Math.min(parsed, 25_000));
 }
 
-/** Deterministic phrase for a calendar day (UTC). Same day → same phrase. */
-export function pickDailyPhrase(date = new Date()): WordCard {
+/** Deterministic phrase for a calendar day (UTC). Biases toward situations that get more likes. */
+export async function pickDailyPhrase(date = new Date()): Promise<WordCard> {
   const eligible = sampleWords.filter(
     (card) =>
       card.japanese.length <= 48 &&
@@ -36,6 +36,26 @@ export function pickDailyPhrase(date = new Date()): WordCard {
   if (eligible.length === 0) {
     return sampleWords[0];
   }
+
+  const key = dayKey(date);
+  const situations = [...new Set(eligible.map((c) => c.situation))] as SituationId[];
+  const situation = await pickSituationForDay(key, situations);
+  const inSituation = eligible.filter((c) => c.situation === situation);
+  const pool = inSituation.length > 0 ? inSituation : eligible;
+
+  return pool[hashString(`${key}:phrase`) % pool.length];
+}
+
+/** Sync fallback when DB stats are unavailable (preview scripts, tests). */
+export function pickDailyPhraseSync(date = new Date()): WordCard {
+  const eligible = sampleWords.filter(
+    (card) =>
+      card.japanese.length <= 48 &&
+      card.english.length <= 100 &&
+      !card.japanese.includes('\n'),
+  );
+
+  if (eligible.length === 0) return sampleWords[0];
 
   const key = dayKey(date);
   return eligible[hashString(key) % eligible.length];
