@@ -37,3 +37,26 @@ create index if not exists idx_gumroad_purchases_purchased_at
 
 create index if not exists idx_gumroad_purchases_tier
   on gumroad_purchases (tier);
+
+-- Daily X posts + engagement (for template learning)
+create table if not exists x_daily_tweets (
+  id bigserial primary key,
+  tweet_id text not null unique,
+  card_id text not null,
+  template_id text not null,
+  situation text not null,
+  char_count integer,
+  tweet_text text not null,
+  likes integer not null default 0,
+  retweets integer not null default 0,
+  replies integer not null default 0,
+  impressions integer not null default 0,
+  posted_at timestamptz not null default now(),
+  metrics_synced_at timestamptz
+);
+
+create index if not exists idx_x_daily_tweets_posted_at
+  on x_daily_tweets (posted_at desc);
+
+create index if not exists idx_x_daily_tweets_template_id
+  on x_daily_tweets (template_id);

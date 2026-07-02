@@ -5,6 +5,7 @@ import {
 } from '@/lib/gumroadLicense';
 import { isAdminAuthConfigured } from '@/lib/adminAuth';
 import { isAnalyticsDbConfigured } from '@/lib/supabaseServer';
+import { isXTwitterConfigured } from '@/lib/xTwitter';
 
 /** Public readiness check — booleans/counts only, no secrets exposed. */
 export async function GET() {
@@ -53,6 +54,13 @@ export async function GET() {
       pingUrl: '/api/webhooks/gumroad',
       envVar: 'GUMROAD_SELLER_ID',
       script: 'npm run setup:gumroad',
+    },
+    dailyTweet: {
+      xApiConfigured: isXTwitterConfigured(),
+      cronSecretConfigured: (process.env.CRON_SECRET?.trim() ?? '').length > 0,
+      scheduleUtc: '0 0 * * *',
+      previewPath: '/api/cron/daily-tweet?preview=1',
+      script: 'npm run setup:x-twitter',
     },
   });
 }
