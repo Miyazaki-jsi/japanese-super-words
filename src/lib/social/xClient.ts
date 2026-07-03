@@ -1,4 +1,7 @@
 import crypto from 'node:crypto';
+import { explainXApiError } from './xErrors';
+
+export const X_API_BASE = 'https://api.x.com';
 
 export type XPostResult =
   | { ok: true; dryRun: true; tweetId?: undefined }
@@ -73,7 +76,7 @@ export async function postTweet(text: string): Promise<XPostResult> {
     return { ok: true, dryRun: true };
   }
 
-  const url = 'https://api.twitter.com/2/tweets';
+  const url = `${X_API_BASE}/2/tweets`;
 
   try {
     const response = await fetch(url, {
@@ -93,12 +96,13 @@ export async function postTweet(text: string): Promise<XPostResult> {
     };
 
     if (!response.ok) {
-      const message =
+      const raw =
         payload.detail ||
         payload.title ||
         payload.errors?.[0]?.detail ||
         `X API error (${response.status})`;
-      return { ok: false, dryRun: false, error: message };
+      const help = explainXApiError(raw);
+      return { ok: false, dryRun: false, error: `${help.title}: ${help.message}` };
     }
 
     const tweetId = payload.data?.id;
@@ -128,12 +132,13 @@ export async function fetchTweetMetrics(tweetId: string): Promise<{
   const params = new URLSearchParams({
     'tweet.fields': 'public_metrics',
   });
-  const url = `https://api.twitter.com/2/tweets/${tweetId}?${params.toString()}`;
+  const tweetPath = `${X_API_BASE}/2/tweets/${tweetId}`;
+  const url = `${tweetPath}?${params.toString()}`;
 
   try {
     const response = await fetch(url, {
       headers: {
-        Authorization: buildOAuth1Header('GET', `https://api.twitter.com/2/tweets/${tweetId}`),
+        Authorization: buildOAuth1Header('GET', tweetPath),
       },
     });
 

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { explainXApiError } from '@/lib/social/xErrors';
 import type { SocialPost, SocialPostMetrics, SocialTemplate } from '@/lib/social/types';
 
 type PostRow = {
@@ -240,6 +241,14 @@ export default function SocialAdminPanel({
     }
   }
 
+  const errorHelp = todayPost?.errorMessage ? explainXApiError(todayPost.errorMessage) : null;
+  const primaryButtonLabel =
+    todayPost?.status === 'failed'
+      ? 'もう一度投稿する'
+      : todayPost?.status === 'posted'
+        ? '今日は投稿済み'
+        : '今日の下書きを生成';
+
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
@@ -280,11 +289,11 @@ export default function SocialAdminPanel({
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => handleGenerate(false)}
-              disabled={loadingAction !== null}
+              onClick={() => handleGenerate(todayPost?.status === 'failed')}
+              disabled={loadingAction !== null || todayPost?.status === 'posted'}
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
             >
-              {loadingAction === 'generate' ? '生成中…' : '今日の下書きを生成'}
+              {loadingAction === 'generate' ? '投稿中…' : primaryButtonLabel}
             </button>
             <button
               type="button"
@@ -344,6 +353,19 @@ export default function SocialAdminPanel({
         ) : null}
 
         {todayPost ? <MetricsForm post={todayPost} metrics={todayMetrics} /> : null}
+
+        {todayPost?.status === 'failed' && errorHelp ? (
+          <div className="mt-4 rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-50">
+            <p className="font-semibold">{errorHelp.title}</p>
+            <p className="mt-2 text-rose-100/90">{errorHelp.message}</p>
+            <p className="mt-3 font-medium">あなたがやること：</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-rose-100/90">
+              {errorHelp.userSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
 
         {actionMessage ? <p className="mt-4 text-sm text-slate-200">{actionMessage}</p> : null}
       </section>
