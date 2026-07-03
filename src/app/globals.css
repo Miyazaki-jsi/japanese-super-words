@@ -204,6 +204,30 @@ button:not(:disabled):not(.no-press):active,
   /* alias — global button styles apply automatically */
 }
 
+/* Home segmented tabs: keep Android Firefox from painting orange/yellow tap artifacts. */
+.home-tab-button {
+  appearance: none;
+  -moz-appearance: none;
+  background-clip: padding-box;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.home-tab-button:focus {
+  outline: none;
+}
+
+.home-tab-button:focus-visible {
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 4px rgba(99, 102, 241, 0.45);
+}
+
+.home-tab-button--active {
+  background-color: #4f46e5;
+  background-image: none;
+}
+
 @keyframes starPop {
   0% {
     transform: scale(1);

@@ -1997,9 +1997,9 @@ export default function Home() {
                       type="button"
                       onClick={() => setHomeTab(tab.id)}
                       aria-selected={isActive}
-                      className={`relative flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2.5 pressable ${
+                      className={`home-tab-button relative flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2.5 pressable ${
                         isActive
-                          ? 'bg-gradient-to-b from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-200/70'
+                          ? 'home-tab-button--active bg-indigo-600 text-white shadow-md shadow-indigo-200/70'
                           : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
                       }`}
                     >
