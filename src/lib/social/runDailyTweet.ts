@@ -1,4 +1,4 @@
-import { buildTweet, pickWordForTweet } from './socialContent';
+import { buildTweet, pickWordForTweet, shouldIncludeAppLink } from './socialContent';
 import { pickTemplateId } from './socialLearning';
 import {
   createSocialPost,
@@ -7,6 +7,7 @@ import {
   getPostForDate,
   getRecentWordIds,
   getSocialTemplates,
+  getTotalSocialPostCount,
   isSocialDbConfigured,
 } from './socialDb';
 import type { DailyTweetResult } from './types';
@@ -55,7 +56,9 @@ export async function runDailyTweet(options?: {
   const templateId = pickTemplateId(templates);
   const recentWordIds = await getRecentWordIds();
   const word = pickWordForTweet(recentWordIds);
-  const generated = buildTweet(templateId, word);
+  const postCount = await getTotalSocialPostCount();
+  const includeLink = shouldIncludeAppLink(postCount);
+  const generated = buildTweet(templateId, word, { includeLink });
 
   const postResult = await postTweet(generated.tweetText);
   const now = new Date().toISOString();

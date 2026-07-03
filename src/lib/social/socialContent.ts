@@ -1,11 +1,11 @@
 import { sampleWords, type WordCard } from '@/data/words';
-import { getSituationLabel } from '@/data/situationLabels';
 import {
   APP_BASE_URL,
-  SCENE_EMOJI,
-  SCENE_TIPS,
+  LINK_EVERY_N_POSTS,
+  TEMPLATE_DEFINITIONS,
   TWEET_MAX_LENGTH,
 } from './constants';
+import { buildDialogueContext, nuanceLine } from './socialDialogues';
 import type { GeneratedTweet, SocialTemplateId } from './types';
 
 function buildAppLink(situation: string, templateId: SocialTemplateId, wordId: string): string {
@@ -23,16 +23,21 @@ function truncateToMax(text: string, max = TWEET_MAX_LENGTH): string {
   return `${text.slice(0, max - 1).trim()}…`;
 }
 
+function linkFooter(link: string): string {
+  return `\n\n🔊 Native audio + 1,000+ phrases\n${link}`;
+}
+
 function isSaveWorthyPhrase(word: WordCard): boolean {
   const ja = word.japanese.trim();
-  if (ja.length < 4) return false;
-  if (/^[ぁ-んァ-ンー]+$/.test(ja) && ja.length < 6) return false;
+  if (ja.length < 3) return false;
   return (
     ja.includes('。') ||
     ja.includes('？') ||
     ja.includes('?') ||
     ja.includes('！') ||
-    ja.length >= 8
+    ja.includes('ください') ||
+    ja.includes('すみません') ||
+    ja.length >= 6
   );
 }
 
@@ -49,56 +54,116 @@ export function pickWordForTweet(recentWordIds: string[]): WordCard {
   return candidates[index] ?? pool[0];
 }
 
-function sceneLabel(situation: string): { en: string; ja: string; emoji: string; tip: string } {
-  const label = getSituationLabel(situation);
-  return {
-    en: label.en,
-    ja: label.ja,
-    emoji: SCENE_EMOJI[situation] ?? '🇯🇵',
-    tip: SCENE_TIPS[situation] ?? `Useful in ${label.en.toLowerCase()} situations in Japan.`,
-  };
+export function shouldIncludeAppLink(existingPostCount: number): boolean {
+  return (existingPostCount + 1) % LINK_EVERY_N_POSTS === 0;
 }
 
-function renderSaveCard(word: WordCard, link: string): string {
-  const scene = sceneLabel(word.situation);
-  return truncateToMax(
-    `📌 Save this for Japan\n\n${scene.emoji} ${scene.en}\n「${word.japanese}」\n${word.romaji}\n→ ${word.english}\n\n${link}`
-  );
+/** 会話例 + 話し言葉解説のミニ教科書 */
+function renderSaveCard(word: WordCard, link: string | null): string {
+  const ctx = buildDialogueContext(word);
+  const body = `${ctx.emoji} Mini textbook · ${ctx.sceneEn}
+
+【会話例】
+${ctx.dialogue}
+
+【このフレーズ】
+「${word.japanese}」
+(${word.reading})
+→ ${word.english}
+
+【話し言葉メモ】
+${ctx.spokenNoteJa}
+
+【使うタイミング】
+${ctx.usageTipEn}`;
+
+  return truncateToMax(link ? body + linkFooter(link) : body);
 }
 
-function renderPhraseNote(word: WordCard, link: string): string {
-  const scene = sceneLabel(word.situation);
-  return truncateToMax(
-    `🇯🇵 Phrase note\n\n「${word.japanese}」\n(${word.reading})\n${word.english}\n\nWhen: ${scene.tip}\n\n${link}`
-  );
+/** 場面ストーリー型 */
+function renderPhraseNote(word: WordCard, link: string | null): string {
+  const ctx = buildDialogueContext(word);
+  const body = `${ctx.emoji} Scene: ${ctx.settingLine}
+
+Imagine you're there right now.
+
+${ctx.dialogue}
+
+That line — 「${word.japanese}」 — is what locals actually say.
+Not textbook Japanese. Real, usable, right-now Japanese.
+
+${nuanceLine(word)}
+
+🇯🇵 話し言葉ポイント：
+${ctx.spokenNoteJa}`;
+
+  return truncateToMax(link ? body + linkFooter(link) : body);
 }
 
-function renderQuickTip(word: WordCard, link: string): string {
-  return truncateToMax(
-    `Quick Japanese for travelers:\n\nTry saying:\n「${word.japanese}」\n= ${word.english}\n\nTap to hear it in the app 👇\n${link}`
-  );
+/** フレーズ深掘り + 会話 */
+function renderQuickTip(word: WordCard, link: string | null): string {
+  const ctx = buildDialogueContext(word);
+  const body = `🇯🇵 Phrase deep-dive
+
+Target: 「${word.japanese}」
+${word.romaji} · ${word.english}
+
+会話でこう使う：
+${ctx.dialogue}
+
+ネイティブっぽく言うコツ：
+${ctx.spokenNoteJa}
+
+${nuanceLine(word)}
+
+📌 ${ctx.sceneEn} — save this for your trip.`;
+
+  return truncateToMax(link ? body + linkFooter(link) : body);
 }
 
-function renderSituationBite(word: WordCard, link: string): string {
-  const scene = sceneLabel(word.situation);
-  return truncateToMax(
-    `${scene.emoji} ${scene.en} in Japan\n\nMust-know phrase:\n「${word.japanese}」\n${word.english}\n\n${link}`
-  );
+/** 1ページ教科書（いちばん情報量多め） */
+function renderSituationBite(word: WordCard, link: string | null): string {
+  const ctx = buildDialogueContext(word);
+  const body = `${ctx.emoji} 1-page lesson · ${ctx.sceneJa}
+
+① 場面
+${ctx.settingLine}
+
+② 会話例
+${ctx.dialogue}
+
+③ フレーズ
+「${word.japanese}」
+${word.reading} / ${word.romaji}
+= ${word.english}
+
+④ 話し言葉解説
+${ctx.spokenNoteJa}
+
+⑤ When to use
+${ctx.usageTipEn}
+
+💡 Bookmark this — one phrase, one real Japan moment.`;
+
+  return truncateToMax(link ? body + linkFooter(link) : body);
 }
 
 export function buildTweet(
   templateId: SocialTemplateId,
-  word: WordCard
+  word: WordCard,
+  options?: { includeLink?: boolean }
 ): GeneratedTweet {
-  const linkUrl = buildAppLink(word.situation, templateId, word.id);
-  const renderers: Record<SocialTemplateId, (w: WordCard, l: string) => string> = {
+  const includeLink = options?.includeLink ?? false;
+  const linkUrl = includeLink ? buildAppLink(word.situation, templateId, word.id) : '';
+
+  const renderers: Record<SocialTemplateId, (w: WordCard, l: string | null) => string> = {
     save_card: renderSaveCard,
     phrase_note: renderPhraseNote,
     quick_tip: renderQuickTip,
     situation_bite: renderSituationBite,
   };
 
-  const tweetText = renderers[templateId](word, linkUrl);
+  const tweetText = renderers[templateId](word, includeLink ? linkUrl : null);
   return {
     templateId,
     wordId: word.id,
@@ -108,7 +173,7 @@ export function buildTweet(
   };
 }
 
-export function previewAllTemplates(word: WordCard): GeneratedTweet[] {
+export function previewAllTemplates(word: WordCard, includeLink = true): GeneratedTweet[] {
   const ids: SocialTemplateId[] = ['save_card', 'phrase_note', 'quick_tip', 'situation_bite'];
-  return ids.map((templateId) => buildTweet(templateId, word));
+  return ids.map((templateId) => buildTweet(templateId, word, { includeLink }));
 }

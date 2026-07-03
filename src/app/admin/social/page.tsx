@@ -121,9 +121,9 @@ function PageHeader() {
           Japanese Super Words
         </p>
         <h1 className="mt-2 text-3xl font-bold text-white">X 自動投稿</h1>
-        <p className="mt-2 text-sm text-slate-400">
-          1日1ツイート · 学習者向けの保存したくなるフレーズノート
-        </p>
+          <p className="mt-2 text-sm text-slate-400">
+            1日1ツイート · 会話例つきミニ教科書（最大500字）
+          </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

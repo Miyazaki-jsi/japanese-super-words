@@ -200,6 +200,18 @@ export async function getSocialPostById(postId: number): Promise<SocialPost | nu
   return data ? mapPost(data as Record<string, unknown>) : null;
 }
 
+export async function getTotalSocialPostCount(): Promise<number> {
+  const db = getSupabaseAdmin();
+  if (!db) return 0;
+
+  const { count, error } = await db
+    .from('social_posts')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+}
+
 export async function listRecentSocialPosts(limit = 14): Promise<SocialPost[]> {
   const db = getSupabaseAdmin();
   if (!db) return [];

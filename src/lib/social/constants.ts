@@ -5,7 +5,9 @@ export const APP_BASE_URL =
 
 export const X_PROFILE_URL = 'https://x.com/miyazaki_jsi';
 
-export const TWEET_MAX_LENGTH = 280;
+export const TWEET_MAX_LENGTH = 500;
+
+export const LINK_EVERY_N_POSTS = 3;
 
 export const DEFAULT_TEMPLATE_SCORE = 1;
 
@@ -16,23 +18,23 @@ export const TEMPLATE_DEFINITIONS: {
 }[] = [
   {
     id: 'save_card',
-    name: 'Save card',
-    description: 'Bookmark-style phrase card learners want to save',
+    name: 'Mini textbook',
+    description: 'Dialogue + spoken Japanese notes + usage timing (~500 chars)',
   },
   {
     id: 'phrase_note',
-    name: 'Phrase note',
-    description: 'Japanese + reading + English with a when-to-use hint',
+    name: 'Scene story',
+    description: 'Narrative scene + real conversation + nuance tip',
   },
   {
     id: 'quick_tip',
-    name: 'Quick tip',
-    description: 'Short actionable tip for travelers',
+    name: 'Phrase deep-dive',
+    description: 'Target phrase + dialogue + native speaking tips',
   },
   {
     id: 'situation_bite',
-    name: 'Situation bite',
-    description: 'Scene-first mini lesson tied to a real Japan moment',
+    name: '1-page lesson',
+    description: 'Full textbook layout: scene, dialogue, phrase, explanation',
   },
 ];
 
