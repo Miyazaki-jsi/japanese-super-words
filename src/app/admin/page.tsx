@@ -126,6 +126,12 @@ export default async function AdminDashboardPage({
 
         <div className="flex flex-wrap items-center gap-2">
           <Link
+            href="/admin/social"
+            className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:text-white"
+          >
+            X 投稿
+          </Link>
+          <Link
             href="/admin?days=7"
             className={`rounded-lg px-3 py-2 text-sm ${
               periodDays === 7

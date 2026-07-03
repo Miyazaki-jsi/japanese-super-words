@@ -7,8 +7,14 @@ export type AppAttribution = {
   campaign?: string;
   video?: string;
   fromYoutube: boolean;
+  fromX: boolean;
   capturedAt: number;
 };
+
+function parseFromX(params: URLSearchParams): boolean {
+  const source = params.get('utm_source')?.toLowerCase();
+  return source === 'x' || source === 'twitter';
+}
 
 function parseFromYoutube(params: URLSearchParams): boolean {
   const from = params.get('from')?.toLowerCase();
@@ -36,6 +42,7 @@ export function captureAttributionFromUrl(search = ''): AppAttribution | null {
     campaign: params.get('utm_campaign') ?? undefined,
     video: params.get('video') ?? undefined,
     fromYoutube: parseFromYoutube(params),
+    fromX: parseFromX(params),
     capturedAt: Date.now(),
   };
 
@@ -53,10 +60,23 @@ export function readAttribution(): AppAttribution | null {
   try {
     const raw = localStorage.getItem(ATTRIBUTION_STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as AppAttribution;
+    return normalizeAttribution(JSON.parse(raw) as Partial<AppAttribution>);
   } catch {
     return null;
   }
+}
+
+function normalizeAttribution(raw: Partial<AppAttribution> | null): AppAttribution | null {
+  if (!raw || typeof raw.capturedAt !== 'number') return null;
+  return {
+    source: raw.source,
+    medium: raw.medium,
+    campaign: raw.campaign,
+    video: raw.video,
+    fromYoutube: raw.fromYoutube === true,
+    fromX: raw.fromX === true,
+    capturedAt: raw.capturedAt,
+  };
 }
 
 export function isFromYoutube(): boolean {
@@ -72,5 +92,6 @@ export function getAttributionProps(): Record<string, string> {
   if (a.campaign) props.campaign = a.campaign;
   if (a.video) props.video = a.video;
   if (a.fromYoutube) props.fromYoutube = 'true';
+  if (a.fromX) props.fromX = 'true';
   return props;
 }

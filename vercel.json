@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/daily-tweet",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/sync-tweet-metrics",
+      "schedule": "0 14 * * *"
+    }
+  ]
+}
