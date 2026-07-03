@@ -328,7 +328,7 @@ export default function SocialAdminPanel({
           <div>
             <h2 className="text-lg font-semibold text-white">今日のツイート</h2>
             <p className="mt-1 text-sm text-indigo-100/80">
-              会話例 + 話し言葉解説 · 最大500字 · リンクは3回に1回
+              場面 + 共感ストーリー + 単語解説 · リンクは3回に1回
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

@@ -122,7 +122,7 @@ function PageHeader() {
         </p>
         <h1 className="mt-2 text-3xl font-bold text-white">X 自動投稿</h1>
           <p className="mt-2 text-sm text-slate-400">
-            1日1ツイート · 会話例つきミニ教科書（最大500字）
+            1日1ツイート · 今日の日本語（共感ストーリー + 単語解説）
           </p>
       </div>
 

@@ -18,23 +18,23 @@ export const TEMPLATE_DEFINITIONS: {
 }[] = [
   {
     id: 'save_card',
-    name: 'Mini textbook',
-    description: 'Dialogue + spoken Japanese notes + usage timing (~500 chars)',
+    name: '今日の日本語',
+    description: 'Scene opener + relatable story + vocab breakdown + reading',
   },
   {
     id: 'phrase_note',
-    name: 'Scene story',
-    description: 'Narrative scene + real conversation + nuance tip',
+    name: '今日の日本語',
+    description: 'Same lesson format (A/B tested via learning loop)',
   },
   {
     id: 'quick_tip',
-    name: 'Phrase deep-dive',
-    description: 'Target phrase + dialogue + native speaking tips',
+    name: '今日の日本語',
+    description: 'Same lesson format (A/B tested via learning loop)',
   },
   {
     id: 'situation_bite',
-    name: '1-page lesson',
-    description: 'Full textbook layout: scene, dialogue, phrase, explanation',
+    name: '今日の日本語',
+    description: 'Same lesson format (A/B tested via learning loop)',
   },
 ];
 
