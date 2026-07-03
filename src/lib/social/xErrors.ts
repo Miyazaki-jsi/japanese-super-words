@@ -8,8 +8,26 @@ export function explainXApiError(raw: string): XErrorHelp {
   const lower = raw.toLowerCase();
 
   if (
+    lower.includes('appropriate level of api access') ||
+    lower.includes('required_enrollment') ||
+    lower.includes('client-not-enrolled')
+  ) {
+    return {
+      title: 'X API：利用登録（クレジット）が必要です',
+      message:
+        'キーは正しくても、X側でAPIの利用枠が有効になっていないと投稿できません。Projects画面の Monthly Post Cap が 0 のときはここが原因です。',
+      userSteps: [
+        'console.x.com を開く（developer.x.com ではなく console.x.com も確認）',
+        'Billing / Credits / Pay Per Use で利用登録またはクレジットを追加',
+        'Projects 画面で Monthly Post Cap が 0 Posts 以外になっているか確認',
+        '登録後、鍵を再取得して Vercel を更新 → Redeploy',
+        'この画面の「X接続テスト」を押して成功するか確認',
+      ],
+    };
+  }
+
+  if (
     lower.includes('attached to a project') ||
-    lower.includes('client-not-enrolled') ||
     lower.includes('client forbidden')
   ) {
     return {

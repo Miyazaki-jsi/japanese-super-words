@@ -208,6 +208,39 @@ export default function SocialAdminPanel({
     }
   }
 
+  async function handleTestConnection() {
+    setLoadingAction('test');
+    setActionMessage('');
+
+    try {
+      const res = await fetch('/api/admin/social/test-connection', { method: 'POST' });
+      const data = (await res.json()) as
+        | { ok: true; username: string }
+        | { ok: false; error?: string; help?: { title: string; message: string } };
+
+      if (!res.ok) {
+        setActionMessage('接続テストに失敗しました');
+        return;
+      }
+
+      if (data.ok) {
+        setActionMessage(`X接続OK：@${data.username} として認識されました`);
+        return;
+      }
+
+      const help = 'help' in data && data.help ? data.help : null;
+      setActionMessage(
+        help
+          ? `${help.title} — ${help.message}（詳細: ${data.error ?? ''}）`
+          : (data.error ?? 'X接続に失敗しました')
+      );
+    } catch {
+      setActionMessage('通信エラーが発生しました');
+    } finally {
+      setLoadingAction(null);
+    }
+  }
+
   async function handleSyncMetrics() {
     setLoadingAction('sync');
     setActionMessage('');
@@ -275,6 +308,18 @@ export default function SocialAdminPanel({
           <p className="mt-4 text-sm text-slate-400">
             APIキーがなくても、毎朝8時（JST）に下書きが自動生成されます。ここからコピーして手動投稿できます。
           </p>
+        ) : null}
+        {xApiConfigured ? (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleTestConnection}
+              disabled={loadingAction !== null}
+              className="rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-60"
+            >
+              {loadingAction === 'test' ? 'テスト中…' : 'X接続テスト（投稿せず確認）'}
+            </button>
+          </div>
         ) : null}
       </section>
 

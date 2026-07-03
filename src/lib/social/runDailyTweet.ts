@@ -81,14 +81,14 @@ export async function runDailyTweet(options?: {
       generated,
       scheduledFor,
       status: 'failed',
-      errorMessage: postResult.error,
+      errorMessage: postResult.displayError ?? postResult.error,
     });
 
     return {
       ok: false,
       dryRun: false,
       post,
-      message: postResult.error,
+      message: postResult.displayError ?? postResult.error,
     };
   }
 

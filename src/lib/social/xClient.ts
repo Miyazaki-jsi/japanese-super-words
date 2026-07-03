@@ -6,7 +6,7 @@ export const X_API_BASE = 'https://api.x.com';
 export type XPostResult =
   | { ok: true; dryRun: true; tweetId?: undefined }
   | { ok: true; dryRun: false; tweetId: string }
-  | { ok: false; dryRun: boolean; error: string };
+  | { ok: false; dryRun: boolean; error: string; displayError?: string };
 
 function readEnv(name: string): string {
   return process.env[name]?.trim() ?? '';
@@ -101,8 +101,9 @@ export async function postTweet(text: string): Promise<XPostResult> {
         payload.title ||
         payload.errors?.[0]?.detail ||
         `X API error (${response.status})`;
+      console.error('[x] postTweet failed', response.status, raw);
       const help = explainXApiError(raw);
-      return { ok: false, dryRun: false, error: `${help.title}: ${help.message}` };
+      return { ok: false, dryRun: false, error: raw, displayError: `${help.title}: ${help.message}` };
     }
 
     const tweetId = payload.data?.id;
@@ -116,6 +117,73 @@ export async function postTweet(text: string): Promise<XPostResult> {
       ok: false,
       dryRun: false,
       error: error instanceof Error ? error.message : 'Failed to post tweet',
+    };
+  }
+}
+
+export type XConnectionTestResult =
+  | { ok: true; username: string; userId: string }
+  | { ok: false; status: number; error: string; help: ReturnType<typeof explainXApiError> };
+
+export async function testXConnection(): Promise<XConnectionTestResult> {
+  if (!isXApiConfigured()) {
+    return {
+      ok: false,
+      status: 0,
+      error: 'X API keys are not configured on the server.',
+      help: explainXApiError('not configured'),
+    };
+  }
+
+  const path = '/2/users/me';
+  const url = `${X_API_BASE}${path}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: { Authorization: buildOAuth1Header('GET', url) },
+    });
+
+    const payload = (await response.json()) as {
+      data?: { id?: string; username?: string };
+      detail?: string;
+      title?: string;
+      errors?: { detail?: string }[];
+    };
+
+    if (!response.ok) {
+      const raw =
+        payload.detail ||
+        payload.title ||
+        payload.errors?.[0]?.detail ||
+        `X API error (${response.status})`;
+      console.error('[x] testXConnection failed', response.status, raw);
+      return {
+        ok: false,
+        status: response.status,
+        error: raw,
+        help: explainXApiError(raw),
+      };
+    }
+
+    const userId = payload.data?.id;
+    const username = payload.data?.username;
+    if (!userId || !username) {
+      return {
+        ok: false,
+        status: response.status,
+        error: 'X API returned no user profile',
+        help: explainXApiError('no user'),
+      };
+    }
+
+    return { ok: true, username, userId };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Connection failed';
+    return {
+      ok: false,
+      status: 0,
+      error: message,
+      help: explainXApiError(message),
     };
   }
 }
