@@ -8,6 +8,24 @@ export function explainXApiError(raw: string): XErrorHelp {
   const lower = raw.toLowerCase();
 
   if (
+    lower.includes('does not have any credits') ||
+    lower.includes('no credits') ||
+    lower.includes('insufficient credits')
+  ) {
+    return {
+      title: 'X API：クレジット不足です',
+      message:
+        'キー設定は成功しています。あとは X 側でクレジットをチャージすれば投稿できます。',
+      userSteps: [
+        'console.x.com を開く',
+        '右上の Buy Credits をクリック',
+        '少額（$5など）をチャージ（1日1投稿なら長く持ちます）',
+        'チャージ後、この画面で「X接続テスト」→「もう一度投稿する」',
+      ],
+    };
+  }
+
+  if (
     lower.includes('appropriate level of api access') ||
     lower.includes('required_enrollment') ||
     lower.includes('client-not-enrolled')
