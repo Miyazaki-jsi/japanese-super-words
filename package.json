@@ -10,6 +10,7 @@
     "generate:voicevox": "npx tsx scripts/generate-voicevox-audio.ts",
     "verify:card-ids": "npx tsx scripts/verify-card-ids.ts",
     "setup:gumroad": "bash scripts/setup-gumroad.sh",
+    "sync:gumroad": "npx tsx scripts/sync-gumroad-purchases.ts",
     "setup:admin": "bash scripts/setup-admin.sh",
     "provision:admin": "bash scripts/provision-admin.sh",
     "verify:supabase": "npx tsx scripts/verify-supabase.ts"

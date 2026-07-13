@@ -3,6 +3,7 @@ import {
   getConfiguredGumroadProductCounts,
   isGumroadLicenseVerifyConfigured,
 } from '@/lib/gumroadLicense';
+import { isGumroadAccessTokenConfigured } from '@/lib/gumroadSync';
 import { isAdminAuthConfigured } from '@/lib/adminAuth';
 import { isAnalyticsDbConfigured } from '@/lib/supabaseServer';
 
@@ -19,6 +20,7 @@ export async function GET() {
     raw ? raw.split(',').map((c) => c.trim()).filter(Boolean).length : 0;
 
   const gumroadLicenseVerify = isGumroadLicenseVerifyConfigured();
+  const gumroadAccessTokenConfigured = isGumroadAccessTokenConfigured();
   const adminAuthConfigured = isAdminAuthConfigured();
   const adminDbConfigured = isAnalyticsDbConfigured();
 
@@ -28,6 +30,7 @@ export async function GET() {
       tripUrlConfigured: tripUrl.length > 0,
       proUrlConfigured: proUrl.length > 0,
       webhookSellerConfigured: sellerId.length > 0,
+      accessTokenConfigured: gumroadAccessTokenConfigured,
       licenseVerifyConfigured: gumroadLicenseVerify,
       tripProductIds: productCounts.trip,
       proProductIds: productCounts.pro,
