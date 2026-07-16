@@ -17,12 +17,15 @@ import {
   saveUnlockTier,
   type UnlockTier,
 } from '@/data/monetization';
+import BilingualLabel, { BilingualButtonLabel } from '@/components/BilingualLabel';
 import FlashCard from '@/components/FlashCard';
 import IntroWizard, { INTRO_DONE_STORAGE_KEY } from '@/components/IntroWizard';
 import JsiLogo from '@/components/JsiLogo';
 import TripPackScreen from '@/components/TripPackScreen';
 import MiniPackScreen from '@/components/MiniPackScreen';
 import UnlockModal, { type UnlockContext } from '@/components/UnlockModal';
+import { announcements, formatAnnouncementDate } from '@/data/announcements';
+import { BiLine, UI_LANG_STORAGE_KEY, useUiLang } from '@/lib/uiLang';
 import {
   getDisplayMiniPacks,
   MINI_PACK_COUNT,
@@ -126,6 +129,7 @@ import {
   Flame,
   Droplets,
   ShieldAlert,
+  Megaphone,
 } from 'lucide-react';
 
 type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'srs_review' | 'trip_pack' | 'mini_pack';
@@ -576,6 +580,7 @@ const isStandaloneDisplayMode = () => {
 };
 
 export default function Home() {
+  const { jaOnly, setJaOnly } = useUiLang();
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
   const [activeMiniPackId, setActiveMiniPackId] = useState<MiniPackId | null>(null);
   const [selectedSituation, setSelectedSituation] = useState<SituationId | null>(null);
@@ -1274,6 +1279,8 @@ export default function Home() {
     clearAllMiniPackUnlocks();
     localStorage.removeItem('japanese-super-words-visited');
     localStorage.removeItem(INTRO_DONE_STORAGE_KEY);
+    localStorage.removeItem(UI_LANG_STORAGE_KEY);
+    setJaOnly(false);
     setShowIntroWizard(false);
     setShowIntroWelcome(false);
     setShowOnboarding(true);
@@ -1647,11 +1654,13 @@ export default function Home() {
           <JsiLogo variant="icon" className="h-11 drop-shadow-sm" priority />
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-base font-extrabold tracking-tight leading-none text-white truncate">
-              Japanese Super Words
+              {jaOnly ? '日本語スーパーワード' : 'Japanese Super Words'}
             </h1>
-            <p className="text-[10px] text-white/90 font-medium tracking-wide truncate">
-              日本語スーパーワード
-            </p>
+            {!jaOnly && (
+              <p className="text-[10px] text-white/90 font-medium tracking-wide truncate">
+                日本語スーパーワード
+              </p>
+            )}
           </div>
         </button>
         <button
@@ -1766,21 +1775,33 @@ export default function Home() {
                       {daysUntilTrip !== null && daysUntilTrip > 0 ? (
                         <>
                           <p className="text-[11px] font-black text-indigo-900 leading-tight">
-                            {daysUntilTrip} day{daysUntilTrip === 1 ? '' : 's'} until Japan trip
+                            {jaOnly
+                              ? `来日まであと ${daysUntilTrip}日`
+                              : `${daysUntilTrip} day${daysUntilTrip === 1 ? '' : 's'} until Japan trip`}
                           </p>
-                          <p className="text-[10px] font-semibold text-indigo-500/90">
-                            来日まであと {daysUntilTrip}日
-                          </p>
+                          {!jaOnly && (
+                            <p className="text-[10px] font-semibold text-indigo-500/90">
+                              来日まであと {daysUntilTrip}日
+                            </p>
+                          )}
                         </>
                       ) : daysUntilTrip === 0 ? (
                         <>
-                          <p className="text-[11px] font-black text-indigo-900 leading-tight">Today is your Japan trip!</p>
-                          <p className="text-[10px] font-semibold text-indigo-500/90">今日が来日の日！</p>
+                          <p className="text-[11px] font-black text-indigo-900 leading-tight">
+                            {jaOnly ? '今日が来日の日！' : 'Today is your Japan trip!'}
+                          </p>
+                          {!jaOnly && (
+                            <p className="text-[10px] font-semibold text-indigo-500/90">今日が来日の日！</p>
+                          )}
                         </>
                       ) : (
                         <>
-                          <p className="text-[11px] font-black text-indigo-900 leading-tight">Hope you enjoyed Japan!</p>
-                          <p className="text-[10px] font-semibold text-indigo-500/90">日本旅行お疲れさま！</p>
+                          <p className="text-[11px] font-black text-indigo-900 leading-tight">
+                            {jaOnly ? '日本旅行お疲れさま！' : 'Hope you enjoyed Japan!'}
+                          </p>
+                          {!jaOnly && (
+                            <p className="text-[10px] font-semibold text-indigo-500/90">日本旅行お疲れさま！</p>
+                          )}
                         </>
                       )}
                       <p className="text-[9px] font-bold text-indigo-400/80 mt-0.5">
@@ -1805,8 +1826,12 @@ export default function Home() {
                         <Plane className="w-4 h-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[11px] font-black text-indigo-900 leading-tight">When is your Japan trip?</p>
-                        <p className="text-[10px] font-semibold text-indigo-500/90">日本はいつ行きますか？</p>
+                        <p className="text-[11px] font-black text-indigo-900 leading-tight">
+                          {jaOnly ? '日本はいつ行きますか？' : 'When is your Japan trip?'}
+                        </p>
+                        {!jaOnly && (
+                          <p className="text-[10px] font-semibold text-indigo-500/90">日本はいつ行きますか？</p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1832,7 +1857,7 @@ export default function Home() {
                         onClick={handleClearTripDate}
                         className="text-[10px] font-bold text-slate-400 hover:text-slate-600"
                       >
-                        Clear date / 日程をクリア
+                        <BiLine en="Clear date" ja="日程をクリア" />
                       </button>
                     )}
                   </div>
@@ -2009,15 +2034,17 @@ export default function Home() {
                         }`}
                       />
                       <span className={`text-[11px] font-black leading-none ${isActive ? 'text-white' : 'text-slate-800'}`}>
-                        {tab.enLabel}
+                        {jaOnly ? tab.label : tab.enLabel}
                       </span>
-                      <span
-                        className={`text-[8px] font-bold leading-none ${
-                          isActive ? 'text-indigo-100' : 'text-slate-400'
-                        }`}
-                      >
-                        {tab.label}
-                      </span>
+                      {!jaOnly && (
+                        <span
+                          className={`text-[8px] font-bold leading-none ${
+                            isActive ? 'text-indigo-100' : 'text-slate-400'
+                          }`}
+                        >
+                          {tab.label}
+                        </span>
+                      )}
                       {tab.badge !== undefined && (
                         <span
                           className={`absolute top-1.5 right-1.5 min-w-[1rem] h-4 px-1 rounded-full text-[9px] font-black flex items-center justify-center ${
@@ -2041,12 +2068,13 @@ export default function Home() {
                 {/* Plans: Trip + Pro */}
                 <section className="space-y-3">
                   <div className="px-0.5">
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none">
-                      Choose your plan
-                    </h3>
-                    <p className="text-[11px] text-slate-400 font-semibold mt-0.5">
-                      プランを選ぶ · Trip か Pro の2つだけ
-                    </p>
+                    <BilingualLabel
+                      en="Choose your plan"
+                      ja="プランを選ぶ · Trip か Pro の2つだけ"
+                      size="md"
+                      enClassName="text-lg font-black text-slate-900 tracking-tight leading-none"
+                      jaClassName="text-[11px] text-slate-400 font-semibold mt-0.5"
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2067,10 +2095,16 @@ export default function Home() {
                               {isTripPackUnlocked ? 'Unlocked' : 'Day 1 free'}
                             </span>
                           </div>
-                          <h4 className="text-base font-black leading-tight">7-Day Trip Prep</h4>
-                          <p className="text-[10px] font-semibold text-white/80 mt-0.5">旅行前7日間コース</p>
+                          <h4 className="text-base font-black leading-tight">
+                            {jaOnly ? '旅行前7日間コース' : '7-Day Trip Prep'}
+                          </h4>
+                          {!jaOnly && (
+                            <p className="text-[10px] font-semibold text-white/80 mt-0.5">旅行前7日間コース</p>
+                          )}
                           <p className="text-[10px] font-bold text-white/70 mt-2 leading-snug flex-1">
-                            Guided lessons · roleplays · quizzes · cheat sheet
+                            {jaOnly
+                              ? 'ガイド付きレッスン・ロールプレイ・クイズ・チートシート'
+                              : 'Guided lessons · roleplays · quizzes · cheat sheet'}
                           </p>
                           {!isTripPackUnlocked && (
                             <p className="text-lg font-black mt-3">
@@ -2108,12 +2142,26 @@ export default function Home() {
                               {isPremiumUnlocked ? 'Active' : 'Best value'}
                             </span>
                           </div>
-                          <h4 className="text-base font-black leading-tight">Japan Pro</h4>
-                          <p className="text-[10px] font-semibold text-white/85 mt-0.5">全部入りプラン</p>
+                          <h4 className="text-base font-black leading-tight">
+                            {jaOnly ? '全部入りプラン' : 'Japan Pro'}
+                          </h4>
+                          {!jaOnly && (
+                            <p className="text-[10px] font-semibold text-white/85 mt-0.5">全部入りプラン</p>
+                          )}
                           <ul className="text-[9px] font-semibold text-white/75 mt-2 space-y-0.5 flex-1 leading-snug">
-                            <li>· 7-day trip course</li>
-                            <li>· {PREMIUM_SITUATION_COUNT} real Japan scenes</li>
-                            <li>· {MINI_PACK_COUNT} guided mini courses</li>
+                            {jaOnly ? (
+                              <>
+                                <li>· 7日間旅行コース</li>
+                                <li>· 日本の現場シチュ {PREMIUM_SITUATION_COUNT}</li>
+                                <li>· ガイド付きミニコース {MINI_PACK_COUNT}</li>
+                              </>
+                            ) : (
+                              <>
+                                <li>· 7-day trip course</li>
+                                <li>· {PREMIUM_SITUATION_COUNT} real Japan scenes</li>
+                                <li>· {MINI_PACK_COUNT} guided mini courses</li>
+                              </>
+                            )}
                           </ul>
                           {!isPremiumUnlocked && (
                             <p className="text-lg font-black mt-3">
@@ -2139,12 +2187,13 @@ export default function Home() {
                 <section className="space-y-3">
                   <div className="flex items-baseline justify-between px-0.5">
                     <div>
-                      <h3 className="text-base font-black text-slate-900 tracking-tight leading-none">
-                        Guided mini courses
-                      </h3>
-                      <p className="text-[11px] text-slate-400 font-semibold mt-0.5">
-                        ロールプレイ付き集中コース · {isPremiumUnlocked ? 'All unlocked' : 'Included with Japan Pro'}
-                      </p>
+                      <BilingualLabel
+                        en="Guided mini courses"
+                        ja={`ロールプレイ付き集中コース · ${isPremiumUnlocked ? 'すべて解除済み' : 'Japan Pro に含まれます'}`}
+                        size="sm"
+                        enClassName="text-base font-black text-slate-900 tracking-tight leading-none"
+                        jaClassName="text-[11px] text-slate-400 font-semibold mt-0.5"
+                      />
                     </div>
                     {!isPremiumUnlocked && (
                       <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full flex items-center gap-1">
@@ -2177,10 +2226,16 @@ export default function Home() {
                                 <Lock className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                               )}
                             </div>
-                            <h4 className="text-[12px] font-black leading-tight pr-1">{pack.titleEn}</h4>
-                            <p className="text-[9px] font-semibold text-white/75 mt-0.5 line-clamp-1">{pack.title}</p>
+                            <h4 className="text-[12px] font-black leading-tight pr-1">
+                              {jaOnly ? pack.title : pack.titleEn}
+                            </h4>
+                            {!jaOnly && (
+                              <p className="text-[9px] font-semibold text-white/75 mt-0.5 line-clamp-1">{pack.title}</p>
+                            )}
                             <p className="text-[8px] font-bold text-white/60 mt-2">
-                              {pack.wordIds.length} phrases · {pack.roleplays.length} roleplays
+                              {jaOnly
+                                ? `フレーズ ${pack.wordIds.length} · ロールプレイ ${pack.roleplays.length}`
+                                : `${pack.wordIds.length} phrases · ${pack.roleplays.length} roleplays`}
                             </p>
                           </div>
                           {!unlocked && (
@@ -2204,10 +2259,12 @@ export default function Home() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-black text-slate-900 leading-tight">
-                      More listening on YouTube
+                      {jaOnly ? 'YouTubeでもっと聞く' : 'More listening on YouTube'}
                     </p>
                     <p className="text-[10px] font-semibold text-slate-500 mt-0.5 truncate">
-                      Japanese Super Immersion · 聞くはJSI、話すはこのアプリ
+                      {jaOnly
+                        ? '聞くはJSI、話すはこのアプリ'
+                        : 'Japanese Super Immersion · 聞くはJSI、話すはこのアプリ'}
                     </p>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
@@ -2223,11 +2280,13 @@ export default function Home() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-black text-slate-900 leading-tight">
-                      Report a bug or fix
+                      {jaOnly ? 'バグや修正を報告する' : 'Report a bug or fix'}
                     </p>
-                    <p className="text-[10px] font-semibold text-slate-500 mt-0.5 truncate">
-                      バグや修正を報告する。
-                    </p>
+                    {!jaOnly && (
+                      <p className="text-[10px] font-semibold text-slate-500 mt-0.5 truncate">
+                        バグや修正を報告する。
+                      </p>
+                    )}
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
                 </button>
@@ -2239,21 +2298,22 @@ export default function Home() {
               <div key="home-tab-situations" className="space-y-4 animate-fade-in">
                 <div className="flex items-baseline justify-between px-0.5">
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none">
-                      Pick a situation
-                    </h3>
-                    <p className="text-[11px] text-slate-400 font-semibold mt-0.5">
-                      シチュエーションを選ぼう · {freeSituations.length + premiumSituations.length} scenes
-                    </p>
+                    <BilingualLabel
+                      en="Pick a situation"
+                      ja={`シチュエーションを選ぼう · ${freeSituations.length + premiumSituations.length} scenes`}
+                      size="md"
+                      enClassName="text-lg font-black text-slate-900 tracking-tight leading-none"
+                      jaClassName="text-[11px] text-slate-400 font-semibold mt-0.5"
+                    />
                   </div>
                   <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                    Free {freeSituations.length}
+                    {jaOnly ? `無料 ${freeSituations.length}` : `Free ${freeSituations.length}`}
                   </span>
                 </div>
 
                 <div>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-0.5 mb-2">
-                    Free · 無料
+                    {jaOnly ? '無料' : 'Free · 無料'}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     {freeSituations.map((sit) => {
@@ -2272,9 +2332,11 @@ export default function Home() {
                           <div className="flex justify-between items-start w-full">
                             <div className="min-w-0 flex-1">
                               <h4 className="font-extrabold text-slate-900 text-[11px] sm:text-xs leading-tight truncate">
-                                {sit.enTitle}
+                                {jaOnly ? sit.title : sit.enTitle}
                               </h4>
-                              <p className="text-[8px] text-slate-400 font-medium truncate">{sit.title}</p>
+                              {!jaOnly && (
+                                <p className="text-[8px] text-slate-400 font-medium truncate">{sit.title}</p>
+                              )}
                             </div>
                             <Icon className="w-3.5 h-3.5 text-indigo-500/80 group-hover:scale-110 transition-transform ml-1 flex-shrink-0" />
                           </div>
@@ -2292,11 +2354,13 @@ export default function Home() {
                   <div className="flex items-center justify-between px-0.5">
                     <div>
                       <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
-                        Japan Pro · プレミアム
+                        {jaOnly ? 'プレミアム' : 'Japan Pro · プレミアム'}
                       </p>
-                      <p className="text-[9px] text-amber-600/80 font-semibold mt-0.5">
-                        {PREMIUM_SCENE_HIGHLIGHTS.join(' · ')} & more
-                      </p>
+                      {!jaOnly && (
+                        <p className="text-[9px] text-amber-600/80 font-semibold mt-0.5">
+                          {PREMIUM_SCENE_HIGHLIGHTS.join(' · ')} & more
+                        </p>
+                      )}
                     </div>
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
                       {isPremiumUnlocked ? 'Unlocked' : 'Pro'}
@@ -2309,10 +2373,12 @@ export default function Home() {
                       <div key={category.id} className="space-y-2">
                         <div className="px-0.5">
                           <h4 className="text-[11px] font-extrabold text-slate-800 leading-tight">
-                            {category.enTitle}
+                            {jaOnly ? category.title : category.enTitle}
                           </h4>
                           <p className="text-[9px] text-slate-400 font-semibold">
-                            {category.title} · {category.descriptionJa ?? category.description}
+                            {jaOnly
+                              ? (category.descriptionJa ?? category.description)
+                              : `${category.title} · ${category.descriptionJa ?? category.description}`}
                           </p>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
@@ -2354,15 +2420,17 @@ export default function Home() {
                                           isPremiumUnlocked ? 'text-amber-900' : 'text-slate-500'
                                         } text-[11px] sm:text-xs leading-tight truncate`}
                                       >
-                                        {sit.enTitle}
+                                        {jaOnly ? sit.title : sit.enTitle}
                                       </h4>
-                                      <p
-                                        className={`text-[8px] ${
-                                          isPremiumUnlocked ? 'text-amber-600/80' : 'text-slate-400'
-                                        } font-medium truncate`}
-                                      >
-                                        {sit.title}
-                                      </p>
+                                      {!jaOnly && (
+                                        <p
+                                          className={`text-[8px] ${
+                                            isPremiumUnlocked ? 'text-amber-600/80' : 'text-slate-400'
+                                          } font-medium truncate`}
+                                        >
+                                          {sit.title}
+                                        </p>
+                                      )}
                                     </div>
                                     {isPremiumUnlocked ? (
                                       <Icon className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
@@ -2398,8 +2466,13 @@ export default function Home() {
             {homeTab === 'review' && (
               <div key="home-tab-review" className="space-y-4 animate-fade-in">
                 <div className="px-0.5">
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none">Review & test</h3>
-                  <p className="text-[11px] text-slate-400 font-semibold mt-0.5">復習・フレーズレベルチェック</p>
+                  <BilingualLabel
+                    en="Review & test"
+                    ja="復習・フレーズレベルチェック"
+                    size="md"
+                    enClassName="text-lg font-black text-slate-900 tracking-tight leading-none"
+                    jaClassName="text-[11px] text-slate-400 font-semibold mt-0.5"
+                  />
                 </div>
 
                 <div className="rounded-2xl bg-gradient-to-br from-orange-50 via-white to-amber-50 border border-orange-100 p-4 shadow-sm space-y-3">
@@ -2411,17 +2484,25 @@ export default function Home() {
                       <div className="min-w-0">
                         <p className="text-base font-black text-slate-900 leading-tight">
                           {streakInfo.currentStreak > 0
-                            ? `${streakInfo.currentStreak} day streak`
-                            : 'Build your streak'}
+                            ? jaOnly
+                              ? `${streakInfo.currentStreak}日連続学習中`
+                              : `${streakInfo.currentStreak} day streak`
+                            : jaOnly
+                              ? '今日からストリークを始めよう'
+                              : 'Build your streak'}
                         </p>
-                        <p className="text-[11px] font-semibold text-orange-700/80 mt-0.5">
-                          {streakInfo.currentStreak > 0
-                            ? `${streakInfo.currentStreak}日連続学習中`
-                            : '今日からストリークを始めよう'}
-                        </p>
+                        {!jaOnly && (
+                          <p className="text-[11px] font-semibold text-orange-700/80 mt-0.5">
+                            {streakInfo.currentStreak > 0
+                              ? `${streakInfo.currentStreak}日連続学習中`
+                              : '今日からストリークを始めよう'}
+                          </p>
+                        )}
                         {streakInfo.longestStreak > streakInfo.currentStreak && (
                           <p className="text-[10px] font-semibold text-slate-400 mt-1">
-                            Best {streakInfo.longestStreak} days · 最高 {streakInfo.longestStreak}日
+                            {jaOnly
+                              ? `最高 ${streakInfo.longestStreak}日`
+                              : `Best ${streakInfo.longestStreak} days · 最高 ${streakInfo.longestStreak}日`}
                           </p>
                         )}
                       </div>
@@ -2436,18 +2517,26 @@ export default function Home() {
                   <div className="rounded-xl bg-white/80 border border-orange-100/80 px-3 py-2.5">
                     <p className="text-[11px] font-bold text-slate-700">
                       {dueReviewCount > 0
-                        ? `${dueReviewCount} word${dueReviewCount === 1 ? '' : 's'} due today`
+                        ? jaOnly
+                          ? `今日の復習 ${dueReviewCount}語`
+                          : `${dueReviewCount} word${dueReviewCount === 1 ? '' : 's'} due today`
                         : learnedIds.length > 0
-                          ? 'No reviews due today — great job!'
-                          : 'Mark words as Learned to start spaced review'}
+                          ? jaOnly
+                            ? '今日の復習はありません'
+                            : 'No reviews due today — great job!'
+                          : jaOnly
+                            ? 'Learnedにすると復習スケジュールが始まります'
+                            : 'Mark words as Learned to start spaced review'}
                     </p>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
-                      {dueReviewCount > 0
-                        ? `今日の復習 ${dueReviewCount}語`
-                        : learnedIds.length > 0
-                          ? '今日の復習はありません'
-                          : 'Learnedにすると復習スケジュールが始まります'}
-                    </p>
+                    {!jaOnly && (
+                      <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                        {dueReviewCount > 0
+                          ? `今日の復習 ${dueReviewCount}語`
+                          : learnedIds.length > 0
+                            ? '今日の復習はありません'
+                            : 'Learnedにすると復習スケジュールが始まります'}
+                      </p>
+                    )}
                   </div>
 
                   <button
@@ -2461,7 +2550,11 @@ export default function Home() {
                     }`}
                   >
                     <RotateCcw className="w-4 h-4" />
-                    {dueReviewCount > 0 ? 'Start today\'s review / 今日の復習' : 'Review reminder / 復習リマインダー'}
+                    {dueReviewCount > 0 ? (
+                      <BiLine en="Start today's review" ja="今日の復習" />
+                    ) : (
+                      <BiLine en="Review reminder" ja="復習リマインダー" />
+                    )}
                   </button>
                 </div>
 
@@ -2469,15 +2562,17 @@ export default function Home() {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
-                        Phrase Level
+                        {jaOnly ? 'フレーズレベル' : 'Phrase Level'}
                       </p>
-                      <p className="text-[10px] font-semibold text-slate-400">フレーズレベル · XPランクとは別</p>
+                      {!jaOnly && (
+                        <p className="text-[10px] font-semibold text-slate-400">フレーズレベル · XPランクとは別</p>
+                      )}
                     </div>
                     {currentPhraseLevel ? (
                       <PhraseLevelBadge level={currentPhraseLevel} size="sm" showLabel />
                     ) : (
                       <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full">
-                        Not checked / 未診断
+                        <BiLine en="Not checked" ja="未診断" />
                       </span>
                     )}
                   </div>
@@ -2504,10 +2599,14 @@ export default function Home() {
                       <ClipboardCheck className="w-6 h-6" />
                     </div>
                     <div className="text-left">
-                      <h4 className="font-extrabold text-white text-base tracking-wide">Phrase Level Check</h4>
-                      <p className="text-[11px] text-indigo-100 font-semibold">
-                        {phraseCheckUsesLearned ? 'Learned phrases' : 'All unlocked'} · up to {phraseCheckQuestionCount} questions
-                      </p>
+                      <h4 className="font-extrabold text-white text-base tracking-wide">
+                        {jaOnly ? 'フレーズレベルチェック' : 'Phrase Level Check'}
+                      </h4>
+                      {!jaOnly && (
+                        <p className="text-[11px] text-indigo-100 font-semibold">
+                          {phraseCheckUsesLearned ? 'Learned phrases' : 'All unlocked'} · up to {phraseCheckQuestionCount} questions
+                        </p>
+                      )}
                       <p className="text-[10px] text-indigo-200/80 font-semibold mt-0.5">
                         旅行フレーズ力を6段階で判定
                       </p>
@@ -2544,11 +2643,17 @@ export default function Home() {
                         <Sparkles className="w-6 h-6" />
                       </div>
                       <div>
-                        <h4 className="font-extrabold text-amber-900 text-base">Upgrade to Japan Pro</h4>
-                        <p className="text-[11px] text-amber-700/90 font-semibold mt-0.5">
-                          {PREMIUM_SITUATION_COUNT} real scenes · {MINI_PACK_COUNT} guided courses · {JAPAN_PRO_UPSELL_NOTE}
+                        <h4 className="font-extrabold text-amber-900 text-base">
+                          {jaOnly ? 'Japan Pro にアップグレード' : 'Upgrade to Japan Pro'}
+                        </h4>
+                        {!jaOnly && (
+                          <p className="text-[11px] text-amber-700/90 font-semibold mt-0.5">
+                            {PREMIUM_SITUATION_COUNT} real scenes · {MINI_PACK_COUNT} guided courses · {JAPAN_PRO_UPSELL_NOTE}
+                          </p>
+                        )}
+                        <p className="text-[10px] text-amber-600/70 font-medium">
+                          プレミアム · {PREMIUM_SITUATION_COUNT}シチュ + ミニコース{MINI_PACK_COUNT}本
                         </p>
-                        <p className="text-[10px] text-amber-600/70 font-medium">プレミアム · {PREMIUM_SITUATION_COUNT}シチュ + ミニコース{MINI_PACK_COUNT}本</p>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -2570,8 +2675,12 @@ export default function Home() {
                       <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
                     </div>
                     <div className="text-left">
-                      <h4 className="font-extrabold text-slate-800 text-base">Favorite Words</h4>
-                      <p className="text-[10px] text-slate-400 font-semibold">お気に入り単語</p>
+                      <h4 className="font-extrabold text-slate-800 text-base">
+                        {jaOnly ? 'お気に入り単語' : 'Favorite Words'}
+                      </h4>
+                      {!jaOnly && (
+                        <p className="text-[10px] text-slate-400 font-semibold">お気に入り単語</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -2678,6 +2787,50 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            {/* お知らせ */}
+            <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm space-y-3">
+              <div className="flex items-center gap-2 px-0.5">
+                <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
+                  <Megaphone className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-black text-slate-900 leading-tight">
+                    {jaOnly ? 'お知らせ' : 'News'}
+                  </h3>
+                  {!jaOnly && (
+                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">お知らせ</p>
+                  )}
+                </div>
+              </div>
+
+              <ul className="space-y-3">
+                {announcements.map((item) => (
+                  <li
+                    key={item.id}
+                    className="rounded-xl border border-slate-100 bg-slate-50/80 px-3.5 py-3"
+                  >
+                    <p className="text-[10px] font-bold text-indigo-600 tracking-wide">
+                      {formatAnnouncementDate(item.date, jaOnly)}
+                    </p>
+                    <p className="text-sm font-extrabold text-slate-900 mt-1 leading-snug">
+                      {jaOnly ? item.titleJa : item.titleEn}
+                    </p>
+                    {!jaOnly && (
+                      <p className="text-[11px] font-semibold text-slate-500 mt-0.5">{item.titleJa}</p>
+                    )}
+                    <p className="text-[11px] font-semibold text-slate-600 mt-2 leading-relaxed">
+                      {jaOnly ? item.bodyJa : item.bodyEn}
+                    </p>
+                    {!jaOnly && (
+                      <p className="text-[10px] font-semibold text-slate-400 mt-1.5 leading-relaxed">
+                        {item.bodyJa}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
           </div>
         ) : currentScreen === 'trip_pack' ? (
           <TripPackScreen
@@ -3763,22 +3916,32 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-black text-slate-900 leading-tight">
                   {messageStep === 'form'
-                    ? 'Send a Message'
+                    ? jaOnly
+                      ? 'メッセージを送る'
+                      : 'Send a Message'
                     : messageStep === 'confirm'
-                    ? 'Confirm Message'
+                    ? jaOnly
+                      ? '送信内容の確認'
+                      : 'Confirm Message'
                     : messageStep === 'success'
-                    ? 'Message Sent'
+                    ? jaOnly
+                      ? '送信完了'
+                      : 'Message Sent'
+                    : jaOnly
+                    ? '設定'
                     : 'Settings'}
                 </h3>
-                <p className="text-xs text-slate-400 font-semibold mt-0.5">
-                  {messageStep === 'form'
-                    ? 'メッセージを送る'
-                    : messageStep === 'confirm'
-                    ? '送信内容の確認'
-                    : messageStep === 'success'
-                    ? '送信完了'
-                    : '設定'}
-                </p>
+                {!jaOnly && (
+                  <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                    {messageStep === 'form'
+                      ? 'メッセージを送る'
+                      : messageStep === 'confirm'
+                      ? '送信内容の確認'
+                      : messageStep === 'success'
+                      ? '送信完了'
+                      : '設定'}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -3791,7 +3954,7 @@ export default function Home() {
                         htmlFor="message-name"
                         className="block text-xs font-bold text-slate-600"
                       >
-                        Your Name / お名前
+                        <BiLine en="Your Name" ja="お名前" />
                       </label>
                       <input
                         id="message-name"
@@ -3809,7 +3972,7 @@ export default function Home() {
                         htmlFor="message-body"
                         className="block text-xs font-bold text-slate-600"
                       >
-                        Message / メッセージ
+                        <BiLine en="Message" ja="メッセージ" />
                       </label>
                       <textarea
                         id="message-body"
@@ -3838,7 +4001,9 @@ export default function Home() {
                     className="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-sm shadow-indigo-200 pressable flex items-center justify-center gap-2"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Continue / 確認画面へ</span>
+                    <span>
+                      <BiLine en="Continue" ja="確認画面へ" />
+                    </span>
                   </button>
                 </>
               ) : messageStep === 'confirm' ? (
@@ -3846,7 +4011,7 @@ export default function Home() {
                   <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 space-y-4">
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        Your Name / お名前
+                        <BiLine en="Your Name" ja="お名前" />
                       </p>
                       <p className="text-sm font-extrabold text-slate-800 mt-1 break-words">
                         {messageName.trim()}
@@ -3854,7 +4019,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        Message / メッセージ
+                        <BiLine en="Message" ja="メッセージ" />
                       </p>
                       <p className="text-sm font-semibold text-slate-700 mt-1 whitespace-pre-wrap break-words leading-relaxed">
                         {messageBody.trim()}
@@ -3863,11 +4028,17 @@ export default function Home() {
                   </div>
 
                     <p className="text-xs text-slate-500 leading-relaxed text-center">
-                      Send this message to Toriyama-san and Miyazaki-san?
-                      <br />
-                      <span className="font-semibold text-[10px] text-slate-400">
-                        この内容で鳥山さんと宮崎さんに送信します。よろしいですか？
-                      </span>
+                      {jaOnly ? (
+                        'この内容で鳥山さんと宮崎さんに送信します。よろしいですか？'
+                      ) : (
+                        <>
+                          Send this message to Toriyama-san and Miyazaki-san?
+                          <br />
+                          <span className="font-semibold text-[10px] text-slate-400">
+                            この内容で鳥山さんと宮崎さんに送信します。よろしいですか？
+                          </span>
+                        </>
+                      )}
                     </p>
 
                   {messageSendError && (
@@ -3886,7 +4057,7 @@ export default function Home() {
                       disabled={isSendingMessage}
                       className="py-3.5 rounded-2xl border border-slate-200 bg-white text-slate-600 font-extrabold text-sm pressable disabled:opacity-50"
                     >
-                      Back / 戻る
+                      <BiLine en="Back" ja="戻る" />
                     </button>
                     <button
                       type="button"
@@ -3895,7 +4066,13 @@ export default function Home() {
                       className="py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-sm shadow-indigo-200 pressable flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                       <Send className="w-4 h-4" />
-                      <span>{isSendingMessage ? 'Sending…' : 'Send / 送信する'}</span>
+                      <span>
+                        {isSendingMessage ? (
+                          jaOnly ? '送信中…' : 'Sending…'
+                        ) : (
+                          <BiLine en="Send" ja="送信する" />
+                        )}
+                      </span>
                     </button>
                   </div>
                 </>
@@ -3904,11 +4081,15 @@ export default function Home() {
                   <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5 text-center space-y-2">
                     <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
                     <p className="text-sm font-extrabold text-emerald-900 leading-relaxed">
-                      Your message has been sent. Thank you!
+                      {jaOnly
+                        ? 'メッセージを送信しました。ありがとうございます！'
+                        : 'Your message has been sent. Thank you!'}
                     </p>
-                    <p className="text-xs font-semibold text-emerald-600/90 mt-0.5">
-                      メッセージを送信しました。ありがとうございます！
-                    </p>
+                    {!jaOnly && (
+                      <p className="text-xs font-semibold text-emerald-600/90 mt-0.5">
+                        メッセージを送信しました。ありがとうございます！
+                      </p>
+                    )}
                   </div>
 
                   <button
@@ -3916,22 +4097,62 @@ export default function Home() {
                     onClick={resetMessageFlow}
                     className="w-full py-3.5 rounded-2xl border border-slate-200 bg-white text-slate-700 font-extrabold text-sm pressable"
                   >
-                    Back to Settings / 設定に戻る
+                    <BiLine en="Back to Settings" ja="設定に戻る" />
                   </button>
                 </>
               ) : (
                 <>
                   <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5 text-left space-y-1">
                     <p className="text-[11px] font-bold text-slate-700 leading-snug">
-                      Purchases are saved with your unlock code — not an account.
+                      {jaOnly
+                        ? '購入はアカウントではなくコードで管理されます。別の端末では同じコードを再入力してください。'
+                        : 'Purchases are saved with your unlock code — not an account.'}
                     </p>
-                    <p className="text-[10px] font-semibold text-slate-500 leading-snug">
-                      購入はアカウントではなくコードで管理されます。別の端末では同じコードを再入力してください。
-                    </p>
-                    <p className="text-[10px] font-semibold text-slate-400 leading-snug pt-0.5">
-                      Lost your code? Use the message form below.
-                      <span className="block">コードを忘れた場合は下の問い合わせへ</span>
-                    </p>
+                    {!jaOnly && (
+                      <>
+                        <p className="text-[10px] font-semibold text-slate-500 leading-snug">
+                          購入はアカウントではなくコードで管理されます。別の端末では同じコードを再入力してください。
+                        </p>
+                        <p className="text-[10px] font-semibold text-slate-400 leading-snug pt-0.5">
+                          Lost your code? Use the message form below.
+                          <span className="block">コードを忘れた場合は下の問い合わせへ</span>
+                        </p>
+                      </>
+                    )}
+                    {jaOnly && (
+                      <p className="text-[10px] font-semibold text-slate-400 leading-snug pt-0.5">
+                        コードを忘れた場合は下の問い合わせへ
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0 text-left">
+                      <p className="text-sm font-extrabold text-indigo-900 leading-tight">
+                        超日本語モード
+                      </p>
+                      <p className="text-[11px] font-semibold text-indigo-600/90 mt-0.5 leading-snug">
+                        {jaOnly
+                          ? 'メニューなどを日本語のみで表示'
+                          : 'Hide English in menus · メニューなどを日本語のみで表示'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={jaOnly}
+                      aria-label="超日本語モード"
+                      onClick={() => setJaOnly(!jaOnly)}
+                      className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 pressable ${
+                        jaOnly ? 'bg-indigo-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                          jaOnly ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
                   </div>
 
                   {!isPremiumUnlocked && !isTripPackUnlocked && (
@@ -3942,10 +4163,12 @@ export default function Home() {
                     >
                       <Luggage className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                       <div className="text-left">
-                        <span className="block text-sm font-extrabold text-indigo-900">Unlock Trip Course</span>
-                        <span className="block text-[11px] font-semibold text-indigo-600/90">
-                          7-day guided course · {TRIP_PACK_PRICE_USD}
-                        </span>
+                        <BilingualButtonLabel
+                          en="Unlock Trip Course"
+                          ja={`7日間ガイドコース · ${TRIP_PACK_PRICE_USD}`}
+                          enClassName="block text-sm font-extrabold text-indigo-900"
+                          jaClassName="block text-[11px] font-semibold text-indigo-600/90"
+                        />
                       </div>
                     </button>
                   )}
@@ -3956,8 +4179,12 @@ export default function Home() {
                         <Luggage className="w-5 h-5" />
                       </div>
                       <div className="text-left">
-                        <span className="block text-sm font-extrabold text-indigo-900">Trip Course Active</span>
-                        <span className="block text-[11px] font-semibold text-indigo-700/90">7-day course unlocked · Day 1–7</span>
+                        <BilingualButtonLabel
+                          en="Trip Course Active"
+                          ja="7日間コース解除済み · Day 1–7"
+                          enClassName="block text-sm font-extrabold text-indigo-900"
+                          jaClassName="block text-[11px] font-semibold text-indigo-700/90"
+                        />
                       </div>
                     </div>
                   )}
@@ -3970,10 +4197,12 @@ export default function Home() {
                     >
                       <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                       <div className="text-left">
-                        <span className="block text-sm font-extrabold text-amber-800">Unlock Japan Pro</span>
-                        <span className="block text-[11px] font-semibold text-amber-600/90">
-                          Trip + {PREMIUM_SITUATION_COUNT} scenes + {MINI_PACK_COUNT} guided courses · {JAPAN_PRO_PRICE_USD}
-                        </span>
+                        <BilingualButtonLabel
+                          en="Unlock Japan Pro"
+                          ja={`Trip + ${PREMIUM_SITUATION_COUNT}シーン + ${MINI_PACK_COUNT}コース · ${JAPAN_PRO_PRICE_USD}`}
+                          enClassName="block text-sm font-extrabold text-amber-800"
+                          jaClassName="block text-[11px] font-semibold text-amber-600/90"
+                        />
                       </div>
                     </button>
                   )}
@@ -3984,8 +4213,12 @@ export default function Home() {
                         <Sparkles className="w-5 h-5" />
                       </div>
                       <div className="text-left">
-                        <span className="block text-sm font-extrabold text-amber-900">Japan Pro Active</span>
-                        <span className="block text-[11px] font-semibold text-amber-700/90">Full course + {PREMIUM_SITUATION_COUNT} scenes + {MINI_PACK_COUNT} guided courses</span>
+                        <BilingualButtonLabel
+                          en="Japan Pro Active"
+                          ja={`全コース + ${PREMIUM_SITUATION_COUNT}シーン + ${MINI_PACK_COUNT}コース`}
+                          enClassName="block text-sm font-extrabold text-amber-900"
+                          jaClassName="block text-[11px] font-semibold text-amber-700/90"
+                        />
                       </div>
                     </div>
                   )}
@@ -3996,8 +4229,12 @@ export default function Home() {
                         <CheckCircle2 className="w-5 h-5" />
                       </div>
                       <div className="text-left min-w-0">
-                        <span className="block text-sm font-extrabold text-emerald-900">Added to Home Screen</span>
-                        <span className="block text-[11px] font-semibold text-emerald-600/90 mt-0.5">ホーム画面に追加済み</span>
+                        <BilingualButtonLabel
+                          en="Added to Home Screen"
+                          ja="ホーム画面に追加済み"
+                          enClassName="block text-sm font-extrabold text-emerald-900"
+                          jaClassName="block text-[11px] font-semibold text-emerald-600/90 mt-0.5"
+                        />
                       </div>
                     </div>
                   ) : (
@@ -4007,18 +4244,28 @@ export default function Home() {
                           <Smartphone className="w-5 h-5" />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
-                          <span className="block text-sm font-extrabold text-slate-900 leading-tight">Add to Home Screen</span>
-                          <span className="block text-[11px] font-semibold text-indigo-600/90 mt-0.5">ホーム画面に追加</span>
+                          <BilingualButtonLabel
+                            en="Add to Home Screen"
+                            ja="ホーム画面に追加"
+                            enClassName="block text-sm font-extrabold text-slate-900 leading-tight"
+                            jaClassName="block text-[11px] font-semibold text-indigo-600/90 mt-0.5"
+                          />
                           <p className="text-[11px] text-slate-500 leading-snug mt-1.5">
                             {canNativeInstall
-                              ? 'Launch like an app with one tap.'
-                              : 'Add from Safari / Chrome to start learning faster.'}
+                              ? jaOnly
+                                ? 'ワンタップでアプリのように起動できます。'
+                                : 'Launch like an app with one tap.'
+                              : jaOnly
+                                ? 'Safari / Chrome から追加すると、すぐに学習を始められます。'
+                                : 'Add from Safari / Chrome to start learning faster.'}
                           </p>
-                          <p className="text-[10px] text-slate-400 leading-snug mt-0.5">
-                            {canNativeInstall
-                              ? 'ワンタップでアプリのように起動できます。'
-                              : 'Safari / Chrome から追加すると、すぐに学習を始められます。'}
-                          </p>
+                          {!jaOnly && (
+                            <p className="text-[10px] text-slate-400 leading-snug mt-0.5">
+                              {canNativeInstall
+                                ? 'ワンタップでアプリのように起動できます。'
+                                : 'Safari / Chrome から追加すると、すぐに学習を始められます。'}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <button
@@ -4029,12 +4276,16 @@ export default function Home() {
                         {canNativeInstall ? (
                           <>
                             <Plus className="w-4 h-4" />
-                            <span>Install / インストール</span>
+                            <span>
+                              <BiLine en="Install" ja="インストール" />
+                            </span>
                           </>
                         ) : (
                           <>
                             <Share2 className="w-4 h-4" />
-                            <span>How to Add / 追加方法を見る</span>
+                            <span>
+                              <BiLine en="How to Add" ja="追加方法を見る" />
+                            </span>
                           </>
                         )}
                       </button>
@@ -4048,12 +4299,12 @@ export default function Home() {
                   >
                     <MessageCircle className="w-5 h-5 text-violet-600 flex-shrink-0" />
                     <div className="text-left">
-                      <span className="block text-sm font-extrabold text-violet-900">
-                        Send a message to Toriyama-san and Miyazaki-san
-                      </span>
-                      <span className="block text-[11px] font-semibold text-violet-600/90">
-                        鳥山さんと宮崎さんにメッセージを送る
-                      </span>
+                      <BilingualButtonLabel
+                        en="Send a message to Toriyama-san and Miyazaki-san"
+                        ja="鳥山さんと宮崎さんにメッセージを送る"
+                        enClassName="block text-sm font-extrabold text-violet-900"
+                        jaClassName="block text-[11px] font-semibold text-violet-600/90"
+                      />
                     </div>
                   </button>
 
@@ -4080,8 +4331,12 @@ export default function Home() {
                     onClick={handleResetProgress}
                     className="w-full py-3.5 rounded-2xl border border-red-100 bg-red-50/50 hover:bg-red-50 text-red-600 hover:text-red-700 pressable"
                   >
-                    <span className="block text-sm font-extrabold">Reset Saved Data</span>
-                    <span className="block text-[11px] font-semibold text-red-400 mt-0.5">保存データをリセット</span>
+                    <BilingualButtonLabel
+                      en="Reset Saved Data"
+                      ja="保存データをリセット"
+                      enClassName="block text-sm font-extrabold"
+                      jaClassName="block text-[11px] font-semibold text-red-400 mt-0.5"
+                    />
                   </button>
 
                   <Link
@@ -4089,8 +4344,12 @@ export default function Home() {
                     onClick={closeSettingsModal}
                     className="block w-full py-3 rounded-2xl border border-slate-100 bg-white text-center text-slate-500 hover:text-indigo-600 hover:border-indigo-100 pressable"
                   >
-                    <span className="block text-xs font-extrabold">Privacy Policy</span>
-                    <span className="block text-[10px] font-semibold text-slate-400 mt-0.5">プライバシーポリシー</span>
+                    <BilingualButtonLabel
+                      en="Privacy Policy"
+                      ja="プライバシーポリシー"
+                      enClassName="block text-xs font-extrabold"
+                      jaClassName="block text-[10px] font-semibold text-slate-400 mt-0.5"
+                    />
                   </Link>
                 </>
               )}

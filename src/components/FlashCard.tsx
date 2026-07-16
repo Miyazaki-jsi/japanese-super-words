@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { WordCard } from '@/data/words';
 import { getSituationLabel } from '@/data/situationLabels';
 import { speakJapanese } from '@/lib/speakJapanese';
+import { useUiLang } from '@/lib/uiLang';
 import { CheckCircle, HelpCircle, RefreshCw, Star, Volume2 } from 'lucide-react';
 
 interface FlashCardProps {
@@ -16,7 +17,14 @@ interface FlashCardProps {
   mode?: 'learn' | 'review';
 }
 
-function ActionLabel({ en, ja }: { en: string; ja: string }) {
+function ActionLabel({ en, ja, jaOnly }: { en: string; ja: string; jaOnly: boolean }) {
+  if (jaOnly) {
+    return (
+      <span className="flex flex-col items-center leading-tight">
+        <span>{ja}</span>
+      </span>
+    );
+  }
   return (
     <span className="flex flex-col items-center leading-tight">
       <span>{en}</span>
@@ -33,6 +41,7 @@ export default function FlashCard({
   onToggleFavorite,
   mode = 'learn',
 }: FlashCardProps) {
+  const { jaOnly } = useUiLang();
   const [isFlipped, setIsFlipped] = useState(false);
   const [animateStar, setAnimateStar] = useState(false);
   const situationLabel = getSituationLabel(card.situation);
@@ -186,7 +195,7 @@ export default function FlashCard({
               <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${negativeIconClass(false)}`}>
                 <HelpCircle className="w-4 h-4" />
               </span>
-              <ActionLabel en={negativeLabel.en} ja={negativeLabel.ja} />
+              <ActionLabel en={negativeLabel.en} ja={negativeLabel.ja} jaOnly={jaOnly} />
             </button>
             <button
               onClick={(e) => handleButtonClick(e, true)}
@@ -195,7 +204,7 @@ export default function FlashCard({
               <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${positiveIconClass(false)}`}>
                 <CheckCircle className="w-4 h-4" />
               </span>
-              <ActionLabel en={positiveLabel.en} ja={positiveLabel.ja} />
+              <ActionLabel en={positiveLabel.en} ja={positiveLabel.ja} jaOnly={jaOnly} />
             </button>
           </div>
         </div>
@@ -246,7 +255,7 @@ export default function FlashCard({
               <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${negativeIconClass(true)}`}>
                 <HelpCircle className="w-4 h-4" />
               </span>
-              <ActionLabel en={negativeLabel.en} ja={negativeLabel.ja} />
+              <ActionLabel en={negativeLabel.en} ja={negativeLabel.ja} jaOnly={jaOnly} />
             </button>
             <button
               onClick={(e) => handleButtonClick(e, true)}
@@ -255,7 +264,7 @@ export default function FlashCard({
               <span className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${positiveIconClass(true)}`}>
                 <CheckCircle className="w-4 h-4" />
               </span>
-              <ActionLabel en={positiveLabel.en} ja={positiveLabel.ja} />
+              <ActionLabel en={positiveLabel.en} ja={positiveLabel.ja} jaOnly={jaOnly} />
             </button>
           </div>
         </div>

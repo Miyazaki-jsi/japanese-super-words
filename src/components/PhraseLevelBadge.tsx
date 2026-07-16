@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { PhraseLevelMeta } from '@/data/phraseLevel';
+import { useUiLang } from '@/lib/uiLang';
 
 type PhraseLevelBadgeProps = {
   level: PhraseLevelMeta;
@@ -22,6 +23,7 @@ export default function PhraseLevelBadge({
   showLabel = false,
   className = '',
 }: PhraseLevelBadgeProps) {
+  const { jaOnly } = useUiLang();
   const Icon = level.icon;
   const s = sizeClasses[size];
 
@@ -34,8 +36,12 @@ export default function PhraseLevelBadge({
       </div>
       {showLabel && (
         <div className="min-w-0 text-left">
-          <p className={`${s.title} font-black text-slate-900 leading-tight`}>{level.enName}</p>
-          <p className={`${s.sub} font-semibold text-slate-500`}>{level.jaName}</p>
+          <p className={`${s.title} font-black text-slate-900 leading-tight`}>
+            {jaOnly ? level.jaName : level.enName}
+          </p>
+          {!jaOnly && (
+            <p className={`${s.sub} font-semibold text-slate-500`}>{level.jaName}</p>
+          )}
         </div>
       )}
     </div>

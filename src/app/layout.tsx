@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
+import { UiLangProvider } from '@/lib/uiLang';
 import './globals.css';
 
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN?.trim();
@@ -80,15 +81,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {plausibleDomain ? (
-          <Script
-            defer
-            data-domain={plausibleDomain}
-            src="https://plausible.io/js/script.pageview-props.tagged-events.js"
-            strategy="afterInteractive"
-          />
-        ) : null}
-        {children}
+        <UiLangProvider>
+          {plausibleDomain ? (
+            <Script
+              defer
+              data-domain={plausibleDomain}
+              src="https://plausible.io/js/script.pageview-props.tagged-events.js"
+              strategy="afterInteractive"
+            />
+          ) : null}
+          {children}
+        </UiLangProvider>
       </body>
     </html>
   );

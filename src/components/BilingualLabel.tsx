@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useUiLang } from '@/lib/uiLang';
 
 type BilingualLabelProps = {
   en: string;
@@ -39,8 +40,19 @@ export default function BilingualLabel({
   jaClassName = '',
   truncate = false,
 }: BilingualLabelProps) {
+  const { jaOnly } = useUiLang();
   const jaColor = onDark ? 'text-white/75' : 'text-slate-400';
   const truncateClass = truncate ? 'truncate' : '';
+
+  if (jaOnly) {
+    return (
+      <div className={className}>
+        <p className={`${EN_SIZE[size]} ${truncateClass} ${enClassName || jaClassName}`}>
+          {ja}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={className}>
@@ -65,9 +77,14 @@ export function BilingualButtonLabel({
   enClassName = 'block text-sm font-extrabold leading-tight',
   jaClassName = '',
 }: BilingualButtonLabelProps) {
+  const { jaOnly } = useUiLang();
   const jaDefault = onDark
     ? 'block text-[10px] font-semibold text-white/80 mt-0.5 leading-tight'
     : 'block text-[10px] font-semibold text-slate-400 mt-0.5 leading-tight';
+
+  if (jaOnly) {
+    return <span className={enClassName}>{ja}</span>;
+  }
 
   return (
     <>
