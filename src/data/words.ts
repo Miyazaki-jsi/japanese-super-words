@@ -2,6 +2,7 @@ import { premiumTravelEssentialWords } from './premiumTravelEssentialWords';
 import { premiumNewSituationWords } from './premiumNewSituationWords';
 import { premiumExtraSituationWords } from './premiumExtraSituationWords';
 import { premiumBatch2SituationWords } from './premiumBatch2SituationWords';
+import { premiumRyokanWords } from './premiumRyokanWords';
 import { hatsumodePackWords } from './hatsumodePackWords';
 
 export type SituationId =
@@ -53,7 +54,8 @@ export type SituationId =
   | 'post_office'
   | 'cabaret_club'
   | 'tachinomi'
-  | 'photo_etiquette';
+  | 'photo_etiquette'
+  | 'ryokan';
 
 export interface WordCard {
   id: string;
@@ -829,5 +831,6 @@ export const sampleWords: WordCard[] = [
   ...premiumNewSituationWords,
   ...premiumExtraSituationWords,
   ...premiumBatch2SituationWords,
+  ...premiumRyokanWords,
   ...hatsumodePackWords,
 ];

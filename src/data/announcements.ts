@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-17-ryokan',
+    date: '2026-07-17',
+    titleEn: 'New scene: Ryokan',
+    titleJa: '新シチュ：旅館',
+    bodyEn:
+      'Japan Pro now includes a Ryokan scene — check-in, meals, baths, and inn etiquette phrases.',
+    bodyJa:
+      'Japan Pro に「旅館」シチュエーションを追加しました。チェックイン・食事・大浴場・作法など、旅館で使える表現を学べます。',
+  },
+  {
     id: '2026-07-17-ja-only-mode',
     date: '2026-07-17',
     titleEn: 'Super Japanese Mode',
@@ -19,6 +29,14 @@ export const announcements: Announcement[] = [
       'Settings now has a toggle to show Japanese only in menus and headings. Flashcard English translations, quizzes, and favorites stay as they are.',
     bodyJa:
       '設定に「超日本語モード」を追加しました。メニューや見出しなどを日本語のみで表示できます。フラッシュカードの英訳・クイズ・お気に入りはそのままです。',
+  },
+  {
+    id: '2026-07-03-minor-bugfix',
+    date: '2026-07-03',
+    titleEn: 'Minor bug fix',
+    titleJa: '軽微なバグ修正',
+    bodyEn: 'We fixed a minor bug.',
+    bodyJa: '軽微なバグを修正しました。',
   },
 ];
 

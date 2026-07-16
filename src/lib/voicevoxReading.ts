@@ -28,6 +28,9 @@ const KANJI_DISAMBIGUATED_CARD_IDS = new Set([
   's20', // 袋は要りません。
   's25', // レシートは要りません。
   'dp26', // 袋は要りません。
+  'ry23', // 夕食は何時ですか？
+  'ry25', // 大浴場はどこですか？
+  'ry30', // チェックアウトは何時ですか？
 ]);
 
 export function getVoicevoxReading(card: Pick<WordCard, 'id' | 'reading' | 'japanese'>): string {

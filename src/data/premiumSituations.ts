@@ -16,6 +16,7 @@ import {
   Gamepad2,
   GlassWater,
   Heart,
+  Home,
   KeyRound,
   Info,
   Luggage,
@@ -236,6 +237,16 @@ export const allPremiumSituations: PremiumSituationMeta[] = [
     sortOrder: 15,
     previewPhraseJa: 'おすすめの観光地はどこですか？',
     previewPhraseEn: 'What sights do you recommend?',
+  },
+  {
+    id: 'ryokan',
+    title: '旅館',
+    enTitle: 'Ryokan',
+    icon: Home,
+    category: 'traveler_essentials',
+    sortOrder: 16,
+    previewPhraseJa: '一泊二食でお願いします。',
+    previewPhraseEn: 'One night with two meals, please.',
   },
 
   // Daily Life (12)
@@ -487,10 +498,10 @@ export const allPremiumSituations: PremiumSituationMeta[] = [
 export const PREMIUM_SCENE_HIGHLIGHTS = [
   'Airport',
   'Shinkansen',
+  'Ryokan',
   'Theme park',
   'Last train',
   'Don Quijote',
-  'Emergencies',
 ] as const;
 
 export const PREMIUM_SITUATION_COUNT = allPremiumSituations.length;

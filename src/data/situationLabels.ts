@@ -52,6 +52,7 @@ export const SITUATION_LABELS: Record<SituationId, SituationLabel> = {
   cabaret_club: { ja: 'キャバクラ', en: 'Cabaret Club' },
   tachinomi: { ja: '立ち飲み', en: 'Standing Bar' },
   photo_etiquette: { ja: '撮影マナー', en: 'Photo Etiquette' },
+  ryokan: { ja: '旅館', en: 'Ryokan' },
 };
 
 export function getSituationLabel(id: SituationId | string): SituationLabel {
