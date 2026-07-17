@@ -18,6 +18,7 @@ const VALID_SITUATIONS = new Set<string>([
   'lost_emergency', 'shrine_temple', 'hatsumode',
   'restaurant_reservation', 'highway_bus', 'disaster_evacuation',
   'theme_park', 'atm_payments', 'shinkansen', 'ryokan',
+  'asking_for_directions',
 ]);
 
 const VALID_MINI_PACKS = new Set<string>([

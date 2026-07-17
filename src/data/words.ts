@@ -55,7 +55,8 @@ export type SituationId =
   | 'cabaret_club'
   | 'tachinomi'
   | 'photo_etiquette'
-  | 'ryokan';
+  | 'ryokan'
+  | 'asking_for_directions';
 
 export interface WordCard {
   id: string;
@@ -408,6 +409,38 @@ export const sampleWords: WordCard[] = [
   { id: 'ht28', japanese: '禁煙ルームをお願いします。', reading: 'きんえんるーむをおねがいします。', romaji: "Kin'en rūmu o onegai shimasu.", english: 'A non-smoking room, please.', situation: 'hotel' },
   { id: 'ht29', japanese: 'チェックアウトをお願いします。', reading: 'ちぇっくあうとをおねがいします。', romaji: 'Chekkuauto o onegai shimasu.', english: 'Check-out, please.', situation: 'hotel' },
   { id: 'ht30', japanese: '近くにコンビニはありますか？', reading: 'ちかくにこんびにはありますか？', romaji: 'Chikaku ni konbini wa arimasu ka?', english: 'Is there a convenience store nearby?', situation: 'hotel' },
+
+  // ==================== ASKING FOR DIRECTIONS (30 phrases) ====================
+  { id: 'dir1', japanese: 'すみません、道を聞いてもいいですか？', reading: 'すみません、みちをきいてもいいですか？', romaji: 'Sumimasen, michi o kiite mo ii desu ka?', english: 'Excuse me, may I ask for directions?', situation: 'asking_for_directions' },
+  { id: 'dir2', japanese: '駅はどこですか？', reading: 'えきはどこですか？', romaji: 'Eki wa doko desu ka?', english: 'Where is the station?', situation: 'asking_for_directions' },
+  { id: 'dir3', japanese: 'この辺にコンビニはありますか？', reading: 'このへんにこんびにはありますか？', romaji: 'Kono hen ni konbini wa arimasu ka?', english: 'Is there a convenience store around here?', situation: 'asking_for_directions' },
+  { id: 'dir4', japanese: 'ここはどこですか？', reading: 'ここはどこですか？', romaji: 'Koko wa doko desu ka?', english: 'Where am I? / What is this place?', situation: 'asking_for_directions' },
+  { id: 'dir5', japanese: '東京駅へはどうやって行きますか？', reading: 'とうきょうえきへはどうやっていきますか？', romaji: 'Tōkyō eki e wa dō yatte ikimasu ka?', english: 'How do I get to Tokyo Station?', situation: 'asking_for_directions' },
+  { id: 'dir6', japanese: '近いですか？', reading: 'ちかいですか？', romaji: 'Chikai desu ka?', english: 'Is it close?', situation: 'asking_for_directions' },
+  { id: 'dir7', japanese: '遠いですか？', reading: 'とおいですか？', romaji: 'Tōi desu ka?', english: 'Is it far?', situation: 'asking_for_directions' },
+  { id: 'dir8', japanese: '歩いて何分くらいですか？', reading: 'あるいてなんぷんくらいですか？', romaji: 'Aruite nan-pun kurai desu ka?', english: 'About how many minutes on foot?', situation: 'asking_for_directions' },
+  { id: 'dir9', japanese: 'この道で合っていますか？', reading: 'このみちであっていますか？', romaji: 'Kono michi de atte imasu ka?', english: 'Is this the right way?', situation: 'asking_for_directions' },
+  { id: 'dir10', japanese: 'まっすぐ行ってください。', reading: 'まっすぐいってください。', romaji: 'Massugu itte kudasai.', english: 'Please go straight.', situation: 'asking_for_directions' },
+  { id: 'dir11', japanese: '右に曲がってください。', reading: 'みぎにまがってください。', romaji: 'Migi ni magatte kudasai.', english: 'Please turn right.', situation: 'asking_for_directions' },
+  { id: 'dir12', japanese: '左に曲がってください。', reading: 'ひだりにまがってください。', romaji: 'Hidari ni magatte kudasai.', english: 'Please turn left.', situation: 'asking_for_directions' },
+  { id: 'dir13', japanese: '次の信号を右です。', reading: 'つぎのしんごうをみぎです。', romaji: 'Tsugi no shingō o migi desu.', english: 'Turn right at the next traffic light.', situation: 'asking_for_directions' },
+  { id: 'dir14', japanese: '二つ目の角を左です。', reading: 'ふたつめのかどをひだりです。', romaji: 'Futatsume no kado o hidari desu.', english: 'Turn left at the second corner.', situation: 'asking_for_directions' },
+  { id: 'dir15', japanese: '交差点を渡ってください。', reading: 'こうさてんをわたってください。', romaji: 'Kōsaten o watatte kudasai.', english: 'Please cross at the intersection.', situation: 'asking_for_directions' },
+  { id: 'dir16', japanese: '橋を渡ってください。', reading: 'はしをわたってください。', romaji: 'Hashi o watatte kudasai.', english: 'Please cross the bridge.', situation: 'asking_for_directions' },
+  { id: 'dir17', japanese: '反対方向です。', reading: 'はんたいほうこうです。', romaji: 'Hantai hōkō desu.', english: "It's the opposite direction.", situation: 'asking_for_directions' },
+  { id: 'dir18', japanese: 'もう少しです。', reading: 'もうすこしです。', romaji: 'Mō sukoshi desu.', english: "You're almost there.", situation: 'asking_for_directions' },
+  { id: 'dir19', japanese: 'あの建物の向こうです。', reading: 'あのたてもののむこうです。', romaji: 'Ano tatemono no mukō desu.', english: "It's beyond that building.", situation: 'asking_for_directions' },
+  { id: 'dir20', japanese: 'もう一度お願いします。', reading: 'もういちどおねがいします。', romaji: 'Mō ichido onegai shimasu.', english: 'One more time, please.', situation: 'asking_for_directions' },
+  { id: 'dir21', japanese: 'ゆっくり話してください。', reading: 'ゆっくりはなしてください。', romaji: 'Yukkuri hanashite kudasai.', english: 'Please speak slowly.', situation: 'asking_for_directions' },
+  { id: 'dir22', japanese: '地図で見せてもらえますか？', reading: 'ちずでみせてもらえますか？', romaji: 'Chizu de misete moraemasu ka?', english: 'Could you show me on a map?', situation: 'asking_for_directions' },
+  { id: 'dir23', japanese: 'スマホの地図を見てもいいですか？', reading: 'すまほのちずをみてもいいですか？', romaji: 'Sumaho no chizu o mite mo ii desu ka?', english: 'May I look at the map on my phone?', situation: 'asking_for_directions' },
+  { id: 'dir24', japanese: 'トイレはどこですか？', reading: 'といれはどこですか？', romaji: 'Toire wa doko desu ka?', english: 'Where is the restroom?', situation: 'asking_for_directions' },
+  { id: 'dir25', japanese: '出口はどちらですか？', reading: 'でぐちはどちらですか？', romaji: 'Deguchi wa dochira desu ka?', english: 'Which way is the exit?', situation: 'asking_for_directions' },
+  { id: 'dir26', japanese: '入り口はどこですか？', reading: 'いりぐちはどこですか？', romaji: 'Iriguchi wa doko desu ka?', english: 'Where is the entrance?', situation: 'asking_for_directions' },
+  { id: 'dir27', japanese: '行き止まりですか？', reading: 'いきどまりですか？', romaji: 'Ikidomari desu ka?', english: 'Is this a dead end?', situation: 'asking_for_directions' },
+  { id: 'dir28', japanese: 'わかりました。ありがとうございます。', reading: 'わかりました。ありがとうございます。', romaji: 'Wakarimashita. Arigatō gozaimasu.', english: 'Got it. Thank you very much.', situation: 'asking_for_directions' },
+  { id: 'dir29', japanese: 'すみません、もう一度いいですか？', reading: 'すみません、もういちどいいですか？', romaji: 'Sumimasen, mō ichido ii desu ka?', english: 'Sorry, could you say that again?', situation: 'asking_for_directions' },
+  { id: 'dir30', japanese: '助かりました。ありがとうございます。', reading: 'たすかりました。ありがとうございます。', romaji: 'Tasukarimashita. Arigatō gozaimasu.', english: 'That helped a lot. Thank you.', situation: 'asking_for_directions' },
 
   // ==================== PREMIUM: HANGOVER (30 items) ====================
   // --- Nouns ---

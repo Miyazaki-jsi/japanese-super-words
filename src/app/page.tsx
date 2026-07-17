@@ -130,6 +130,7 @@ import {
   Droplets,
   ShieldAlert,
   Megaphone,
+  Play,
 } from 'lucide-react';
 
 type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'srs_review' | 'trip_pack' | 'mini_pack';
@@ -654,7 +655,8 @@ export default function Home() {
   const [canNativeInstall, setCanNativeInstall] = useState(false);
   const [isStandaloneApp, setIsStandaloneApp] = useState(false);
 
-  const [homeTab, setHomeTab] = useState<HomeTab>('packs');
+  const [homeTab, setHomeTab] = useState<HomeTab>('situations');
+  const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
   const [tripDate, setTripDate] = useState<string | null>(null);
   const [tripDateDraft, setTripDateDraft] = useState('');
   const [isEditingTripDate, setIsEditingTripDate] = useState(false);
@@ -961,13 +963,13 @@ export default function Home() {
     icon: React.ComponentType<{ className?: string }>;
     badge?: number;
   }[] = [
-    { id: 'packs', label: 'パック', enLabel: 'Packs', icon: Luggage },
     {
       id: 'situations',
       label: 'シチュエーション',
       enLabel: 'Situations',
       icon: LayoutGrid,
     },
+    { id: 'packs', label: 'パック', enLabel: 'Packs', icon: Luggage },
     {
       id: 'review',
       label: '復習',
@@ -1444,7 +1446,16 @@ export default function Home() {
     { id: 'sushi_shop', title: '寿司屋', enTitle: 'Sushi Shop', icon: Fish, color: 'from-cyan-500 to-teal-600' },
     { id: 'koban', title: '交番', enTitle: 'Police Box', icon: Shield, color: 'from-blue-600 to-indigo-700' },
     { id: 'hotel', title: 'ホテル', enTitle: 'Hotel', icon: Building2, color: 'from-violet-500 to-purple-600' },
+    { id: 'asking_for_directions', title: '道を尋ねる', enTitle: 'Asking for Directions', icon: Milestone, color: 'from-lime-500 to-green-600' },
   ] as const;
+
+  /** First-visit starter: one clear free scene to try immediately */
+  const starterSituationId = 'convenience_store' as const;
+  const starterSituation =
+    freeSituations.find((s) => s.id === starterSituationId) ?? freeSituations[0];
+  const StarterIcon = starterSituation.icon;
+  const starterStats = getStats(starterSituation.id);
+  const otherFreeSituations = freeSituations.filter((s) => s.id !== starterSituation.id);
 
   const premiumSituations = allPremiumSituations;
 
@@ -2311,12 +2322,61 @@ export default function Home() {
                   </span>
                 </div>
 
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSituation(starterSituation.id);
+                    setCurrentScreen('situation');
+                    setFilter('all');
+                    trackEvent('starter_try_now', {
+                      ...getAttributionProps(),
+                      situation: starterSituation.id,
+                    });
+                  }}
+                  className="btn-press w-full text-left rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-pink-50 p-4 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${starterSituation.color} text-white shadow-md`}
+                    >
+                      <StarterIcon className="h-6 w-6" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-black text-white">
+                        <Sparkles className="h-3 w-3" />
+                        {jaOnly ? 'ここから' : 'Start here'}
+                      </span>
+                      <h3 className="mt-1.5 text-base font-black leading-tight text-slate-900">
+                        {jaOnly ? starterSituation.title : starterSituation.enTitle}
+                      </h3>
+                      {!jaOnly && (
+                        <p className="text-[11px] font-semibold text-slate-500">{starterSituation.title}</p>
+                      )}
+                      <p className="mt-1 text-[11px] font-medium leading-snug text-slate-600">
+                        {jaOnly
+                          ? '日本で毎日使える・無料で今すぐ練習'
+                          : 'Everyday Japan phrases — free, try it now'}
+                      </p>
+                      <p className="mt-1.5 font-mono text-[10px] font-bold text-slate-500">
+                        <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 align-middle" />
+                        {starterStats.learnedCount}/{starterStats.total}
+                        {jaOnly ? ' フレーズ' : ' phrases'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-black text-white shadow-md shadow-indigo-200/80">
+                    <Play className="h-4 w-4 fill-current" />
+                    {jaOnly ? '今すぐ試す' : 'Try now'}
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
+                </button>
+
                 <div>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-0.5 mb-2">
-                    {jaOnly ? '無料' : 'Free · 無料'}
+                    {jaOnly ? 'ほかの無料' : 'More free · ほかの無料'}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    {freeSituations.map((sit) => {
+                    {otherFreeSituations.map((sit) => {
                       const stats = getStats(sit.id);
                       const Icon = sit.icon;
                       return (
@@ -2805,7 +2865,7 @@ export default function Home() {
               </div>
 
               <ul className="space-y-3">
-                {announcements.map((item) => (
+                {(showAllAnnouncements ? announcements : announcements.slice(0, 3)).map((item) => (
                   <li
                     key={item.id}
                     className="rounded-xl border border-slate-100 bg-slate-50/80 px-3.5 py-3"
@@ -2830,6 +2890,22 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
+
+              {announcements.length > 3 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllAnnouncements((open) => !open)}
+                  className="btn-press w-full py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-[11px] font-black hover:bg-slate-100 transition-colors"
+                >
+                  {showAllAnnouncements
+                    ? jaOnly
+                      ? '閉じる'
+                      : 'Show less'
+                    : jaOnly
+                      ? `もっと見る（あと ${announcements.length - 3} 件）`
+                      : `More (${announcements.length - 3} older)`}
+                </button>
+              )}
             </section>
           </div>
         ) : currentScreen === 'trip_pack' ? (

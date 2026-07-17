@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 DIRS=(
-  airport_immigration allergies_dietary atm_payments coffee_shop coin_laundry
+  airport_immigration allergies_dietary asking_for_directions atm_payments coffee_shop coin_laundry
   convenience_store depachika disaster_evacuation don_quijote festival
   game_center greetings gyudon_shop hangover hatsumode highway_bus
   hospital hotel izakaya karaoke koban late_night_bar lost_emergency

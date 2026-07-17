@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-18-home-and-directions',
+    date: '2026-07-18',
+    titleEn: 'Home screen update + new free scene',
+    titleJa: 'ホーム画面の改善と新無料シチュ',
+    bodyEn:
+      'The home screen now opens on Situations first, with a big Try now card for Convenience Store. We also added a new free scene, Asking for Directions — 30 street phrases with audio.',
+    bodyJa:
+      'ホーム画面を改善しました。最初にシチュエーションが開き、コンビニの「今すぐ試す」が目立つようになりました。あわせて無料シチュ「道を尋ねる」を追加。道を聞く・曲がる・お礼まで、音声付きフレーズ30個です。',
+  },
+  {
     id: '2026-07-17-ryokan',
     date: '2026-07-17',
     titleEn: 'New scene: Ryokan',
