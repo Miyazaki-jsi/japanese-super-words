@@ -27,6 +27,7 @@ import UnlockModal, { type UnlockContext } from '@/components/UnlockModal';
 import { announcements, formatAnnouncementDate } from '@/data/announcements';
 import { getDailyProgressTip } from '@/data/progressTips';
 import { BiLine, UI_LANG_STORAGE_KEY, useUiLang } from '@/lib/uiLang';
+import { useUiTheme } from '@/lib/uiTheme';
 import {
   getDisplayMiniPacks,
   MINI_PACK_COUNT,
@@ -132,6 +133,7 @@ import {
   ShieldAlert,
   Megaphone,
   Play,
+  Sun,
 } from 'lucide-react';
 
 type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'srs_review' | 'trip_pack' | 'mini_pack';
@@ -585,6 +587,7 @@ const isStandaloneDisplayMode = () => {
 
 export default function Home() {
   const { jaOnly, setJaOnly } = useUiLang();
+  const { darkMode, setDarkMode } = useUiTheme();
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
   const [activeMiniPackId, setActiveMiniPackId] = useState<MiniPackId | null>(null);
   const [selectedSituation, setSelectedSituation] = useState<SituationId | null>(null);
@@ -4280,6 +4283,44 @@ export default function Home() {
                       <span
                         className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
                           jaOnly ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0 text-left flex items-start gap-2.5">
+                      <div
+                        className={`mt-0.5 w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          darkMode ? 'bg-slate-800 text-amber-300' : 'bg-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {darkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-extrabold text-slate-900 leading-tight">
+                          {jaOnly ? 'ダークモード' : 'Dark mode'}
+                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500 mt-0.5 leading-snug">
+                          {jaOnly
+                            ? '画面を暗い色にして見やすく'
+                            : 'Easier on the eyes at night · 画面を暗い色に'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={darkMode}
+                      aria-label={jaOnly ? 'ダークモード' : 'Dark mode'}
+                      onClick={() => setDarkMode(!darkMode)}
+                      className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 pressable ${
+                        darkMode ? 'bg-indigo-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                          darkMode ? 'translate-x-5' : 'translate-x-0'
                         }`}
                       />
                     </button>

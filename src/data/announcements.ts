@@ -11,6 +11,14 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-18-dark-mode',
+    date: '2026-07-18',
+    titleEn: 'Dark mode',
+    titleJa: 'ダークモード',
+    bodyEn: 'You can switch to dark mode in Settings. Easier on the eyes at night.',
+    bodyJa: '設定からダークモードに切り替えできるようになりました。夜でも見やすくなります。',
+  },
+  {
     id: '2026-07-18-home-design',
     date: '2026-07-18',
     titleEn: 'Homepage design update',
