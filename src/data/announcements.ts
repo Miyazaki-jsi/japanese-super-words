@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-18-home-design',
+    date: '2026-07-18',
+    titleEn: 'Homepage design update',
+    titleJa: 'トップページのデザインを修正',
+    bodyEn:
+      'We refreshed the home screen layout — easier tips, a slim Add to Home Screen banner, and cleaner spacing.',
+    bodyJa:
+      'トップページのデザインを修正しました。励まし文・ホーム画面追加の案内など、見やすさを整えています。',
+  },
+  {
     id: '2026-07-18-home-and-directions',
     date: '2026-07-18',
     titleEn: 'Home screen update + new free scene',
