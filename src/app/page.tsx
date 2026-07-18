@@ -139,6 +139,8 @@ type HomeTab = 'packs' | 'situations' | 'review';
 type FilterType = 'all' | 'unlearned';
 type MessageStep = 'form' | 'confirm' | 'success';
 
+const PWA_HOME_BANNER_DISMISSED_KEY = 'japanese-super-words-pwa-home-banner-dismissed';
+
 const TRIP_DATE_STORAGE_KEY = 'japanese-super-words-trip-date';
 const SUPER_TEST_INTRO_EXIT_MS = 450;
 
@@ -655,6 +657,7 @@ export default function Home() {
   const installPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
   const [canNativeInstall, setCanNativeInstall] = useState(false);
   const [isStandaloneApp, setIsStandaloneApp] = useState(false);
+  const [showPwaHomeBanner, setShowPwaHomeBanner] = useState(false);
 
   const [homeTab, setHomeTab] = useState<HomeTab>('situations');
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
@@ -888,6 +891,9 @@ export default function Home() {
 
   useEffect(() => {
     setIsStandaloneApp(isStandaloneDisplayMode());
+    setShowPwaHomeBanner(
+      !isStandaloneDisplayMode() && !localStorage.getItem(PWA_HOME_BANNER_DISMISSED_KEY)
+    );
 
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
@@ -899,6 +905,7 @@ export default function Home() {
       installPromptRef.current = null;
       setCanNativeInstall(false);
       setIsStandaloneApp(true);
+      setShowPwaHomeBanner(false);
     };
 
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
@@ -1224,6 +1231,11 @@ export default function Home() {
     setOnboardingTab(/android/.test(userAgent) ? 'android' : 'ios');
     closeSettingsModal();
     setShowOnboarding(true);
+  };
+
+  const dismissPwaHomeBanner = () => {
+    localStorage.setItem(PWA_HOME_BANNER_DISMISSED_KEY, '1');
+    setShowPwaHomeBanner(false);
   };
 
   const handleAddToHomeScreen = async () => {
@@ -1889,6 +1901,41 @@ export default function Home() {
                 )}
               </div>
             </div>
+
+            {!isStandaloneApp && showPwaHomeBanner && (
+              <div className="relative flex items-stretch gap-1 animate-fade-in">
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleAddToHomeScreen();
+                  }}
+                  className="btn-press flex-1 min-w-0 flex items-center gap-2.5 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50 px-3.5 py-3 text-left hover:border-indigo-200 hover:shadow-sm transition-all"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-indigo-200">
+                    <Smartphone className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-black text-indigo-900 leading-snug">
+                      {jaOnly ? 'ホーム画面に追加してみよう！' : 'Try adding it to your Home Screen!'}
+                    </p>
+                    {!jaOnly && (
+                      <p className="text-[10px] font-semibold text-indigo-500/90 mt-0.5">
+                        ホーム画面に追加してみよう！
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissPwaHomeBanner}
+                  className="flex-shrink-0 w-10 rounded-2xl border border-slate-100 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center"
+                  aria-label={jaOnly ? '閉じる' : 'Dismiss'}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
             {showIntroWelcome && (
               <div className="relative bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white shadow-lg shadow-indigo-200/50 animate-fade-in">
