@@ -25,6 +25,7 @@ import TripPackScreen from '@/components/TripPackScreen';
 import MiniPackScreen from '@/components/MiniPackScreen';
 import UnlockModal, { type UnlockContext } from '@/components/UnlockModal';
 import { announcements, formatAnnouncementDate } from '@/data/announcements';
+import { getDailyProgressTip } from '@/data/progressTips';
 import { BiLine, UI_LANG_STORAGE_KEY, useUiLang } from '@/lib/uiLang';
 import {
   getDisplayMiniPacks,
@@ -711,6 +712,7 @@ export default function Home() {
   }, []);
 
   const totalXP = learnedIds.length;
+  const progressTip = getDailyProgressTip(learnedIds.length);
 
   const getRankInfo = (xp: number) => {
     if (xp < 100) {
@@ -1770,6 +1772,18 @@ export default function Home() {
                           <span className="text-[9px] font-bold text-slate-400 flex-shrink-0">Start streak</span>
                         ) : null}
                       </div>
+                      {progressTip && (
+                          <div className="mt-1.5">
+                            <p className="text-[10px] font-bold leading-snug text-indigo-700/90">
+                              {jaOnly ? progressTip.ja : progressTip.en}
+                            </p>
+                            {!jaOnly && (
+                              <p className="text-[9px] font-semibold leading-snug text-slate-400 mt-0.5">
+                                {progressTip.ja}
+                              </p>
+                            )}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
