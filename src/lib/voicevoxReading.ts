@@ -7,6 +7,9 @@ import type { WordCard } from '@/data/words';
 const VOICEVOX_READING_OVERRIDES: Record<string, string> = {
   // 食券 — kanji input yields ショッケン' (accent on けん) vs flat ショ'ッケン from hiragana alone
   r3: '食券',
+  // Suica is commonly read スイカ; all-hiragana すいか can sound odd / ambiguous
+  s41: 'スイカにチャージしたいです。',
+  a36: 'ICカード',
 };
 
 /** Cards that use japanese (not hiragana reading) + conversational を patch at synthesis time. */
@@ -27,6 +30,18 @@ const CONVERSATIONAL_JAPANESE_CARD_IDS = new Set([
 const KANJI_DISAMBIGUATED_CARD_IDS = new Set([
   's20', // 袋は要りません。
   's25', // レシートは要りません。
+  's30', // 電子マネーは使えますか？
+  's38', // ポイントカードは持っていません。
+  's39', // ATMはどこですか？
+  's40', // トイレはどこですか？
+  's42', // 傘は売っていますか？
+  's43', // イートインはできますか？
+  's45', // お箸はありますか？
+  'a32', // この電車は新宿行きですか？
+  'a34', // 乗り換えはどこですか？
+  'a35', // 出口はどちらですか？
+  'a39', // 窓口はどこですか？
+  'a45', // この改札で入れますか？（では→で+入れ）
   'dp26', // 袋は要りません。
   'ry23', // 夕食は何時ですか？
   'ry25', // 大浴場はどこですか？

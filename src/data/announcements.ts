@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-27-konbini-eki-deeper',
+    date: '2026-07-27',
+    titleEn: 'More Convenience Store & Station phrases',
+    titleJa: 'コンビニ・駅のフレーズを追加',
+    bodyEn:
+      'Convenience Store and Train Station now have 15 new survival phrases each — checkout answers, ticket window lines, transfers, and more.',
+    bodyJa:
+      '「コンビニ」「駅」に、それぞれ15個の使えるフレーズを追加しました。レジの返事・切符・乗り換えなど、現場でそのまま使えます。',
+  },
+  {
     id: '2026-07-18-dark-mode',
     date: '2026-07-18',
     titleEn: 'Dark mode',

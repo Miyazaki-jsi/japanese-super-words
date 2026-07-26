@@ -106,7 +106,7 @@ export const sampleWords: WordCard[] = [
   { id: 'r29', japanese: '半分でお願いします。', reading: 'はんぶんでおねがいします。', romaji: 'Hanbun de onegai shimasu.', english: 'Half portion, please.', situation: 'ramen_shop' },
   { id: 'r30', japanese: 'テイクアウトできますか？', reading: 'ていくあうとできますか？', romaji: 'Teikuauto dekimasu ka?', english: 'Can I get it to go?', situation: 'ramen_shop' },
 
-  // ==================== CONVENIENCE STORE (30 items) ====================
+  // ==================== CONVENIENCE STORE (45 items) ====================
   // --- Nouns ---
   { id: 's1', japanese: 'おにぎり', reading: 'おにぎり', romaji: 'Onigiri', english: 'Rice ball', situation: 'convenience_store' },
   { id: 's2', japanese: 'レジ', reading: 'れじ', romaji: 'Reji', english: 'Cash register', situation: 'convenience_store' },
@@ -143,6 +143,22 @@ export const sampleWords: WordCard[] = [
   { id: 's28', japanese: '新しい', reading: 'あたらしい', romaji: 'Atarashii', english: 'New / fresh', situation: 'convenience_store' },
   { id: 's29', japanese: '在庫はありますか？', reading: 'ざいこはありますか？', romaji: 'Zaiko wa arimasu ka?', english: 'Is it in stock?', situation: 'convenience_store' },
   { id: 's30', japanese: '電子マネーは使えますか？', reading: 'でんしマネーはつかえますか？', romaji: 'Denshi manē wa tsukaemasu ka?', english: 'Can I use electronic money?', situation: 'convenience_store' },
+  // --- Deeper: checkout & daily survival ---
+  { id: 's31', japanese: 'これ、お願いします。', reading: 'これ、おねがいします。', romaji: 'Kore, onegai shimasu.', english: 'This one, please. (handing items at the register)', situation: 'convenience_store' },
+  { id: 's32', japanese: 'いいえ、大丈夫です。', reading: 'いいえ、だいじょうぶです。', romaji: 'Iie, daijōbu desu.', english: "No, I'm fine. / No, thank you.", situation: 'convenience_store' },
+  { id: 's33', japanese: 'はい、温めてください。', reading: 'はい、あたためてください。', romaji: 'Hai, atatamete kudasai.', english: 'Yes, please heat it up.', situation: 'convenience_store' },
+  { id: 's34', japanese: 'いいえ、そのままで。', reading: 'いいえ、そのままで。', romaji: 'Iie, sono mama de.', english: 'No, leave it as is (no heating).', situation: 'convenience_store' },
+  { id: 's35', japanese: '現金でお願いします。', reading: 'げんきんでおねがいします。', romaji: 'Genkin de onegai shimasu.', english: 'Cash, please.', situation: 'convenience_store' },
+  { id: 's36', japanese: 'これでお願いします。', reading: 'これでおねがいします。', romaji: 'Kore de onegai shimasu.', english: 'With this, please. (handing money / a card)', situation: 'convenience_store' },
+  { id: 's37', japanese: '領収書をお願いします。', reading: 'りょうしゅうしょをおねがいします。', romaji: 'Ryōshūsho o onegai shimasu.', english: 'A receipt, please. (official receipt)', situation: 'convenience_store' },
+  { id: 's38', japanese: 'ポイントカードは持っていません。', reading: 'ぽいんとかーどはもっていません。', romaji: 'Pointo kādo wa motte imasen.', english: "I don't have a points card.", situation: 'convenience_store' },
+  { id: 's39', japanese: 'ATMはどこですか？', reading: 'えーてぃーえむはどこですか？', romaji: 'Ē-tī-emu wa doko desu ka?', english: 'Where is the ATM?', situation: 'convenience_store' },
+  { id: 's40', japanese: 'トイレはどこですか？', reading: 'といれはどこですか？', romaji: 'Toire wa doko desu ka?', english: 'Where is the restroom?', situation: 'convenience_store' },
+  { id: 's41', japanese: 'Suicaにチャージしたいです。', reading: 'すいかにちゃーじしたいです。', romaji: 'Suica ni chāji shitai desu.', english: 'I want to charge my Suica.', situation: 'convenience_store' },
+  { id: 's42', japanese: '傘は売っていますか？', reading: 'かさはうっていますか？', romaji: 'Kasa wa utte imasu ka?', english: 'Do you sell umbrellas?', situation: 'convenience_store' },
+  { id: 's43', japanese: 'イートインはできますか？', reading: 'いーといんはできますか？', romaji: 'Ītoin wa dekimasu ka?', english: 'Can I eat in here?', situation: 'convenience_store' },
+  { id: 's44', japanese: 'コピーをお願いします。', reading: 'こぴーをおねがいします。', romaji: 'Kopī o onegai shimasu.', english: "I'd like a photocopy, please.", situation: 'convenience_store' },
+  { id: 's45', japanese: 'お箸はありますか？', reading: 'おはしはありますか？', romaji: 'Ohashi wa arimasu ka?', english: 'Do you have chopsticks?', situation: 'convenience_store' },
 
   // ==================== GREETINGS (30 items) ====================
   // --- Nouns ---
@@ -220,7 +236,7 @@ export const sampleWords: WordCard[] = [
   { id: 'h29', japanese: '吐き気がします。', reading: 'はきけがします。', romaji: 'Hakike ga shimasu.', english: 'I feel nauseous.', situation: 'hospital' },
   { id: 'h30', japanese: '検査結果はいつわかりますか？', reading: 'けんさけっかはいつわかりますか？', romaji: 'Kensa kekka wa itsu wakarimasu ka?', english: 'When will the test results be ready?', situation: 'hospital' },
 
-  // ==================== TRAIN STATION (30 items) ====================
+  // ==================== TRAIN STATION (45 items) ====================
   // --- Nouns ---
   { id: 'a1', japanese: '改札口', reading: 'かいさつぐち', romaji: 'Kaisatsuguchi', english: 'Ticket gate', situation: 'train_station' },
   { id: 'a2', japanese: 'プラットホーム', reading: 'ぷらっとほーむ', romaji: 'Purattohōmu', english: 'Station platform', situation: 'train_station' },
@@ -257,6 +273,22 @@ export const sampleWords: WordCard[] = [
   { id: 'a28', japanese: '優先席はどこですか？', reading: 'ゆうせんせきはどこですか？', romaji: 'Yūsenseki wa doko desu ka?', english: 'Where are the priority seats?', situation: 'train_station' },
   { id: 'a29', japanese: 'この座席は空いていますか？', reading: 'このざせきはあいていますか？', romaji: 'Kono zaseki wa aite imasu ka?', english: 'Is this seat available?', situation: 'train_station' },
   { id: 'a30', japanese: '終点はどこですか？', reading: 'しゅうてんはどこですか？', romaji: 'Shūten wa doko desu ka?', english: 'What is the final stop?', situation: 'train_station' },
+  // --- Deeper: ticket window & daily riding ---
+  { id: 'a31', japanese: '渋谷まで一枚ください。', reading: 'しぶやまでいちまいください。', romaji: 'Shibuya made ichimai kudasai.', english: 'One ticket to Shibuya, please. (swap the station name)', situation: 'train_station' },
+  { id: 'a32', japanese: 'この電車は新宿行きですか？', reading: 'このでんしゃはしんじゅくいきですか？', romaji: 'Kono densha wa Shinjuku iki desu ka?', english: 'Is this train bound for Shinjuku?', situation: 'train_station' },
+  { id: 'a33', japanese: '何番線ですか？', reading: 'なんばんせんですか？', romaji: 'Nan-bansen desu ka?', english: 'Which platform / track number?', situation: 'train_station' },
+  { id: 'a34', japanese: '乗り換えはどこですか？', reading: 'のりかえはどこですか？', romaji: 'Norikae wa doko desu ka?', english: 'Where do I transfer?', situation: 'train_station' },
+  { id: 'a35', japanese: '出口はどちらですか？', reading: 'でぐちはどちらですか？', romaji: 'Deguchi wa dochira desu ka?', english: 'Which way is the exit?', situation: 'train_station' },
+  { id: 'a36', japanese: 'ICカード', reading: 'あいしーかーど', romaji: 'IC kādo', english: 'IC card (Suica, Pasmo, etc.)', situation: 'train_station' },
+  { id: 'a37', japanese: '片道', reading: 'かたみち', romaji: 'Katamichi', english: 'One-way (ticket)', situation: 'train_station' },
+  { id: 'a38', japanese: '往復', reading: 'おうふく', romaji: 'Ōfuku', english: 'Round-trip (ticket)', situation: 'train_station' },
+  { id: 'a39', japanese: '窓口はどこですか？', reading: 'まどぐちはどこですか？', romaji: 'Madoguchi wa doko desu ka?', english: 'Where is the ticket window?', situation: 'train_station' },
+  { id: 'a40', japanese: '駅員', reading: 'えきいん', romaji: 'Ekiin', english: 'Station staff', situation: 'train_station' },
+  { id: 'a41', japanese: '各駅停車', reading: 'かくえきていしゃ', romaji: 'Kakueki teisha', english: 'Local train (stops at every station)', situation: 'train_station' },
+  { id: 'a42', japanese: '快速', reading: 'かいそく', romaji: 'Kaisoku', english: 'Rapid / express-ish local service', situation: 'train_station' },
+  { id: 'a43', japanese: '乗り過ごしました。', reading: 'のりすごしました。', romaji: 'Norisugoshimashita.', english: 'I missed my stop. / I rode past it.', situation: 'train_station' },
+  { id: 'a44', japanese: 'チャージしたいです。', reading: 'ちゃーじしたいです。', romaji: 'Chāji shitai desu.', english: 'I want to top up (my IC card).', situation: 'train_station' },
+  { id: 'a45', japanese: 'この改札で入れますか？', reading: 'このかいさつではいれますか？', romaji: 'Kono kaisatsu de hairemasu ka?', english: 'Can I enter through this gate?', situation: 'train_station' },
 
   // ==================== IZAKAYA (30 items) ====================
   // --- Nouns ---
