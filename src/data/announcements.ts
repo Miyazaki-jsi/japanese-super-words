@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-27-progress-backup',
+    date: '2026-07-27',
+    titleEn: 'Backup & restore your progress',
+    titleJa: '学習データのバックアップ',
+    bodyEn:
+      'Settings now has Save backup / Restore. Progress is stored on this device — keep a JSON file so you can recover after a wipe or phone change.',
+    bodyJa:
+      '設定に「バックアップ保存／復元」を追加しました。進捗はこの端末に保存されます。消えたとき・機種変更用にJSONファイルを残しておきましょう。',
+  },
+  {
     id: '2026-07-27-konbini-eki-deeper',
     date: '2026-07-27',
     titleEn: 'More Convenience Store & Station phrases',

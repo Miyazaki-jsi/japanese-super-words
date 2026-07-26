@@ -89,10 +89,12 @@ export default function PrivacyPage() {
                 <li>匿名のアナリティクス用 visitor ID（ランダム UUID）</li>
               </ul>
               <p>
-                You can delete this data anytime via <strong>Settings → Reset Saved Data</strong>.
+                You can export a backup JSON via <strong>Settings → Save backup</strong>, restore it
+                later, or delete everything via <strong>Settings → Reset Saved Data</strong>.
               </p>
               <p className="text-slate-500">
-                <strong>設定 → 保存データをリセット</strong> から、いつでも削除できます。
+                <strong>設定 → バックアップ保存</strong> でJSONを書き出せます。復元も同画面から。削除は
+                <strong>設定 → 保存データをリセット</strong> です。
               </p>
             </Section>
 

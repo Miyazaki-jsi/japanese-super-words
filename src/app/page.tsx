@@ -77,6 +77,14 @@ import { trackEvent } from '@/lib/analytics';
 import { speakJapanese } from '@/lib/speakJapanese';
 import { usePurchaseReturnUnlock } from '@/lib/usePurchaseReturnUnlock';
 import {
+  applyBackup,
+  BackupParseError,
+  collectBackupData,
+  parseBackupJson,
+  shareOrDownloadBackup,
+  type ProgressBackup,
+} from '@/lib/progressBackup';
+import {
   clearStudyHabits,
   getDueWordIds,
   getUpcomingReviewCount,
@@ -134,6 +142,8 @@ import {
   Megaphone,
   Play,
   Sun,
+  Download,
+  Upload,
 } from 'lucide-react';
 
 type ScreenType = 'home' | 'situation' | 'favorites' | 'super_test' | 'srs_review' | 'trip_pack' | 'mini_pack';
@@ -651,6 +661,11 @@ export default function Home() {
   const [showPremiumUnlockedModal, setShowPremiumUnlockedModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
+  const [showRestoreConfirmModal, setShowRestoreConfirmModal] = useState(false);
+  const [pendingRestoreBackup, setPendingRestoreBackup] = useState<ProgressBackup | null>(null);
+  const [backupNotice, setBackupNotice] = useState<{ en: string; ja: string } | null>(null);
+  const [isBackupBusy, setIsBackupBusy] = useState(false);
+  const backupFileInputRef = useRef<HTMLInputElement>(null);
   const [messageStep, setMessageStep] = useState<MessageStep | null>(null);
   const [messageName, setMessageName] = useState('');
   const [messageBody, setMessageBody] = useState('');
@@ -1313,6 +1328,114 @@ export default function Home() {
 
   const handleResetProgress = () => {
     setShowResetConfirmModal(true);
+  };
+
+  const handleExportBackup = async () => {
+    if (isBackupBusy) return;
+    setIsBackupBusy(true);
+    setBackupNotice(null);
+    try {
+      const backup = collectBackupData(localStorage);
+      const keyCount = Object.keys(backup.data).length;
+      if (keyCount === 0) {
+        setBackupNotice({
+          en: 'Nothing to back up yet. Learn a few cards first.',
+          ja: 'まだバックアップするデータがありません。先に少し学習してください。',
+        });
+        return;
+      }
+      const result = await shareOrDownloadBackup(backup);
+      trackEvent('backup_export', { ...getAttributionProps(), keys: keyCount, result });
+      if (result === 'shared') {
+        setBackupNotice({
+          en: 'Backup ready — save it to Files / Drive.',
+          ja: 'バックアップを共有しました。ファイル／Driveに保存してください。',
+        });
+      } else if (result === 'copied') {
+        setBackupNotice({
+          en: 'Backup copied to clipboard. Paste into a note to keep it.',
+          ja: 'バックアップをコピーしました。メモアプリに貼って保存してください。',
+        });
+      } else {
+        setBackupNotice({
+          en: 'Backup downloaded. Keep the JSON file safe.',
+          ja: 'バックアップを保存しました。JSONファイルを大切に保管してください。',
+        });
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setBackupNotice({
+          en: 'Backup cancelled.',
+          ja: 'バックアップをキャンセルしました。',
+        });
+        return;
+      }
+      console.error(error);
+      setBackupNotice({
+        en: 'Could not create backup. Try again.',
+        ja: 'バックアップに失敗しました。もう一度試してください。',
+      });
+    } finally {
+      setIsBackupBusy(false);
+    }
+  };
+
+  const handlePickBackupFile = () => {
+    if (isBackupBusy) return;
+    setBackupNotice(null);
+    backupFileInputRef.current?.click();
+  };
+
+  const handleBackupFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setIsBackupBusy(true);
+    try {
+      const raw = await file.text();
+      const backup = parseBackupJson(raw);
+      setPendingRestoreBackup(backup);
+      setShowRestoreConfirmModal(true);
+    } catch (error) {
+      console.error(error);
+      const message =
+        error instanceof BackupParseError
+          ? error.message
+          : 'Could not read that file.';
+      setBackupNotice({
+        en: message,
+        ja:
+          error instanceof BackupParseError
+            ? 'バックアップファイルを読めませんでした。正しいJSONか確認してください。'
+            : 'ファイルを読めませんでした。',
+      });
+    } finally {
+      setIsBackupBusy(false);
+    }
+  };
+
+  const performRestoreBackup = () => {
+    if (!pendingRestoreBackup || isBackupBusy) return;
+    setIsBackupBusy(true);
+    try {
+      const result = applyBackup(pendingRestoreBackup, localStorage);
+      trackEvent('backup_restore', {
+        ...getAttributionProps(),
+        keys: result.written,
+        removed: result.removed,
+      });
+      setShowRestoreConfirmModal(false);
+      setPendingRestoreBackup(null);
+      setShowSettingsModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      setIsBackupBusy(false);
+      setBackupNotice({
+        en: 'Restore failed. Your current data was not changed.',
+        ja: '復元に失敗しました。いまのデータはそのままです。',
+      });
+    }
   };
 
   const rank = getRankInfo(totalXP);
@@ -4498,6 +4621,70 @@ export default function Home() {
                     })}
                   </div>
 
+                  <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-4 space-y-3">
+                    <div className="text-left space-y-1">
+                      <BilingualButtonLabel
+                        en="Backup progress"
+                        ja="学習データのバックアップ"
+                        enClassName="block text-sm font-extrabold text-slate-900"
+                        jaClassName="block text-[11px] font-semibold text-sky-700/90"
+                      />
+                      <p className="text-[11px] text-slate-500 leading-snug">
+                        {jaOnly
+                          ? '進捗はこの端末に保存されます。消えたとき用にJSONファイルを残しておきましょう。'
+                          : 'Progress stays on this device. Save a JSON file so you can restore later.'}
+                      </p>
+                      {!jaOnly && (
+                        <p className="text-[10px] text-slate-400 leading-snug">
+                          進捗はこの端末に保存されます。消えたとき用にJSONファイルを残しておきましょう。
+                        </p>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => void handleExportBackup()}
+                        disabled={isBackupBusy}
+                        className="py-3 rounded-xl border border-sky-200 bg-white hover:bg-sky-50 text-sky-800 pressable disabled:opacity-60 flex flex-col items-center justify-center gap-1"
+                      >
+                        <Download className="w-4 h-4" />
+                        <BilingualButtonLabel
+                          en="Save backup"
+                          ja="バックアップ保存"
+                          enClassName="block text-xs font-extrabold"
+                          jaClassName="block text-[10px] font-semibold text-sky-600/90"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handlePickBackupFile}
+                        disabled={isBackupBusy}
+                        className="py-3 rounded-xl border border-sky-200 bg-white hover:bg-sky-50 text-sky-800 pressable disabled:opacity-60 flex flex-col items-center justify-center gap-1"
+                      >
+                        <Upload className="w-4 h-4" />
+                        <BilingualButtonLabel
+                          en="Restore"
+                          ja="復元する"
+                          enClassName="block text-xs font-extrabold"
+                          jaClassName="block text-[10px] font-semibold text-sky-600/90"
+                        />
+                      </button>
+                    </div>
+                    <input
+                      ref={backupFileInputRef}
+                      type="file"
+                      accept="application/json,.json"
+                      className="hidden"
+                      onChange={(event) => void handleBackupFileSelected(event)}
+                    />
+                    {backupNotice && (
+                      <p className="text-[11px] leading-snug text-sky-900 bg-white/80 border border-sky-100 rounded-xl px-3 py-2">
+                        <span className="font-bold block">{backupNotice.en}</span>
+                        <span className="text-sky-700/90 block mt-0.5">{backupNotice.ja}</span>
+                      </p>
+                    )}
+                  </div>
+
                   <button
                     onClick={handleResetProgress}
                     className="w-full py-3.5 rounded-2xl border border-red-100 bg-red-50/50 hover:bg-red-50 text-red-600 hover:text-red-700 pressable"
@@ -4613,6 +4800,57 @@ export default function Home() {
               >
                 Reset
                 <span className="block text-[10px] font-semibold text-red-100 mt-0.5">リセットする</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RESTORE BACKUP CONFIRM MODAL */}
+      {showRestoreConfirmModal && pendingRestoreBackup && (
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-[32px] p-6 max-w-sm w-full space-y-5 shadow-2xl border border-sky-100 animate-scale-up">
+            <div className="text-center space-y-3">
+              <div className="w-14 h-14 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <Upload className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-black text-slate-900 leading-tight">
+                  Replace current progress with this backup?
+                </h3>
+                <p className="text-sm font-bold text-sky-700">
+                  いまの進捗をバックアップで上書きしますか？
+                </p>
+                <p className="text-xs text-slate-500 leading-relaxed px-2">
+                  {Object.keys(pendingRestoreBackup.data).length} saved items · exported{' '}
+                  {pendingRestoreBackup.exportedAt.slice(0, 10)}
+                  <br />
+                  <span className="text-[10px] text-slate-400">
+                    現在のデータはバックアップの内容に置き換わります。
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRestoreConfirmModal(false);
+                  setPendingRestoreBackup(null);
+                }}
+                className="flex-1 py-3 rounded-2xl text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+              >
+                Cancel
+                <span className="block text-[10px] font-semibold text-slate-400 mt-0.5">キャンセル</span>
+              </button>
+              <button
+                type="button"
+                onClick={performRestoreBackup}
+                disabled={isBackupBusy}
+                className="flex-1 py-3 rounded-2xl text-sm font-extrabold bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-100 pressable disabled:opacity-60"
+              >
+                Restore
+                <span className="block text-[10px] font-semibold text-sky-100 mt-0.5">復元する</span>
               </button>
             </div>
           </div>
