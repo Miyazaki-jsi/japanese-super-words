@@ -58,6 +58,7 @@ import {
   PREMIUM_SCENE_HIGHLIGHTS,
   PREMIUM_SITUATION_COUNT,
 } from '@/data/premiumSituations';
+import { getSituationReading } from '@/data/situationLabels';
 import PhraseLevelBadge from '@/components/PhraseLevelBadge';
 import PhraseLevelLadder from '@/components/PhraseLevelLadder';
 import {
@@ -489,16 +490,32 @@ function situationMatchesQuery(
   sit: { id: string; title: string; enTitle: string },
   rawQuery: string,
 ): boolean {
-  const query = rawQuery.trim().toLowerCase();
+  const query = rawQuery.trim();
   if (!query) return false;
-  const title = sit.title.toLowerCase();
+
+  const readingHira = toHiraganaStr(getSituationReading(sit.id) || sit.title);
   const enTitle = sit.enTitle.toLowerCase();
   const id = sit.id.toLowerCase().replace(/_/g, ' ');
-  if (title.includes(query) || enTitle.includes(query) || id.includes(query)) return true;
-  if (isKanaOrKanjiQuery(rawQuery.trim())) {
-    const queryHira = toHiraganaStr(rawQuery.trim());
-    if (queryHira && toHiraganaStr(sit.title).includes(queryHira)) return true;
+  const queryLower = query.toLowerCase();
+
+  if (enTitle.includes(queryLower) || id.includes(queryLower)) return true;
+  if (sit.title.toLowerCase().includes(queryLower)) return true;
+
+  if (isKanaOrKanjiQuery(query)) {
+    const queryHira = toHiraganaStr(query);
+    if (queryHira && readingHira.startsWith(queryHira)) return true;
+    if (sit.title.startsWith(query)) return true;
+    return false;
   }
+
+  if (isLatinQuery(query)) {
+    const { hira, remainder } = parseRomajiPrefix(queryLower);
+    if (hira || remainder) {
+      if (matchesReadingPrefix(readingHira, hira, remainder)) return true;
+    }
+    return enTitle.startsWith(queryLower) || id.startsWith(queryLower);
+  }
+
   return false;
 }
 
