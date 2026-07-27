@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-07-27-situation-search',
+    date: '2026-07-27',
+    titleEn: 'Search situations',
+    titleJa: 'シチュエーション検索',
+    bodyEn:
+      'On Situations, use the slim search next to More free — type a scene name and tap a suggestion (same style as Review word search).',
+    bodyJa:
+      'シチュエーション画面の「ほかの無料」横に細い検索窓を追加しました。名前を入れると候補が出ます（復習タブの単語検索と同じ操作感）。',
+  },
+  {
     id: '2026-07-27-progress-backup',
     date: '2026-07-27',
     titleEn: 'Backup & restore your progress',
