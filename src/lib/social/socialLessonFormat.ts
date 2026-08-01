@@ -39,9 +39,59 @@ const GLOSSARY: VocabPart[] = [
 
 const PARTICLES = 'でとはをがにのへも';
 
+const DEFAULT_QUESTIONS = [
+  'Have you used this in Japan?',
+  'Would you try saying this out loud?',
+  'Which word is hardest for you here?',
+  'Save or skip — what do you think?',
+];
+
+const SITUATION_QUESTIONS: Partial<Record<string, string[]>> = {
+  coffee_shop: [
+    'Have you ordered coffee in Japanese?',
+    'Would you say this or just point?',
+  ],
+  convenience_store: [
+    'Konbini — have you used this line?',
+    'Which konbini phrase do you need most?',
+  ],
+  ramen_shop: [
+    'Ramen order — confident or nervous?',
+    'Have you said this at a ramen shop?',
+  ],
+  train_station: [
+    'Ever asked this at a station?',
+    'Station stress: which phrase saves you?',
+  ],
+  restaurant_reservation: [
+    'Would you book with this phrase?',
+    'Reservation or walk-in — which are you?',
+  ],
+  hotel: [
+    'Hotel check-in: would this help you?',
+    'Tried this at a hotel front desk?',
+  ],
+  izakaya: [
+    'Izakaya ready? Have you used this?',
+    'Would you try this on your next night out?',
+  ],
+  onsen: [
+    'Onsen rules — does this help?',
+    'Would you ask this before going in?',
+  ],
+  taxi: [
+    'Taxi in Japan — said this before?',
+    'Would you use Japanese or the map?',
+  ],
+  greetings: [
+    'Do you use this greeting already?',
+    'Polite or casual — which do you prefer?',
+  ],
+};
+
 export function sceneOpener(situation: string): string {
   const label = getSituationLabel(situation);
-  return `${label.ja}で使える今日の日本語！`;
+  return `${label.en} Japanese`;
 }
 
 export function phraseForDisplay(japanese: string): string {
@@ -106,90 +156,33 @@ export function formatSpacedReading(word: WordCard, parts: VocabPart[]): string 
   return segments.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
-export function buildContextStory(word: WordCard): string {
-  const ja = word.japanese;
-
-  if (/にんにく.*抜き/.test(ja)) {
-    return `にんにくは超うまい！けど臭い！\nその日にもしデートがあったら口が臭くなって彼女と喋りづらくなる…。\nそんな時に使えるフレーズです。`;
+/** Stable pick from a list based on word id (same word → same question). */
+export function pickEngagementQuestion(word: WordCard): string {
+  const pool = SITUATION_QUESTIONS[word.situation] ?? DEFAULT_QUESTIONS;
+  let hash = 0;
+  for (let i = 0; i < word.id.length; i += 1) {
+    hash = (hash + word.id.charCodeAt(i) * (i + 1)) % 997;
   }
-  if (/わさび.*抜き/.test(ja)) {
-    return `わさびは旨い！けど、思ってるよりキツいことも。\n鼻がツーンとして、会話中に集中できなくなる…。\nそんな時は遠慮なく「抜き」でOK。`;
-  }
-  if (/ネギ.*抜き|ねぎ.*抜き/.test(ja)) {
-    return `ネギ好きな人も多いけど、嫌いな人も結構いる。\n匂いが気になる日や、口の中をスッキリさせたい時に使えます。`;
-  }
-  if (/卵.*抜き/.test(ja)) {
-    return `日本の料理って、意外と卵が入ってる。\nアレルギーがある人は、注文の最初に言っておくと安心。`;
-  }
-  if (/替え玉/.test(ja)) {
-    return `ラーメン、スープ残して麺だけなくなった…。\nそんな時「替え玉」があるお店は神。\n日本だけの文化、知ってるとラーメンが2倍楽しい。`;
-  }
-  if (/食券|券売機/.test(ja)) {
-    return `ラーメン屋、券売機で先に買うタイプ多い。\n並んでる時に慌てないよう、この言葉知っておくと余裕が出る。`;
-  }
-  if (/すみません/.test(ja)) {
-    return `日本では「すみません」が万能。\n呼びかけにも、謝る時にも使える。\n旅行者が最初に覚えるならこれ。`;
-  }
-  if (/お会計|会計/.test(ja)) {
-    return `食べ終わった後、会計どうする？って焦ることある。\nこの1文あれば、スマートに店を出られる。`;
-  }
-  if (/持ち帰り/.test(ja)) {
-    return `食べきれない！でも捨てたくない！\nそんな時「持ち帰り」が使える。\nコンビニでもラーメン屋でも通じる。`;
-  }
-  if (/予約/.test(ja)) {
-    return `人気店、並ばないと入れない。\n「予約」しておけば、現地到着後も余裕。`;
-  }
-  if (/切符|きっぷ/.test(ja)) {
-    return `駅の券売機、初見だと迷子になりがち。\n焦ってる時ほど、短い日本語1文が助けになる。`;
-  }
-  if (/トイレ/.test(ja)) {
-    return `トイレどこ？は旅行者の永遠の悩み。\n短く聞ければ、すぐ解決。`;
-  }
-  if (/荷物/.test(ja)) {
-    return `スーツケース持ち歩き、しんどい。\n「荷物」系のフレーズは、ホテルでも駅でも使える。`;
-  }
-
-  return buildSituationFallbackStory(word);
-}
-
-function buildSituationFallbackStory(word: WordCard): string {
-  const label = getSituationLabel(word.situation);
-  const stories: Partial<Record<string, string>> = {
-    ramen_shop: `ラーメン屋、英語メニューないことも多い。\nでもこの1文覚えれば、注文で困らない。\n${label.ja}デビュー前に保存しておこう。`,
-    convenience_store: `コンビニは日本の生活インフラ。\nレジで聞かれること多いから、短い日本語があるとテンポよく買い物できる。`,
-    train_station: `駅は情報が多すぎてパニックになりやすい。\n短い日本語1文があるだけで、だいぶ落ち着ける。`,
-    izakaya: `居酒屋、メニューが読めなくても注文できる。\nこのフレーズを覚えておけば、現地で「使えた！」となる。`,
-    hotel: `ホテルチェックイン、疲れてる時に英語説明はキツい。\n短い日本語の方が、フロントも助かる。`,
-    sushi_shop: `寿司屋、職人さんとの距離が近い。\n短くはっきり伝えるのが、実は正解。`,
-    taxi: `タクシー、目的地を伝えるだけでも緊張する。\nこのフレーズ、スマホより早いことも。`,
-    onsen: `温泉、ルールが独特。\n知らないと入れないこともあるから、先にフレーズだけ覚えとこう。`,
-    kaiten_sushi: `回転寿司、回ってるだけじゃ注文できない。\n声出し文化、ここで使う。`,
-  };
-
-  return (
-    stories[word.situation] ??
-    `${label.ja}で「使えた！」となるフレーズ。\n現地で困った時、英語より短い日本語の方が通じる。\n今日の1文、保存しておこう。`
-  );
+  return pool[hash % pool.length] ?? DEFAULT_QUESTIONS[0];
 }
 
 export function formatVocabLines(parts: VocabPart[]): string {
   return parts.map((part) => `・${part.ja}（${part.en}）`).join('\n');
 }
 
+/** Short phrase + reading + English + reply-bait question. */
 export function renderDailyJapaneseLesson(word: WordCard, link: string | null): string {
   const parts = extractVocabParts(word);
   const spaced = formatSpacedReading(word, parts);
   const phrase = phraseForDisplay(word.japanese);
+  const question = pickEngagementQuestion(word);
 
   const body = `${sceneOpener(word.situation)}
 「${phrase}」
+${spaced}
+(${word.english})
 
-${buildContextStory(word)}
-
-${formatVocabLines(parts)}
-
-「${spaced}」
-（${word.english}）`;
+${question}`;
 
   if (link) {
     return `${body}\n\n${link}`;

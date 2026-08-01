@@ -18,23 +18,23 @@ export const TEMPLATE_DEFINITIONS: {
 }[] = [
   {
     id: 'save_card',
-    name: '今日の日本語',
-    description: 'Scene opener + relatable story + vocab breakdown + reading',
+    name: 'Short Q',
+    description: 'Scene + phrase + reading + English + reply question (Mon/Wed/Fri)',
   },
   {
     id: 'phrase_note',
-    name: '今日の日本語',
-    description: 'Same lesson format (A/B tested via learning loop)',
+    name: 'Short Q',
+    description: 'Same short question format (A/B via learning loop)',
   },
   {
     id: 'quick_tip',
-    name: '今日の日本語',
-    description: 'Same lesson format (A/B tested via learning loop)',
+    name: 'Short Q',
+    description: 'Same short question format (A/B via learning loop)',
   },
   {
     id: 'situation_bite',
-    name: '今日の日本語',
-    description: 'Same lesson format (A/B tested via learning loop)',
+    name: 'Short Q',
+    description: 'Same short question format (A/B via learning loop)',
   },
 ];
 

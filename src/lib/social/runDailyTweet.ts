@@ -13,7 +13,7 @@ import {
 import type { DailyTweetResult } from './types';
 import { isXAutoPostEnabled, postTweet } from './xClient';
 
-import { todayJapanDate } from './japanDate';
+import { isAutoPostDayJapan, todayJapanDate } from './japanDate';
 
 export async function runDailyTweet(options?: {
   scheduledFor?: string;
@@ -24,6 +24,15 @@ export async function runDailyTweet(options?: {
       ok: false,
       dryRun: true,
       message: 'Supabase is not configured. Run the social SQL in supabase/schema.sql first.',
+    };
+  }
+
+  // Cron: Mon/Wed/Fri only (Japan). Admin force can still generate any day.
+  if (!options?.force && !isAutoPostDayJapan()) {
+    return {
+      ok: true,
+      dryRun: !isXAutoPostEnabled(),
+      message: 'Skipped: auto-post runs Mon/Wed/Fri (Japan time) only.',
     };
   }
 
