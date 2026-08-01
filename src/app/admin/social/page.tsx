@@ -122,7 +122,7 @@ function PageHeader() {
         </p>
         <h1 className="mt-2 text-3xl font-bold text-white">X 自動投稿</h1>
           <p className="mt-2 text-sm text-slate-400">
-            月・水・金のみ · 短いフレーズ + 英語の質問（リプ誘発）
+            月・金＝短いフレーズ / 水＝AIプロンプト（スレッド）
           </p>
       </div>
 

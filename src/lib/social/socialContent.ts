@@ -2,6 +2,7 @@ import { sampleWords, type WordCard } from '@/data/words';
 import { APP_BASE_URL, LINK_EVERY_N_POSTS, TWEET_MAX_LENGTH } from './constants';
 import { renderDailyJapaneseLesson } from './socialLessonFormat';
 import type { GeneratedTweet, SocialTemplateId } from './types';
+import { pickWowPromptForDate, renderWowPromptThread, type WowPrompt } from './wowPrompts';
 
 function buildAppLink(situation: string, templateId: SocialTemplateId, wordId: string): string {
   const url = new URL(APP_BASE_URL);
@@ -69,6 +70,35 @@ export function buildTweet(
     situation: word.situation,
     tweetText,
     linkUrl,
+  };
+}
+
+export type WowGeneratedTweet = GeneratedTweet & {
+  threadReply: string;
+  wowPrompt: WowPrompt;
+};
+
+/** Wednesday wow-prompt thread (parent + reply with full prompt). */
+export function buildWowPromptTweet(
+  scheduledFor: string,
+  templateId: SocialTemplateId = 'quick_tip'
+): WowGeneratedTweet {
+  const wowPrompt = pickWowPromptForDate(scheduledFor);
+  const thread = renderWowPromptThread(wowPrompt);
+  const tweetText = `${thread.parent}
+
+---
+REPLY:
+${thread.reply}`;
+
+  return {
+    templateId,
+    wordId: wowPrompt.id,
+    situation: 'ai_prompt',
+    tweetText,
+    linkUrl: '',
+    threadReply: thread.reply,
+    wowPrompt,
   };
 }
 

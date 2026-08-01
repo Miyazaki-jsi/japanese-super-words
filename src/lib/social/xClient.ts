@@ -71,12 +71,16 @@ function buildOAuth1Header(method: string, url: string): string {
   return `OAuth ${headerValue}`;
 }
 
-export async function postTweet(text: string): Promise<XPostResult> {
+export async function postTweet(text: string, replyToId?: string): Promise<XPostResult> {
   if (!isXApiConfigured() || !isXAutoPostEnabled()) {
     return { ok: true, dryRun: true };
   }
 
   const url = `${X_API_BASE}/2/tweets`;
+  const body: { text: string; reply?: { in_reply_to_tweet_id: string } } = { text };
+  if (replyToId) {
+    body.reply = { in_reply_to_tweet_id: replyToId };
+  }
 
   try {
     const response = await fetch(url, {
@@ -85,7 +89,7 @@ export async function postTweet(text: string): Promise<XPostResult> {
         Authorization: buildOAuth1Header('POST', url),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(body),
     });
 
     const payload = (await response.json()) as {
