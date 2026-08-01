@@ -306,7 +306,7 @@ export default function SocialAdminPanel({
         </div>
         {!xApiConfigured ? (
           <p className="mt-4 text-sm text-slate-400">
-            APIキーがなくても、毎朝8時（JST）に下書きが自動生成されます。ここからコピーして手動投稿できます。
+            APIキーがなくても、月・水・金の朝8時（JST）に下書きが自動生成されます。ここからコピーして手動投稿できます。
           </p>
         ) : null}
         {xApiConfigured ? (
