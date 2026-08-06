@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { getAdminStats } from '@/lib/analyticsServer';
 import { isAdminAuthConfigured } from '@/lib/adminAuth';
+import { isGumroadAccessTokenConfigured } from '@/lib/gumroadSync';
 import { isAnalyticsDbConfigured } from '@/lib/supabaseServer';
 import AdminLogoutButton from './AdminLogoutButton';
+import GumroadSyncButton from './GumroadSyncButton';
 
 function formatMoney(cents: number, currency: string): string {
   try {
@@ -103,6 +105,7 @@ export default async function AdminDashboardPage({
   const stats = await getAdminStats(periodDays);
   const authConfigured = isAdminAuthConfigured();
   const dbConfigured = isAnalyticsDbConfigured();
+  const gumroadSyncConfigured = isGumroadAccessTokenConfigured();
 
   const funnelMax = Math.max(
     stats.unlockModalShown,
@@ -248,6 +251,10 @@ export default async function AdminDashboardPage({
             )}
           </div>
         </div>
+      </section>
+
+      <section className="mt-8">
+        <GumroadSyncButton configured={gumroadSyncConfigured} />
       </section>
 
       <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
