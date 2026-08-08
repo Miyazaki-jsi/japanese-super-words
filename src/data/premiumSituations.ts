@@ -390,6 +390,16 @@ export const allPremiumSituations: PremiumSituationMeta[] = [
     previewPhraseJa: '一番好きな食べ物は何？',
     previewPhraseEn: "What's your favorite food?",
   },
+  {
+    id: 'chou_tsukau',
+    title: '超使うフレーズ',
+    enTitle: 'Super Useful Phrases',
+    icon: Sparkles,
+    category: 'daily_life',
+    sortOrder: 15,
+    previewPhraseJa: '気にしないで。',
+    previewPhraseEn: "Don't worry about it.",
+  },
 
   // Fun & Nightlife (12)
   {

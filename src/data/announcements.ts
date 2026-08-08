@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-08-08-chou-tsukau',
+    date: '2026-08-08',
+    titleEn: 'New Pro scene: Super Useful Phrases',
+    titleJa: '新Proシチュ：超使うフレーズ',
+    bodyEn:
+      'Japan Pro now includes Super Useful Phrases — 30 everyday lines like “Ki ni shinaide,” “Osaki ni,” “Tasukatta,” and soft refusals from real Japanese conversation.',
+    bodyJa:
+      'Japan Pro に「超使うフレーズ」を追加しました。「気にしないで」「お先に」「助かった」など、日常で超使う会話フレーズ30個です。',
+  },
+  {
     id: '2026-08-08-suki-kirai',
     date: '2026-08-08',
     titleEn: 'New Pro scene: Like or Dislike?',
