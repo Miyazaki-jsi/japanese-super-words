@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-08-08-suki-kirai',
+    date: '2026-08-08',
+    titleEn: 'New Pro scene: Like or Dislike?',
+    titleJa: '新Proシチュ：すき？きらい？',
+    bodyEn:
+      'Japan Pro now includes Like or Dislike? — 30 real conversation phrases about favorites, pet peeves, food, and indoor vs outdoor (from our YouTube episode).',
+    bodyJa:
+      'Japan Pro に「すき？きらい？」を追加しました。好き・嫌い・食べ物・インドア／アウトドアなど、動画で出てくる会話フレーズ30個です。',
+  },
+  {
     id: '2026-08-08-japanese-table',
     date: '2026-08-08',
     titleEn: 'New Pro scene: Japanese Dinner Table',

@@ -4,6 +4,7 @@ import { premiumExtraSituationWords } from './premiumExtraSituationWords';
 import { premiumBatch2SituationWords } from './premiumBatch2SituationWords';
 import { premiumRyokanWords } from './premiumRyokanWords';
 import { premiumJapaneseTableWords } from './premiumJapaneseTableWords';
+import { premiumSukiKiraiWords } from './premiumSukiKiraiWords';
 import { hatsumodePackWords } from './hatsumodePackWords';
 
 export type SituationId =
@@ -58,6 +59,7 @@ export type SituationId =
   | 'photo_etiquette'
   | 'ryokan'
   | 'japanese_table'
+  | 'suki_kirai'
   | 'asking_for_directions';
 
 export interface WordCard {
@@ -900,5 +902,6 @@ export const sampleWords: WordCard[] = [
   ...premiumBatch2SituationWords,
   ...premiumRyokanWords,
   ...premiumJapaneseTableWords,
+  ...premiumSukiKiraiWords,
   ...hatsumodePackWords,
 ];

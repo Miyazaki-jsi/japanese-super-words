@@ -380,6 +380,16 @@ export const allPremiumSituations: PremiumSituationMeta[] = [
     previewPhraseJa: '肉じゃが',
     previewPhraseEn: 'Meat-and-potato stew',
   },
+  {
+    id: 'suki_kirai',
+    title: 'すき？きらい？',
+    enTitle: 'Like or Dislike?',
+    icon: Heart,
+    category: 'daily_life',
+    sortOrder: 14,
+    previewPhraseJa: '一番好きな食べ物は何？',
+    previewPhraseEn: "What's your favorite food?",
+  },
 
   // Fun & Nightlife (12)
   {
