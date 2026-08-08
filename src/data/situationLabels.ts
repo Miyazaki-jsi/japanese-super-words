@@ -53,6 +53,7 @@ export const SITUATION_LABELS: Record<SituationId, SituationLabel> = {
   tachinomi: { ja: '立ち飲み', en: 'Standing Bar', reading: 'たちのみ' },
   photo_etiquette: { ja: '撮影マナー', en: 'Photo Etiquette', reading: 'さつえいまなー' },
   ryokan: { ja: '旅館', en: 'Ryokan', reading: 'りょかん' },
+  japanese_table: { ja: '日本人の食卓', en: 'Japanese Dinner Table', reading: 'にほんじんのしょくたく' },
   asking_for_directions: { ja: '道を尋ねる', en: 'Asking for Directions', reading: 'みちをたずねる' },
 };
 

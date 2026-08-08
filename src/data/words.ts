@@ -3,6 +3,7 @@ import { premiumNewSituationWords } from './premiumNewSituationWords';
 import { premiumExtraSituationWords } from './premiumExtraSituationWords';
 import { premiumBatch2SituationWords } from './premiumBatch2SituationWords';
 import { premiumRyokanWords } from './premiumRyokanWords';
+import { premiumJapaneseTableWords } from './premiumJapaneseTableWords';
 import { hatsumodePackWords } from './hatsumodePackWords';
 
 export type SituationId =
@@ -56,6 +57,7 @@ export type SituationId =
   | 'tachinomi'
   | 'photo_etiquette'
   | 'ryokan'
+  | 'japanese_table'
   | 'asking_for_directions';
 
 export interface WordCard {
@@ -897,5 +899,6 @@ export const sampleWords: WordCard[] = [
   ...premiumExtraSituationWords,
   ...premiumBatch2SituationWords,
   ...premiumRyokanWords,
+  ...premiumJapaneseTableWords,
   ...hatsumodePackWords,
 ];

@@ -370,6 +370,16 @@ export const allPremiumSituations: PremiumSituationMeta[] = [
     previewPhraseJa: 'アメリカまで送れますか？',
     previewPhraseEn: 'Can you send this to the US?',
   },
+  {
+    id: 'japanese_table',
+    title: '日本人の食卓',
+    enTitle: 'Japanese Dinner Table',
+    icon: UtensilsCrossed,
+    category: 'daily_life',
+    sortOrder: 13,
+    previewPhraseJa: '肉じゃが',
+    previewPhraseEn: 'Meat-and-potato stew',
+  },
 
   // Fun & Nightlife (12)
   {

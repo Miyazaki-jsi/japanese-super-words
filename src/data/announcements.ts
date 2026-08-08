@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-08-08-japanese-table',
+    date: '2026-08-08',
+    titleEn: 'New Pro scene: Japanese Dinner Table',
+    titleJa: '新Proシチュ：日本人の食卓',
+    bodyEn:
+      'Japan Pro now includes Japanese Dinner Table — 30 everyday foods from a real Japanese home dinner (rice, fish, curry, nikujaga, natto, and more).',
+    bodyJa:
+      'Japan Pro に「日本人の食卓」を追加しました。ご飯・魚・カレー・肉じゃが・納豆など、家庭の夜ごはんでよく出る食べ物の単語30個です。',
+  },
+  {
     id: '2026-07-27-situation-search',
     date: '2026-07-27',
     titleEn: 'Search situations',
