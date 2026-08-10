@@ -59,6 +59,7 @@ import {
   PREMIUM_SITUATION_COUNT,
 } from '@/data/premiumSituations';
 import { getSituationReading } from '@/data/situationLabels';
+import { isSituationNew } from '@/data/situationAddedAt';
 import PhraseLevelBadge from '@/components/PhraseLevelBadge';
 import PhraseLevelLadder from '@/components/PhraseLevelLadder';
 import {
@@ -484,6 +485,16 @@ function wordMatchesQuery(card: WordCard, rawQuery: string): boolean {
   }
 
   return false;
+}
+
+function SituationNewBadge({ className = '' }: { className?: string }) {
+  return (
+    <span
+      className={`rounded bg-emerald-500 px-1 py-[1px] text-[7px] font-black uppercase tracking-wide text-white shadow-sm ${className}`}
+    >
+      New
+    </span>
+  );
 }
 
 function situationMatchesQuery(
@@ -2697,8 +2708,13 @@ export default function Home() {
                                   <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <Icon className="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
                                     <div className="min-w-0">
-                                      <p className="text-xs font-extrabold text-slate-800 truncate">
-                                        {jaOnly ? sit.title : sit.enTitle}
+                                      <p className="text-xs font-extrabold text-slate-800 truncate flex items-center gap-1.5">
+                                        <span className="truncate">
+                                          {jaOnly ? sit.title : sit.enTitle}
+                                        </span>
+                                        {isSituationNew(sit.id) && (
+                                          <SituationNewBadge className="flex-shrink-0" />
+                                        )}
                                       </p>
                                       {!jaOnly && (
                                         <p className="text-[10px] text-slate-500 font-semibold truncate">
@@ -2741,7 +2757,7 @@ export default function Home() {
                           }}
                           className="bg-white rounded-xl border border-slate-100 shadow-sm px-2.5 py-2 text-left hover:border-indigo-100 hover:shadow-md transition-all group flex flex-col justify-between h-20"
                         >
-                          <div className="flex justify-between items-start w-full">
+                          <div className="flex justify-between items-start w-full gap-1">
                             <div className="min-w-0 flex-1">
                               <h4 className="font-extrabold text-slate-900 text-[11px] sm:text-xs leading-tight truncate">
                                 {jaOnly ? sit.title : sit.enTitle}
@@ -2750,7 +2766,10 @@ export default function Home() {
                                 <p className="text-[8px] text-slate-400 font-medium truncate">{sit.title}</p>
                               )}
                             </div>
-                            <Icon className="w-3.5 h-3.5 text-indigo-500/80 group-hover:scale-110 transition-transform ml-1 flex-shrink-0" />
+                            <div className="flex flex-col items-end gap-0.5 flex-shrink-0 ml-1">
+                              {isSituationNew(sit.id) && <SituationNewBadge />}
+                              <Icon className="w-3.5 h-3.5 text-indigo-500/80 group-hover:scale-110 transition-transform" />
+                            </div>
                           </div>
                           <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 font-mono mt-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -2844,11 +2863,14 @@ export default function Home() {
                                         </p>
                                       )}
                                     </div>
-                                    {isPremiumUnlocked ? (
-                                      <Icon className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                                    ) : (
-                                      <Lock className="w-3 h-3 text-amber-500/60 flex-shrink-0" />
-                                    )}
+                                    <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                                      {isSituationNew(sit.id) && <SituationNewBadge />}
+                                      {isPremiumUnlocked ? (
+                                        <Icon className="w-3.5 h-3.5 text-amber-500" />
+                                      ) : (
+                                        <Lock className="w-3 h-3 text-amber-500/60" />
+                                      )}
+                                    </div>
                                   </div>
                                   <div className="mt-1">
                                     {isPremiumUnlocked ? (
