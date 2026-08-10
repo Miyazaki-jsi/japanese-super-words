@@ -3,11 +3,15 @@ import nodemailer from 'nodemailer';
 
 const CONTACT_TO = 'kangtaizhangfeng98@gmail.com';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const name = typeof body.name === 'string' ? body.name.trim() : '';
     const message = typeof body.message === 'string' ? body.message.trim() : '';
+    const emailRaw = typeof body.email === 'string' ? body.email.trim() : '';
+    const email = emailRaw || '';
 
     if (!name) {
       return NextResponse.json(
@@ -21,6 +25,27 @@ export async function POST(request: Request) {
         { error: '名前は100文字以内で入力してください。 / Name must be 100 characters or less.' },
         { status: 400 }
       );
+    }
+
+    if (email) {
+      if (email.length > 200) {
+        return NextResponse.json(
+          {
+            error:
+              'メールアドレスは200文字以内で入力してください。 / Email must be 200 characters or less.',
+          },
+          { status: 400 }
+        );
+      }
+      if (!EMAIL_RE.test(email)) {
+        return NextResponse.json(
+          {
+            error:
+              'メールアドレスの形式が正しくありません。 / Please enter a valid email address.',
+          },
+          { status: 400 }
+        );
+      }
     }
 
     if (!message) {
@@ -63,11 +88,14 @@ export async function POST(request: Request) {
       auth: { user, pass },
     });
 
+    const emailLine = email ? `メール: ${email}\n` : 'メール: （未入力・返信不可）\n';
+
     await transporter.sendMail({
       from: `"Japanese Super Words" <${user}>`,
       to: CONTACT_TO,
+      ...(email ? { replyTo: email } : {}),
       subject: `[Japanese Super Words] ${name} さんからのメッセージ`,
-      text: `Japanese Super Words アプリからメッセージが届きました。\n\n名前: ${name}\n\n---\n\n${message}`,
+      text: `Japanese Super Words アプリからメッセージが届きました。\n\n名前: ${name}\n${emailLine}\n---\n\n${message}`,
     });
 
     return NextResponse.json({ success: true });

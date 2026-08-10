@@ -125,13 +125,15 @@ export default function PrivacyPage() {
 
             <Section titleEn="4. Contact form" titleJa="4. お問い合わせフォーム">
               <p>
-                If you send a message through Settings, we receive your <strong>name</strong> and{' '}
-                <strong>message text</strong> by email. Please do not include passwords or payment
-                card numbers.
+                If you send a message through Settings, we receive your <strong>name</strong>,{' '}
+                <strong>message text</strong>, and optionally your <strong>email</strong> (only if
+                you enter it). Email is used only to reply when we can. Please do not include
+                passwords or payment card numbers.
               </p>
               <p className="text-slate-500">
                 設定画面からメッセージを送信した場合、<strong>お名前</strong>と
-                <strong>メッセージ内容</strong>がメールで運営者に届きます。パスワードやクレジットカード番号は入力しないでください。
+                <strong>メッセージ内容</strong>、任意で入力した<strong>メールアドレス</strong>
+                がメールで運営者に届きます。メールは返信のためにのみ使います。パスワードやクレジットカード番号は入力しないでください。
               </p>
             </Section>
 

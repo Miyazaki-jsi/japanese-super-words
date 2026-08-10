@@ -702,6 +702,7 @@ export default function Home() {
   const backupFileInputRef = useRef<HTMLInputElement>(null);
   const [messageStep, setMessageStep] = useState<MessageStep | null>(null);
   const [messageName, setMessageName] = useState('');
+  const [messageEmail, setMessageEmail] = useState('');
   const [messageBody, setMessageBody] = useState('');
   const [messageFormError, setMessageFormError] = useState('');
   const [messageSendError, setMessageSendError] = useState('');
@@ -1211,6 +1212,7 @@ export default function Home() {
   const resetMessageFlow = () => {
     setMessageStep(null);
     setMessageName('');
+    setMessageEmail('');
     setMessageBody('');
     setMessageFormError('');
     setMessageSendError('');
@@ -1224,6 +1226,7 @@ export default function Home() {
 
   const handleOpenMessageForm = () => {
     setMessageName(userName === 'ゲスト' ? '' : userName);
+    setMessageEmail('');
     setMessageBody('');
     setMessageFormError('');
     setMessageSendError('');
@@ -1233,6 +1236,7 @@ export default function Home() {
   const handleReportBug = () => {
     setShowSettingsModal(true);
     setMessageName(userName === 'ゲスト' ? '' : userName);
+    setMessageEmail('');
     setMessageBody('');
     setMessageFormError('');
     setMessageSendError('');
@@ -1244,6 +1248,21 @@ export default function Home() {
     if (!messageName.trim()) {
       setMessageFormError('名前を入力してください。 / Please enter your name.');
       return;
+    }
+    const email = messageEmail.trim();
+    if (email) {
+      if (email.length > 200) {
+        setMessageFormError(
+          'メールアドレスは200文字以内で入力してください。 / Email must be 200 characters or less.'
+        );
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setMessageFormError(
+          'メールアドレスの形式が正しくありません。 / Please enter a valid email address.'
+        );
+        return;
+      }
     }
     if (!messageBody.trim()) {
       setMessageFormError('メッセージを入力してください。 / Please enter a message.');
@@ -1263,6 +1282,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: messageName.trim(),
+          email: messageEmail.trim(),
           message: messageBody.trim(),
         }),
       });
@@ -4377,6 +4397,39 @@ export default function Home() {
 
                     <div className="space-y-1.5">
                       <label
+                        htmlFor="message-email"
+                        className="block text-xs font-bold text-slate-600"
+                      >
+                        <BiLine en="Email (optional)" ja="メール（任意）" />
+                      </label>
+                      <input
+                        id="message-email"
+                        type="email"
+                        value={messageEmail}
+                        onChange={(e) => setMessageEmail(e.target.value)}
+                        maxLength={200}
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-300"
+                      />
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
+                        {jaOnly ? (
+                          '入れると、ワンチャン返事がくるかも？ なくても送れます。'
+                        ) : (
+                          <>
+                            Add it if you&apos;d like a reply someday (no promises). You can still
+                            send without it.
+                            <br />
+                            <span className="text-[10px] text-slate-400">
+                              入れると、ワンチャン返事がくるかも？ なくても送れます。
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label
                         htmlFor="message-body"
                         className="block text-xs font-bold text-slate-600"
                       >
@@ -4423,6 +4476,18 @@ export default function Home() {
                       </p>
                       <p className="text-sm font-extrabold text-slate-800 mt-1 break-words">
                         {messageName.trim()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <BiLine en="Email" ja="メール" />
+                      </p>
+                      <p className="text-sm font-extrabold text-slate-800 mt-1 break-words">
+                        {messageEmail.trim()
+                          ? messageEmail.trim()
+                          : jaOnly
+                            ? '（なし・返信なし）'
+                            : '(none — no reply)'}
                       </p>
                     </div>
                     <div>
@@ -4496,6 +4561,19 @@ export default function Home() {
                     {!jaOnly && (
                       <p className="text-xs font-semibold text-emerald-600/90 mt-0.5">
                         メッセージを送信しました。ありがとうございます！
+                      </p>
+                    )}
+                    {messageEmail.trim() ? (
+                      <p className="text-[11px] font-semibold text-emerald-700/80 leading-relaxed pt-1">
+                        {jaOnly
+                          ? 'メールを入れてくれたので、返事できるときは送ります（必ずではないよ）。'
+                          : 'You left an email — we may reply when we can (no promises).'}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] font-semibold text-emerald-700/80 leading-relaxed pt-1">
+                        {jaOnly
+                          ? 'メールなしなので、こちらから返事はできません。'
+                          : 'No email left, so we can’t reply from here.'}
                       </p>
                     )}
                   </div>
