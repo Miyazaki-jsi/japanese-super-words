@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-08-10-contact-email',
+    date: '2026-08-10',
+    titleEn: 'Optional email on messages',
+    titleJa: 'メッセージにメール（任意）を追加',
+    bodyEn:
+      'In Settings → Send a Message, you can leave an email if you’d like a reply someday (no promises). You can still send without it.',
+    bodyJa:
+      '設定の「メッセージを送る」に、メールアドレス（任意）を追加しました。入れるとワンチャン返事がくるかも？ なくても送れます。',
+  },
+  {
     id: '2026-08-08-chou-tsukau',
     date: '2026-08-08',
     titleEn: 'New Pro scene: Super Useful Phrases',
