@@ -11,6 +11,16 @@ export type Announcement = {
 /** Newest first. Add new entries at the top. */
 export const announcements: Announcement[] = [
   {
+    id: '2026-08-10-payment-methods',
+    date: '2026-08-10',
+    titleEn: 'Payment note: no PayPal',
+    titleJa: 'お支払いについて（PayPal不可）',
+    bodyEn:
+      'PayPal is not available on Gumroad for this product. Please pay by card (Apple Pay / Google Pay may appear on supported devices).',
+    bodyJa:
+      'PayPalでは払えません。カードでお支払いください（対応端末では Apple Pay／Google Pay も使えることがあります）。',
+  },
+  {
     id: '2026-08-10-contact-email',
     date: '2026-08-10',
     titleEn: 'Optional email on messages',

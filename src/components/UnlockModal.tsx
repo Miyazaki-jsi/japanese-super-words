@@ -344,16 +344,28 @@ export default function UnlockModal({
             </ul>
 
             {gumroadUrl ? (
-              <a
-                href={gumroadUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleGumroadClick}
-                className="btn-press pressable flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black text-sm shadow-lg shadow-indigo-200"
-              >
-                Buy on Gumroad
-                <ExternalLink className="w-4 h-4" />
-              </a>
+              <>
+                <a
+                  href={gumroadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleGumroadClick}
+                  className="btn-press pressable flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black text-sm shadow-lg shadow-indigo-200"
+                >
+                  Buy on Gumroad
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5 text-center space-y-0.5">
+                  <p className="text-[10px] font-bold text-slate-600 leading-snug">
+                    PayPal is not available. Please pay by card (Apple Pay / Google Pay may appear on
+                    supported devices).
+                  </p>
+                  <p className="text-[9px] font-semibold text-slate-400 leading-snug">
+                    PayPalでは払えません。カードでお支払いください（対応端末では Apple Pay／Google
+                    Pay も使えることがあります）。
+                  </p>
+                </div>
+              </>
             ) : (
               <div className="rounded-xl bg-amber-50 border border-amber-100 px-3 py-2.5 text-[10px] font-semibold text-amber-800 text-center">
                 Store link coming soon — use your unlock code below
